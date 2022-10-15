@@ -15,6 +15,7 @@ now=`date +%Y%m%d%H%M%S`
 cd ${SCRIPT_DIR}
 ./venv/bin/pip3 freeze > ./requirements.txt
 chmod 664 ./requirements.txt
+rm -rf ./venv
 rm -rf ./__pycache__
 rm -rf ./tmp/*
 rm -f ./var/uuid
