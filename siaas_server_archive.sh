@@ -21,7 +21,7 @@ rm -rf ./var
 sudo chown -R ${bak_user}:${bak_group} .
 
 cd ..
-tar  --exclude='siaas-server/venv' --exclude='siaas-server/.git*' -cpzf ./siaas-server-${now}.tgz siaas-server
+tar --exclude='siaas-server/venv' --exclude='siaas-server/.git*' -cpzf ./siaas-server-${now}.tgz siaas-server
 chown ${bak_user}:${bak_group} siaas-server-${now}.tgz
 chmod 664 siaas-server-${now}.tgz
 
