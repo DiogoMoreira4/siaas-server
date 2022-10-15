@@ -8,8 +8,6 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 cd ${SCRIPT_DIR}
-mkdir -p tmp
-mkdir -p conf
 
 apt-get update
 apt-get install -y python3 python3-pip python3-venv git mongodb
