@@ -14,10 +14,14 @@ mkdir -p conf
 apt-get update
 apt-get install -y python3 python3-pip python3-venv git mongodb
 
+python3 -m venv ./venv
+source ./venv/bin/activate
+pip3 install wheel==0.37.1
+pip3 install -r ./requirements.txt
+
 sed -i 's|bind_ip[[:space:]]*=[[:space:]]*127.0.0.1|bind_ip = 0.0.0.0|g' /etc/mongodb.conf
 systemctl restart mongodb
 systemctl enable mongodb
 
 ln -fs ${SCRIPT_DIR}/siaas_server_run.sh /usr/local/bin/
 ln -fs ${SCRIPT_DIR}/siaas_server_kill.sh /usr/local/bin/
-ln -fs ${SCRIPT_DIR}/siaas_server_archive.sh /usr/local/bin/
