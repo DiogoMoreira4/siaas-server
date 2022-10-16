@@ -8,7 +8,7 @@ By João Pedro Seara, supervised by teacher Carlos Serrão (PhD).
 
 __
 
-**Instructions for Ubuntu 20.04 "Focal"**
+**Instructions (tested on Ubuntu 20.04 "Focal")**
 
  - Set up system and Pyhon packages: `sudo ./siaas_server_install_system_packages.sh`
  
