@@ -9,9 +9,5 @@ fi
 
 cd ${SCRIPT_DIR}
 
-mkdir -p conf
-mkdir -p tmp
-mkdir -p var
-
 source ./venv/bin/activate
 python3 ./siaas_server.py
