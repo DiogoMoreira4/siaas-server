@@ -10,16 +10,16 @@ from copy import copy
 logger = logging.getLogger(__name__)
 
 
-def create_or_update_agent_configs(db_collection=None, agent_uuid=None, config_dict={}):
+def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_dict={}):
 
     if db_collection == None:
         logger.error(
             "No valid DB collection object received. No data was uploaded.")
         return False
 
-    if agent_uuid == None:
+    if agent_uid == None:
         logger.error(
-            "No valid agent UUID received. No data was uploaded.")
+            "No valid agent UID received. No data was uploaded.")
         return False
 
     if type(config_dict) is not dict:
@@ -27,8 +27,8 @@ def create_or_update_agent_configs(db_collection=None, agent_uuid=None, config_d
             "No valid dict received. No data was uploaded.")
         return False
 
-    #siaas_uuid = siaas_aux.get_or_create_unique_system_id()
-    siaas_uuid = "1"
+    #siaas_uid = siaas_aux.get_or_create_unique_system_id()
+    siaas_uid = "1"
 
     # Creating a new dict with a date object and date transfer direction so we can easily filter it and order entries in MongoDB
 
@@ -43,8 +43,8 @@ def create_or_update_agent_configs(db_collection=None, agent_uuid=None, config_d
     complete_dict = {}
     complete_dict["payload"] = dict(config_dict)
     complete_dict["timestamp"] = siaas_aux.get_now_utc_obj()
-    complete_dict["origin"] = "server_"+siaas_uuid
-    complete_dict["destiny"] = "agent_"+agent_uuid
+    complete_dict["origin"] = "server_"+siaas_uid
+    complete_dict["destiny"] = "agent_"+agent_uid
     complete_dict["scope"] = "agent_configs"
 
     ret_db = False
@@ -135,9 +135,9 @@ if __name__ == "__main__":
     MONGO_DB = "siaas"
     MONGO_COLLECTION = "siaas"
 
-    #siaas_uuid = siaas_aux.get_or_create_unique_system_id()
-    # siaas_uuid = "00000000-0000-0000-0000-000000000000" # hack to show data from all servers
-    siaas_uuid = "1"
+    #siaas_uid = siaas_aux.get_or_create_unique_system_id()
+    # siaas_uid = "00000000-0000-0000-0000-000000000000" # hack to show data from all servers
+    siaas_uid = "1"
 
     config = {
         "data_transfer_loop_interval_sec": 60,
@@ -157,16 +157,16 @@ if __name__ == "__main__":
 
     #bc_config = {}
 
-    agent_uuid = "0924aa8b-6dc9-4fec-9716-d1601fc8b6c6"
+    agent_uid = "0924aa8b-6dc9-4fec-9716-d1601fc8b6c6"
 
     collection = siaas_aux.connect_mongodb_collection(
         MONGO_USER, MONGO_PWD, MONGO_HOST+":"+MONGO_PORT, MONGO_DB, MONGO_COLLECTION)
 
-    create_or_update_agent_configs(collection, agent_uuid, config)
+    create_or_update_agent_configs(collection, agent_uid, config)
     create_or_update_agent_configs(
         collection, "ffffffff-ffff-ffff-ffff-ffffffffffff", bc_config)
 
-    cursor = siaas_aux.read_mongodb_collection(collection, agent_uuid)
+    cursor = siaas_aux.read_mongodb_collection(collection, agent_uid)
     #cursor = siaas_aux.read_mongodb_collection(collection, "ffffffff-ffff-ffff-ffff-ffffffffffff")
 
     if cursor != None:

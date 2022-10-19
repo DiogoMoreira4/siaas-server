@@ -103,26 +103,26 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
     return write_to_local_file(os.path.join(sys.path[0], 'var/config.db'), config_dict)
 
 
-def read_mongodb_collection(collection, siaas_uuid="00000000-0000-0000-0000-000000000000"):
+def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-000000000000"):
     """
     Reads data from the Mongo DB collection
-    If the UUID is "nil" it will return all records. Else, it will return records only for the inputted UUID
+    If the UID is "nil" it will return all records. Else, it will return records only for the inputted UID
     Returns a list of records. Returns None if data can't be read
     """
     logger.info("Reading data from the remote DB server ...")
     try:
 
-        if(siaas_uuid == "00000000-0000-0000-0000-000000000000"):
+        if(siaas_uid == "00000000-0000-0000-0000-000000000000"):
             # cursor = collection.find() # show all raw
             cursor = collection.find().sort('_id', -1).limit(5)  # show only most recent raw
             # cursor = collection.find({},{'_id': False}).sort('_id', -1).limit(5) # show only most recent, hide object id, direction and timestamp
         else:
             # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1) # show most recent first
-            # cursor = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uuid}).sort('_id', -1) # show most recent first
+            # cursor = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}).sort('_id', -1) # show most recent first
             cursor = collection.find({"payload": {'$exists': True}, "destiny": {'$in': [
-                                     "agent_"+siaas_uuid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
+                                     "agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
             # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1).limit(5)  # show only the 5 most recent
-            # cursor = collection.find({"payload": {'$exists': True}, "origin":"server_"+siaas_uuid},{'_id': False}).sort('_id', -1).limit(5) # same, but only for the UUID of this server
+            # cursor = collection.find({"payload": {'$exists': True}, "origin":"server_"+siaas_uid},{'_id': False}).sort('_id', -1).limit(5) # same, but only for the UID of this server
             # cursor = collection.find({"payload.agent.platform.system.os": "Linux" },{'_id': False}).sort('_id', -1).limit(5) # show only most recent for agents running on Linux
 
         results = list(cursor)
@@ -234,70 +234,70 @@ def read_from_local_file(file_to_read):
 
 def get_or_create_unique_system_id():
     """
-    Reads the local UUID file and returns it
-    If this file does not exist or has no data, continues to generate an UUID. If it has an invalid UUID, it will return a nil UUID
-    Proceeds to try to generate an UUID from local system data
+    Reads the local UID file and returns it
+    If this file does not exist or has no data, continues to generate an UID. If it has an invalid UID, it will return a nil UID
+    Proceeds to try to generate an UID from local system data
     If this fails, generates a random one
-    If all fails, returns a nil UUID
+    If all fails, returns a nil UID
     """
     logger.debug(
-        "Searching for an existing UUID and creating a new one if it doesn't exist ...")
+        "Searching for an existing UID and creating a new one if it doesn't exist ...")
     try:
-        with open(os.path.join(sys.path[0], 'var/uuid'), 'r') as file:
+        with open(os.path.join(sys.path[0], 'var/uid'), 'r') as file:
             content = file.read()
             if len(content or '') == 0:
                 raise IOError(
-                    "Nothing valid could be read from local UUID file.")
+                    "Nothing valid could be read from local UID file.")
             if content.split('\n')[0] == "ffffffff-ffff-ffff-ffff-ffffffffffff":
                 logger.warning(
-                    "Invalid ID, reserved for broadcast. Returning a nil UUID.")
+                    "Invalid ID, reserved for broadcast. Returning a nil UID.")
                 return "00000000-0000-0000-0000-000000000000"
-            logger.debug("Reusing existing UUID: "+str(content))
+            logger.debug("Reusing existing UID: "+str(content))
             return content.split('\n')[0]
     except:
         pass
     logger.debug(
-        "Existing UUID not found. Creating a new one from system info ...")
-    new_uuid = ""
+        "Existing UID not found. Creating a new one from system info ...")
+    new_uid = ""
     try:
         with open("/sys/class/dmi/id/board_serial", 'r') as file:
             content = file.read()
-            new_uuid = content.split('\n')[0]
+            new_uid = content.split('\n')[0]
     except:
         pass
-    if len(new_uuid) == 0:
+    if len(new_uid) == 0:
         try:
             with open("/sys/class/dmi/id/product_uuid", 'r') as file:
                 content = file.read()
-                new_uuid = content.split('\n')[0]
+                new_uid = content.split('\n')[0]
         except:
             pass
-    if len(new_uuid) == 0:
+    if len(new_uid) == 0:
         try:
             with open("/var/lib/dbus/machine-id", 'r') as file:
                 content = file.read()
-                new_uuid = content.split('\n')[0]
+                new_uid = content.split('\n')[0]
         except:
             pass
-    if len(new_uuid) == 0:
+    if len(new_uid) == 0:
         logger.warning(
-            "Couldn't create a new UUID from the system info. Creating a new one on-the-fly ...")
+            "Couldn't create a new UID from the system info. Creating a new one on-the-fly ...")
         try:
-            new_uuid = str(uuid.UUID(int=uuid.getnode()))
+            new_uid = str(uuid.UUID(int=uuid.getnode()))
         except:
             logger.error(
-                "There was an error while generating a new UUID. Returning a nil UUID.")
+                "There was an error while generating a new UID. Returning a nil UID.")
             return "00000000-0000-0000-0000-000000000000"
     try:
         os.makedirs(os.path.join(sys.path[0], 'var'), exist_ok=True)
-        with open(os.path.join(sys.path[0], 'var/uuid'), 'w') as file:
-            file.write(new_uuid)
-            logger.debug("Wrote new UUID to a local file: "+new_uuid)
+        with open(os.path.join(sys.path[0], 'var/uid'), 'w') as file:
+            file.write(new_uid)
+            logger.debug("Wrote new UID to a local file: "+new_uid)
     except Exception as e:
-        logger.error("There was an error while writing to the local UUID file: " +
-                     str(e)+". Returning a nil UUID.")
+        logger.error("There was an error while writing to the local UID file: " +
+                     str(e)+". Returning a nil UID.")
         return "00000000-0000-0000-0000-000000000000"
-    return new_uuid
+    return new_uid
 
 
 def get_size(bytes, suffix="B"):
