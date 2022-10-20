@@ -9,5 +9,13 @@ fi
 
 cd ${SCRIPT_DIR}
 
+if ! source ./venv/bin/activate 2> /dev/null
+then
+	python3 -m venv ./venv
+	source ./venv/bin/activate
+	pip3 install wheel==0.37.1
+	pip3 install -r ./requirements.txt
+fi
+
 source ./venv/bin/activate
-python3 ./siaas_server.py
+python3 -u ./siaas_server.py
