@@ -8,6 +8,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 #mongo --eval 'db.runCommand({ connectionStatus: 1 })'
+#mongo --eval 'Mongo().getDBNames()'
 #echo "show dbs" | mongo
 
 mongo siaas --eval 'db.dropAllUsers()'
@@ -19,5 +20,4 @@ mongo siaas --eval 'db.getUsers()'
 
 #mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.insert({"siaas_test_key":"siaas_test_value"})'
 #mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.getCollectionNames()'
-#mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'Mongo().getDBNames()'
 #mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.drop()'
