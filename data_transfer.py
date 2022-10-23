@@ -149,7 +149,7 @@ if __name__ == "__main__":
     bc_config = {
         "data_transfer_loop_interval_sec": 120,
         "disable_portscanner": "true",
-        "ignore_neighbourhood": "",
+        "ignore_neighborhood": "",
         "silent_mode": "true"
     }
 
