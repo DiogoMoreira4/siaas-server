@@ -142,17 +142,9 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
     try:
 
         if(siaas_uid == "00000000-0000-0000-0000-000000000000"):
-            # cursor = collection.find() # show all raw
-            cursor = collection.find().sort('_id', -1).limit(5)  # show only most recent raw
-            # cursor = collection.find({},{'_id': False}).sort('_id', -1).limit(5) # show only most recent, hide object id, direction and timestamp
+            cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1).limit(15) # show everything
         else:
-            # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1) # show most recent first
-            # cursor = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}).sort('_id', -1) # show most recent first
-            #cursor = collection.find({"payload": {'$exists': True}, "origin": {'$in': ["agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
-            cursor = collection.find({"payload": {'$exists': True}, "destiny": {'$in': ["agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
-            # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1).limit(5)  # show only the 5 most recent
-            # cursor = collection.find({"payload": {'$exists': True}, "origin":"server_"+siaas_uid},{'_id': False}).sort('_id', -1).limit(5) # same, but only for the UID of this server
-            # cursor = collection.find({"payload.agent.platform.system.os": "Linux" },{'_id': False}).sort('_id', -1).limit(5) # show only most recent for agents running on Linux
+            cursor = collection.find({'$and': [{"payload": {'$exists': True}}, {'$or':[{"origin": "server_"+siaas_uid}, {"destiny": {'$in': ["server_"+siaas_uid, "server_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}]}]}).sort('_id', -1).limit(15)  # destinated or originated to/from the server
 
         results = list(cursor)
         for doc in results:
