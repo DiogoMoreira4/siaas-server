@@ -146,31 +146,47 @@ if __name__ == "__main__":
         "silent_mode": "false"
     }
 
+    config_2 = {
+        "data_transfer_loop_interval_sec": 30,
+        "disable_portscanner": "false",
+        "silent_mode": "false"
+    }
+
+
     bc_config = {
         "data_transfer_loop_interval_sec": 120,
         "disable_portscanner": "true",
-        "ignore_neighborhood": "",
-        "silent_mode": "true"
+        "ignore_neighbourhood": "",
+        "silent_mode": "true",
+        "testing_a_dict": { "oi": 123 }
     }
 
     #config = {}
-
+    #config_2 = {}
     #bc_config = {}
 
     agent_uid = "0924aa8b-6dc9-4fec-9716-d1601fc8b6c6"
+    agent_uid_2 = "L1HF89B0091"
 
     collection = siaas_aux.connect_mongodb_collection(
         MONGO_USER, MONGO_PWD, MONGO_HOST+":"+MONGO_PORT, MONGO_DB, MONGO_COLLECTION)
 
     create_or_update_agent_configs(collection, agent_uid, config)
+    create_or_update_agent_configs(collection, agent_uid_2, config_2)
     create_or_update_agent_configs(
         collection, "ffffffff-ffff-ffff-ffff-ffffffffffff", bc_config)
 
     cursor = siaas_aux.read_mongodb_collection(collection, agent_uid)
+    cursor2 = siaas_aux.read_mongodb_collection(collection, agent_uid_2)
     #cursor = siaas_aux.read_mongodb_collection(collection, "ffffffff-ffff-ffff-ffff-ffffffffffff")
 
     if cursor != None:
         for doc in cursor:
+            # print('\n'+str(pprint.pformat(doc)))
+            print('\n'+str(doc))
+
+    if cursor2 != None:
+        for doc in cursor2:
             # print('\n'+str(pprint.pformat(doc)))
             print('\n'+str(doc))
 
