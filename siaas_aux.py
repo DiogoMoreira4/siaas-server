@@ -119,8 +119,8 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
         else:
             # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1) # show most recent first
             # cursor = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}).sort('_id', -1) # show most recent first
-            cursor = collection.find({"payload": {'$exists': True}, "destiny": {'$in': [
-                                     "agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
+            #cursor = collection.find({"payload": {'$exists': True}, "origin": {'$in': ["agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
+            cursor = collection.find({"payload": {'$exists': True}, "destiny": {'$in': ["agent_"+siaas_uid, "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}).sort('_id', -1)  # show most recent first
             # cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1).limit(5)  # show only the 5 most recent
             # cursor = collection.find({"payload": {'$exists': True}, "origin":"server_"+siaas_uid},{'_id': False}).sort('_id', -1).limit(5) # same, but only for the UID of this server
             # cursor = collection.find({"payload.agent.platform.system.os": "Linux" },{'_id': False}).sort('_id', -1).limit(5) # show only most recent for agents running on Linux
