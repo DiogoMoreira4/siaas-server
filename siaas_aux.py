@@ -154,6 +154,56 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
         logger.error("Can't read data from remote DB server: "+str(e))
         return None
 
+def get_dict_current_agent_status(collection, agent_uid=None, module=None):
+    """
+    Reads agent data from the Mongo DB collection
+    We can select a list of agents and modules to display
+    Returns a list of records. Returns empty dict if data can't be read
+    """
+    logger.debug("Reading data from the remote DB server ...")
+    out_dict={}
+
+    if agent_uid == None:
+        try:
+            collection.create_index("timestamp", unique=False)
+            cursor = collection.aggregate([
+                 { "$match": {"origin": { "$regex": "^agent_" }}},
+                 { "$sort": { "timestamp": 1 } },
+                 { "$group": { "_id": {"origin": "$origin"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
+                      ] )
+            results=list(cursor)
+        except Exception as e:
+            logger.error("Can't read data from remote DB server: "+str(e))
+            return out_dict
+
+    else:
+        results=[]
+        for u in agent_uid.split(','):
+            uid=u.lstrip().rstrip()
+            try:
+                cursor = collection.find(
+                   {'$and': [{"payload": {'$exists': True}}, {"origin": "agent_"+uid}]}
+                     ).sort('_id', -1).limit(1)
+                results=results+list(cursor)
+            except Exception as e:
+                logger.error("Can't read data from remote DB server: "+str(e))
+
+    for r in results:
+        try:
+            if r["origin"].startswith("agent_"):
+                uid=r["origin"].split("_",1)[1]
+                if module == None:
+                   out_dict[uid]=r["payload"]
+                else:
+                   out_dict[uid]={}
+                   for m in module.split(','):
+                       mod=m.lstrip().rstrip()
+                       if mod in r["payload"].keys():
+                           out_dict[uid][mod]=r["payload"][mod]
+        except:
+            logger.debug("Ignoring invalid entry when grabbing agent data.")
+
+    return out_dict
 
 def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, convert_to_string=False):
     """

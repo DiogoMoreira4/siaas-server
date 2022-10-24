@@ -178,10 +178,14 @@ if __name__ == "__main__":
 
     results = siaas_aux.read_mongodb_collection(collection, siaas_uid)
 
+    results = siaas_aux.get_dict_current_agent_status(collection, agent_uid=agent_uid+","+agent_uid_2, module="neighborhood")
+    #results = siaas_aux.get_dict_current_agent_status(collection)
+
     if results != None:
-        for doc in results:
+        pprint.pprint(results)
+        #for doc in results:
             # print('\n'+str(pprint.pformat(doc)))
-            print('\n'+str(doc))
+            #print('\n'+str(doc))
 
     print('\nAll done. Bye!\n')
 
