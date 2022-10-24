@@ -154,6 +154,37 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
         logger.error("Can't read data from remote DB server: "+str(e))
         return None
 
+def get_dict_active_agents(collection):
+    """
+    Reads a list of active agents
+    Returns a list of records. Returns empty dict if data can't be read
+    """
+    logger.debug("Reading data from the remote DB server ...")
+    out_dict={}
+
+    try:
+        collection.create_index("timestamp", unique=False)
+        cursor = collection.aggregate([
+             { "$match": {"origin": { "$regex": "^agent_" }}},
+             { "$sort": { "timestamp": 1 } },
+             { "$group": { "_id": {"origin": "$origin"}, "origin": {"$last":"$origin"}, "timestamp": { "$last": "$timestamp" } } }
+                 ] )
+        results=list(cursor)
+    except Exception as e:
+        logger.error("Can't read data from remote DB server: "+str(e))
+        return out_dict
+
+    for r in results:
+        try:
+            uid=r["origin"].split("_",1)[1]
+            out_dict[uid]={}
+            out_dict[uid]["last_seen"]=r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+        except:
+            logger.debug("Ignoring invalid entry when grabbing active agents data.")
+
+    return out_dict
+
+
 def get_dict_current_agent_status(collection, agent_uid=None, module=None):
     """
     Reads agent data from the Mongo DB collection
@@ -167,9 +198,9 @@ def get_dict_current_agent_status(collection, agent_uid=None, module=None):
         try:
             collection.create_index("timestamp", unique=False)
             cursor = collection.aggregate([
-                 { "$match": {"origin": { "$regex": "^agent_" }}},
-                 { "$sort": { "timestamp": 1 } },
-                 { "$group": { "_id": {"origin": "$origin"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
+                { "$match": {'$and': [{"origin": { "$regex": "^agent_" }}, {"scope": "agent_data"}]}},
+                { "$sort": { "timestamp": 1 } },
+                { "$group": { "_id": {"origin": "$origin"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
                       ] )
             results=list(cursor)
         except Exception as e:
@@ -182,7 +213,7 @@ def get_dict_current_agent_status(collection, agent_uid=None, module=None):
             uid=u.lstrip().rstrip()
             try:
                 cursor = collection.find(
-                   {'$and': [{"payload": {'$exists': True}}, {"origin": "agent_"+uid}]}
+                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": "agent_"+uid}]}
                      ).sort('_id', -1).limit(1)
                 results=results+list(cursor)
             except Exception as e:
@@ -205,7 +236,7 @@ def get_dict_current_agent_status(collection, agent_uid=None, module=None):
 
     return out_dict
 
-def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, convert_to_string=False):
+def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, include_broadcast=False, convert_to_string=False):
     """
     Reads data from the Mongo DB collection, specifically published by the server, for agents
     Returns a config dict. Returns an empty dict if anything failed
@@ -231,8 +262,11 @@ def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-
         for doc in results2:
             broadcasted_configs = doc["payload"]
 
-        final_results = dict(
-            list(broadcasted_configs.items())+list(my_configs.items())) # configs directed to the agent have precedence over broadcasted ones
+        if include_broadcast:
+            final_results = dict(
+                list(broadcasted_configs.items())+list(my_configs.items())) # configs directed to the agent have precedence over broadcasted ones
+        else:
+            final_results = my_configs
 
         for k in final_results.keys():
             if convert_to_string:
