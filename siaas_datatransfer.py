@@ -98,8 +98,7 @@ def loop():
 
         if db_collection != None:
             # Upload server data
-            last_uploaded_dict = upload_server_data(
-                db_collection, last_uploaded_dict)
+            #last_uploaded_dict = upload_server_data(db_collection, last_uploaded_dict)
             # Download server data
             #download_server_data(db_collection, scope="agent-configs")
 
