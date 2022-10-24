@@ -17,20 +17,23 @@ from urllib.parse import quote_plus
 
 logger = logging.getLogger(__name__)
 
-def merge_module_dicts(module_list=[]):
+
+def merge_module_dicts(modules=""):
     """
     Grabs all DB files from the module list and concatenate them
-    Returns an empty dict if it fails 
+    Returns an empty dict if it fails
     """
     merged_dict = {}
-    for module in module_list:
+    for module in modules.split(','):
+        module = module.lstrip().rstrip()
         try:
-            next_dict_to_merge = {}
-            next_dict_to_merge[module] = {}
-            next_dict_to_merge[module] = read_from_local_file(
+            module_dict = read_from_local_file(
                 os.path.join(sys.path[0], 'var/'+str(module)+'.db'))
-            merged_dict = dict(
-                list(merged_dict.items())+list(next_dict_to_merge.items()))
+            if module_dict != None:
+                next_dict_to_merge = {}
+                next_dict_to_merge[module] = module_dict
+                merged_dict = dict(
+                  list(merged_dict.items())+list(next_dict_to_merge.items()))
         except:
             logger.warning("Couldn't merge dict: " +
                            str(next_dict_to_merge))
@@ -185,7 +188,7 @@ def get_dict_active_agents(collection):
     return out_dict
 
 
-def get_dict_current_agent_status(collection, agent_uid=None, module=None):
+def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     """
     Reads agent data from the Mongo DB collection
     We can select a list of agents and modules to display
@@ -231,6 +234,59 @@ def get_dict_current_agent_status(collection, agent_uid=None, module=None):
                        mod=m.lstrip().rstrip()
                        if mod in r["payload"].keys():
                            out_dict[uid][mod]=r["payload"][mod]
+        except:
+            logger.debug("Ignoring invalid entry when grabbing agent data.")
+
+    return out_dict
+
+def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast=False):
+    """
+    Reads agent data from the Mongo DB collection
+    We can select a list of agents and modules to display
+    Returns a list of records. Returns empty dict if data can't be read
+    """
+    logger.debug("Reading data from the remote DB server ...")
+    out_dict={}
+
+    if agent_uid == None:
+        try:
+            collection.create_index("timestamp", unique=False)
+            cursor = collection.aggregate([
+                { "$match": {'$and': [{"destiny": { "$regex": "^agent_" }}, {"scope": "agent_configs"}]}},
+                { "$sort": { "timestamp": 1 } },
+                { "$group": { "_id": {"destiny": "$destiny"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
+                      ] )
+            results=list(cursor)
+        except Exception as e:
+            logger.error("Can't read data from remote DB server: "+str(e))
+            return out_dict
+
+    else:
+        results=[]
+        for u in agent_uid.split(','):
+            uid=u.lstrip().rstrip()
+            try:
+                cursor = collection.find(
+                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {"destiny": "agent_"+uid}]}
+                     ).sort('_id', -1).limit(1)
+                results=results+list(cursor)
+            except Exception as e:
+                logger.error("Can't read data from remote DB server: "+str(e))
+            
+    if include_broadcast:
+        try:
+            cursor = collection.find(
+               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {"destiny": "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"}]}
+                 ).sort('_id', -1).limit(1)
+            results=results+list(cursor)
+        except Exception as e:
+            logger.error("Can't read data from remote DB server: "+str(e))
+
+    for r in results:
+        try:
+            if r["destiny"].startswith("agent_"):
+                    uid=r["destiny"].split("_",1)[1]
+                    out_dict[uid]=r["payload"]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 

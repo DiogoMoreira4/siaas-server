@@ -178,9 +178,13 @@ if __name__ == "__main__":
 
     results = siaas_aux.read_mongodb_collection(collection, siaas_uid)
 
-    results = siaas_aux.get_dict_current_agent_status(collection, agent_uid=agent_uid+","+agent_uid_2, module="neighborhood")
-    results = siaas_aux.get_dict_current_agent_status(collection)
-    results = siaas_aux.get_dict_active_agents(collection)
+    results = siaas_aux.get_dict_current_agent_data(collection, agent_uid=agent_uid+","+agent_uid_2, module="neighborhood")
+    #results = siaas_aux.get_dict_current_agent_data(collection)
+    #results = siaas_aux.get_dict_active_agents(collection)
+
+
+    results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, include_broadcast=False)
+    #results = siaas_aux.get_dict_current_agent_configs(collection, include_broadcast=True)
 
     if results != None:
         pprint.pprint(results)

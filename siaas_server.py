@@ -15,12 +15,14 @@ from waitress import serve
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
-import siaas_routes
-
 SIAAS_VERSION = "0.0.1"
 
+def get_db_collection():
+    return DB_COLLECTION_OBJ
 
 if __name__ == "__main__":
+
+    import siaas_routes
 
     print('\n')
 
@@ -43,21 +45,43 @@ if __name__ == "__main__":
     # Initializing local databases for configurations
     siaas_aux.write_to_local_file(
         os.path.join(sys.path[0], 'var/config.db'), {})
-    siaas_aux.write_to_local_file(os.path.join(
-        sys.path[0], 'var/config_orig.db'), {})
+
+    # Some default values for the DB connection just in case (these will be overwritten if there's a config file key for them)
+    MONGO_USER = "siaas"
+    MONGO_PWD = "siaas"
+    MONGO_HOST = "127.0.0.1"
+    MONGO_PORT = "27017"
+    MONGO_DB = "siaas"
+    MONGO_COLLECTION = "siaas"
 
     # Read local configuration file and insert in local database
     siaas_aux.write_config_db_from_conf_file()
-    siaas_aux.write_config_db_from_conf_file(output=os.path.join(sys.path[0], 'var/config_orig.db'))
+
+    # Get all values
+    config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
+    for config_name in config_dict.keys():
+        if config_name.upper() == "MONGO_USER":
+            MONGO_USER = config_dict[config_name]
+        if config_name.upper() == "MONGO_PWD":
+            MONGO_PWD = config_dict[config_name]
+        if config_name.upper() == "MONGO_HOST":
+            MONGO_HOST = config_dict[config_name]
+        if config_name.upper() == "MONGO_PORT":
+            MONGO_PORT = config_dict[config_name]
+        if config_name.upper() == "MONGO_DB":
+            MONGO_DB = config_dict[config_name]
+        if config_name.upper() == "MONGO_COLLECTION":
+            MONGO_COLLECTION = config_dict[config_name]
+        if config_name.upper() == "LOG_LEVEL":
+            LOG_LEVEL = config_dict[config_name]
 
     # Define logging level according to user config
     log_file = "log/siaas-server.log"
-    log_level = siaas_aux.get_config_from_configs_db(config_name="log_level")
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     try:
         logging.basicConfig(handlers=[RotatingFileHandler(os.path.join(sys.path[0], log_file), maxBytes=10240000, backupCount=5)],
-                            format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=eval("logging."+log_level.upper()))
+                            format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=eval("logging."+LOG_LEVEL.upper()))
     except:
         logging.basicConfig(handlers=[RotatingFileHandler(os.path.join(sys.path[0], log_file), maxBytes=10240000, backupCount=5)],
                             format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
@@ -68,6 +92,12 @@ if __name__ == "__main__":
         logger.critical("\nCan't proceed without an unique system ID. Aborting !\n")
         sys.exit(3)
 
+    # Create connection to MongoDB
+    if len(MONGO_PORT or '') > 0:
+        mongo_host_port = MONGO_HOST+":"+MONGO_PORT
+    else:
+        mongo_host_port = MONGO_HOST
+    DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
 
     print("\nSIAAS Server v"+SIAAS_VERSION +
           " starting ["+server_uid+"]\n\nLogging to: "+os.path.join(sys.path[0], log_file)+"\n")
