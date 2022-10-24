@@ -187,6 +187,58 @@ def get_dict_active_agents(collection):
 
     return out_dict
 
+def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=5):
+    """
+    Reads agent data from the Mongo DB collection
+    We can select a list of agents and modules to display
+    Returns a list of records. Returns empty dict if data can't be read
+    """
+    logger.debug("Reading data from the remote DB server ...")
+    out_dict={}
+
+    if agent_uid == None:
+        try:
+            cursor = collection.find(
+                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}
+                       ]}
+                     ).sort('_id', -1).limit(int(limit_outputs))
+            results=list(cursor)
+        except Exception as e:
+            logger.error("Can't read data from remote DB server: "+str(e))
+            return out_dict
+
+    else:
+        results=[]
+        for u in agent_uid.split(','):
+            uid=u.lstrip().rstrip()
+            try:
+                cursor = collection.find(
+                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": "agent_"+uid}]}
+                     ).sort('_id', -1).limit(int(limit_outputs))
+                results=results+list(cursor)
+            except Exception as e:
+                logger.error("Can't read data from remote DB server: "+str(e))
+
+    for r in results:
+        try:
+            if r["origin"].startswith("agent_"):
+                uid=r["origin"].split("_",1)[1]
+                timestamp=r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+                if timestamp not in out_dict.keys():
+                   out_dict[timestamp]={}
+                if module == None:
+                   out_dict[timestamp][uid]=r["payload"]
+                else:
+                   out_dict[timestamp][uid]={}
+                   for m in module.split(','):
+                       mod=m.lstrip().rstrip()
+                       if mod in r["payload"].keys():
+                           out_dict[timestamp][uid][mod]=r["payload"][mod]
+        except:
+            logger.debug("Ignoring invalid entry when grabbing agent data.")
+
+    return out_dict
+
 
 def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     """
