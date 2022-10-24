@@ -7,4 +7,4 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-ps -ef | grep siaas.*server | grep -v grep | awk {'print $2'} | xargs kill -9 2> /dev/null
+ps -ef | grep "siaas_server" | grep -v grep | awk {'print $2'} | xargs kill -9 2> /dev/null
