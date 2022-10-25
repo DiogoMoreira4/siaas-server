@@ -186,8 +186,8 @@ if __name__ == "__main__":
     results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, include_broadcast=False)
     #results = siaas_aux.get_dict_current_agent_configs(collection, include_broadcast=True)
 
-    results = siaas_aux.get_dict_historical_agent_data(collection)
-    results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
+    results = siaas_aux.get_dict_historical_agent_data(collection, days=1)
+    #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
 
     if results != None:
         pprint.pprint(results)

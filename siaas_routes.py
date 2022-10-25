@@ -67,10 +67,9 @@ def agents():
 @app.route('/siaas-server/agents/data', methods = ['GET'], strict_slashes=False)
 def agents_data():
     module = request.args.get('module', default='*', type=str)
-    all_existing_modules = "config,neighborhood,platform,portscanner"
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
-            module = all_existing_modules
+            module = None
     collection = get_db_collection()
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
     return jsonify(
@@ -136,16 +135,16 @@ def agents_configs_id(agent_uid):
 @app.route('/siaas-server/agents/historical', methods = ['GET'], strict_slashes=False)
 def agents_historical():
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=10, type=int)
-    all_existing_modules = "config,neighborhood,platform,portscanner"
+    limit_outputs = request.args.get('limit', default=25, type=int)
+    days = request.args.get('days', default=7, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0:
+    if limit_outputs <= 0 or days <=0:
         output={}
     else:
-        output = siaas_aux.get_dict_historical_agent_data(collection, module=module, limit_outputs=limit_outputs)
+        output = siaas_aux.get_dict_historical_agent_data(collection, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
             'status': 'success',
@@ -158,15 +157,16 @@ def agents_historical():
 @app.route('/siaas-server/agents/historical/<agent_uid>', methods = ['GET'], strict_slashes=False)
 def agents_historical_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=10, type=int)
+    limit_outputs = request.args.get('limit', default=25, type=int)
+    days = request.args.get('days', default=7, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0:
+    if limit_outputs <= 0 or days <=0:
         output={}
     else:
-        output = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs)
+        output = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
             'status': 'success',

@@ -11,7 +11,7 @@ import os
 import sys
 import json
 from copy import copy
-from datetime import datetime
+from datetime import datetime, timedelta
 from pymongo import MongoClient
 from urllib.parse import quote_plus
 
@@ -188,7 +188,7 @@ def get_dict_active_agents(collection):
 
     return out_dict
 
-def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=5):
+def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999):
     """
     Reads agent data from the Mongo DB collection
     We can select a list of agents and modules to display
@@ -197,10 +197,12 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
     logger.debug("Reading data from the remote DB server ...")
     out_dict={}
 
+
     if agent_uid == None:
         try:
+            last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
-                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}
+                    {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp":{"$gte": last_d}}
                        ]}
                      ).sort('_id', -1).limit(int(limit_outputs))
             results=list(cursor)
@@ -214,8 +216,9 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip())
         try:
+            last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
-               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": {'$in': agent_list}}]}
+               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp":{"$gte": last_d}}, {"origin": {'$in': agent_list}}]}
                  ).sort('_id', -1).limit(int(limit_outputs))
             results=results+list(cursor)
         except Exception as e:
