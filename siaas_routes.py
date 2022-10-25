@@ -105,7 +105,8 @@ def agents_data_id(agent_uid):
 @app.route('/siaas-server/agents/configs', methods = ['GET'], strict_slashes=False)
 def agents_configs():
     collection = get_db_collection()
-    output = siaas_aux.get_dict_current_agent_configs(collection, include_broadcast=True)
+    merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
+    output = siaas_aux.get_dict_current_agent_configs(collection, merge_broadcast=merge_broadcast)
     return jsonify(
         {
             'status': 'success',
@@ -119,7 +120,8 @@ def agents_configs():
 def agents_configs_id(agent_uid):
     if request.method == 'GET':
         collection = get_db_collection()
-        output = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, include_broadcast=False)
+        merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
+        output = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
     if request.method == 'POST':
         pass
     # TODO: POST - SERVER POST LATEST CONFIGS

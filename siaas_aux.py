@@ -298,7 +298,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     return out_dict
 
 
-def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast=False):
+def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=False):
     """
     Reads agent data from the Mongo DB collection
     We can select a list of agents and modules to display
@@ -333,12 +333,13 @@ def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast
             except Exception as e:
                 logger.error("Can't read data from remote DB server: "+str(e))
             
-    if include_broadcast:
+    if merge_broadcast:
+        results_bc=[]
         try:
             cursor = collection.find(
                {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {"destiny": "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"}]}
                  ).sort('_id', -1).limit(1)
-            results=results+list(cursor)
+            results_bc=list(cursor)
         except Exception as e:
             logger.error("Can't read data from remote DB server: "+str(e))
 
@@ -346,7 +347,13 @@ def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast
         try:
             if r["destiny"].startswith("agent_"):
                     uid=r["destiny"].split("_",1)[1]
-                    out_dict[uid]=r["payload"]
+                    if merge_broadcast:
+                        if len(results_bc)>0:
+                            out_dict[uid]=dict(list(results_bc[0]["payload"].items())+list(r["payload"].items()))
+                        else:
+                            out_dict[uid]=r["payload"]
+                    else:
+                       out_dict[uid]=r["payload"]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
