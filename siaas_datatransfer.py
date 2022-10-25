@@ -31,7 +31,6 @@ if __name__ == "__main__":
     config = {
         "datatransfer_loop_interval_sec": 45,
         "disable_portscanner": "false",
-        "manual_hosts": "google.com",
         "silent_mode": "false"
     }
 
