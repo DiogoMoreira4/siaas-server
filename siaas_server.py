@@ -46,19 +46,17 @@ if __name__ == "__main__":
     siaas_aux.write_to_local_file(
         os.path.join(sys.path[0], 'var/config.db'), {})
 
-    # Some default values for the DB connection just in case (these will be overwritten if there's a config file key for them)
-    MONGO_USER = "siaas"
-    MONGO_PWD = "siaas"
-    MONGO_HOST = "127.0.0.1"
-    MONGO_PORT = "27017"
-    MONGO_DB = "siaas"
-    MONGO_COLLECTION = "siaas"
-
     # Read local configuration file and insert in local database
     siaas_aux.write_config_db_from_conf_file()
 
     # Get all values
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
+    MONGO_USER=None
+    MONGO_PWD=None
+    MONGO_HOST=None
+    MONGO_PORT=None
+    MONGO_DB=None
+    MONGO_COLLECTION=None
     for config_name in config_dict.keys():
         if config_name.upper() == "MONGO_USER":
             MONGO_USER = config_dict[config_name]
@@ -72,16 +70,15 @@ if __name__ == "__main__":
             MONGO_DB = config_dict[config_name]
         if config_name.upper() == "MONGO_COLLECTION":
             MONGO_COLLECTION = config_dict[config_name]
-        if config_name.upper() == "LOG_LEVEL":
-            LOG_LEVEL = config_dict[config_name]
 
     # Define logging level according to user config
     log_file = "log/siaas-server.log"
+    log_level = siaas_aux.get_config_from_configs_db(config_name="log_level")
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
     try:
         logging.basicConfig(handlers=[RotatingFileHandler(os.path.join(sys.path[0], log_file), maxBytes=10240000, backupCount=5)],
-                            format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=eval("logging."+LOG_LEVEL.upper()))
+                            format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=eval("logging."+log_level.upper()))
     except:
         logging.basicConfig(handlers=[RotatingFileHandler(os.path.join(sys.path[0], log_file), maxBytes=10240000, backupCount=5)],
                             format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)

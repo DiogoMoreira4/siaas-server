@@ -30,7 +30,7 @@ def index():
 @app.route('/siaas-server', methods=['GET'], strict_slashes=False)
 def siaas_server():
     module = request.args.get('module', default='*', type=str)
-    all_existing_modules = "config,neighborhood,platform,portscanner"
+    all_existing_modules = "platform,neighborhood,portscanner,config"
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = all_existing_modules
