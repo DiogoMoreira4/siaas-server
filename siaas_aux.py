@@ -190,7 +190,7 @@ def get_dict_active_agents(collection):
 
 def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999):
     """
-    Reads agent data from the Mongo DB collection
+    Reads historical agent data from the Mongo DB collection
     We can select a list of agents and modules to display
     Returns a list of records. Returns empty dict if data can't be read
     """
