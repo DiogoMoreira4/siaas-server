@@ -686,4 +686,3 @@ def to_cidr_notation(bytes_network, bytes_netmask):
     net = "%s/%s" % (network, netmask)
 
     return net
-
