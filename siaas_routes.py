@@ -6,7 +6,7 @@ import os
 import sys
 
 app.config['JSON_AS_ASCII'] = False
-
+app.config['JSON_SORT_KEYS'] = False
 
 @app.route('/', strict_slashes=False)
 @app.route('/index', strict_slashes=False)
@@ -19,10 +19,10 @@ def index():
     }
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(siaas),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': siaas
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -43,10 +43,10 @@ def siaas_server():
 
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -57,10 +57,10 @@ def agents():
     output = siaas_aux.get_dict_active_agents(collection)
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -74,10 +74,10 @@ def agents_data():
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -95,10 +95,10 @@ def agents_data_id(agent_uid):
     # TODO: POST - AGENT UPLOAD LATEST DATA
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -109,10 +109,10 @@ def agents_configs():
     output = siaas_aux.get_dict_current_agent_configs(collection, merge_broadcast=merge_broadcast)
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -127,10 +127,10 @@ def agents_configs_id(agent_uid):
     # TODO: POST - SERVER POST LATEST CONFIGS
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -149,10 +149,10 @@ def agents_historical():
         output = siaas_aux.get_dict_historical_agent_data(collection, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
 
@@ -171,9 +171,9 @@ def agents_historical_id(agent_uid):
         output = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
+            'output': output,
             'status': 'success',
             'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str(),
-            'output': output
+            'time': siaas_aux.get_now_utc_str()
         }
     )
