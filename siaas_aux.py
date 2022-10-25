@@ -209,15 +209,16 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
 
     else:
         results=[]
+        agent_list=[]
         for u in agent_uid.split(','):
-            uid=u.lstrip().rstrip()
-            try:
-                cursor = collection.find(
-                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": "agent_"+uid}]}
-                     ).sort('_id', -1).limit(int(limit_outputs))
-                results=results+list(cursor)
-            except Exception as e:
-                logger.error("Can't read data from remote DB server: "+str(e))
+            agent_list.append("agent_"+u.lstrip().rstrip())
+        try:
+            cursor = collection.find(
+               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": {'$in': agent_list}}]}
+                 ).sort('_id', -1).limit(int(limit_outputs))
+            results=results+list(cursor)
+        except Exception as e:
+            logger.error("Can't read data from remote DB server: "+str(e))
 
     for r in results:
         try:
@@ -290,6 +291,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
     return out_dict
+
 
 def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast=False):
     """
