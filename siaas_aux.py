@@ -166,7 +166,8 @@ def get_dict_active_agents(collection):
     out_dict={}
 
     try:
-        collection.create_index("timestamp", unique=False)
+        if "timestamp" not in str(list(collection.index_information())):
+             collection.create_index("timestamp", unique=False)
         cursor = collection.aggregate([
              { "$match": {"origin": { "$regex": "^agent_" }}},
              { "$sort": { "timestamp": 1 } },
@@ -252,7 +253,8 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
 
     if agent_uid == None:
         try:
-            collection.create_index("timestamp", unique=False)
+            if "timestamp" not in str(list(collection.index_information())):
+                collection.create_index("timestamp", unique=False)
             cursor = collection.aggregate([
                 { "$match": {'$and': [{"origin": { "$regex": "^agent_" }}, {"scope": "agent_data"}]}},
                 { "$sort": { "timestamp": 1 } },
@@ -304,7 +306,8 @@ def get_dict_current_agent_configs(collection, agent_uid=None, include_broadcast
 
     if agent_uid == None:
         try:
-            collection.create_index("timestamp", unique=False)
+            if "timestamp" not in str(list(collection.index_information())):
+                collection.create_index("timestamp", unique=False)
             cursor = collection.aggregate([
                 { "$match": {'$and': [{"destiny": { "$regex": "^agent_" }}, {"scope": "agent_configs"}]}},
                 { "$sort": { "timestamp": 1 } },

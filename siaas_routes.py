@@ -116,7 +116,7 @@ def agents_configs():
         }
     )
 
-@app.route('/siaas-server/agents/configs/<agent_uid>', methods = ['GET'], strict_slashes=False)
+@app.route('/siaas-server/agents/configs/<agent_uid>', methods = ['GET','POST'], strict_slashes=False)
 def agents_configs_id(agent_uid):
     if request.method == 'GET':
         collection = get_db_collection()
