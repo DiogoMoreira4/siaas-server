@@ -9,6 +9,7 @@ import logging
 import uuid
 import os
 import sys
+import re
 import json
 from copy import copy
 from datetime import datetime, timedelta
@@ -114,6 +115,7 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
     logger.debug("Writing configuration local DB, from local file: "+conf_file)
 
     config_dict = {}
+    pattern = "^[A-Za-z0-9_-]*$"
 
     local_conf_file = read_from_local_file(conf_file)
     if len(local_conf_file or '') == 0:
@@ -124,11 +126,13 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
             line_uncommented = line.split('#')[0].rstrip().lstrip()
             if len(line_uncommented) == 0:
                 continue
-            config_name = line_uncommented.split("=", 1)[0].rstrip().lstrip().replace("\"", "").replace("\'", "")
+            config_name = line_uncommented.split("=", 1)[0].rstrip().lstrip()
+            if not bool(re.match(pattern, config_name)):
+                raise
             config_value = line_uncommented.split("=", 1)[1].rstrip().lstrip()
             config_dict[config_name] = config_value
         except:
-            logger.warning("Invalid line from local config file: "+str(line))
+            logger.warning("Invalid line from local configuration file was ignored: "+str(line))
             continue
 
     return write_to_local_file(output, dict(sorted(config_dict.items())))
@@ -153,6 +157,18 @@ def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_di
         logger.error(
             "No valid dict received. No data was uploaded.")
         return False
+
+    if "#" in str(config_dict):
+        logger.error(
+            "Detected invalid character '#' in the input configuration dict. No data was uploaded.")
+        return False
+
+    pattern = "^[A-Za-z0-9_-]*$"
+    for k in config_dict.keys():
+        if not bool(re.match(pattern, k)):
+            logger.error(
+               "Invalid character detected in configuration dict keys. No data was uploaded.")
+            return False
 
     siaas_uid = get_or_create_unique_system_id()
 
