@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 def delete_historical_data(db_collection=None, days_to_keep=365):
 
     logger.info("Performing historical database cleanup, keeping last "+str(days_to_keep)+" days ...")
-    if siaas_aux.delete_all_records_older_than(db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep) >= 0:
-       logger.info("DB cleanup finished.")
+    deleted_count = siaas_aux.delete_all_records_older_than(db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep)
+    if deleted_count:
+       logger.info("DB cleanup finished. "+str(deleted_count)+" records deleted.")
        return True
     else:
        logger.error("DB could not be cleaned up. This might result in an eventual disk exhaustion in the server!")
