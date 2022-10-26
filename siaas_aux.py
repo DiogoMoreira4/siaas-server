@@ -419,10 +419,11 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                             out_dict[uid]=r["payload"]
                     else:
                        out_dict[uid]=r["payload"]
+                    out_dict[uid]=dict(sorted(out_dict[uid].items()))
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
-    return dict(sorted(out_dict.items()))
+    return out_dict
 
 def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days_to_keep=3650):
     """

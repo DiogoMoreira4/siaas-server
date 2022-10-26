@@ -90,20 +90,18 @@ def agents_data_id(agent_uid):
                 module = None
         collection = get_db_collection()
         output = siaas_aux.get_dict_current_agent_data(collection, agent_uid=agent_uid, module=module)
-    if request.method == 'POST':
-        pass
-    if request.method == 'DELETE':
-        pass
-    # TODO: POST - AGENT UPLOAD LATEST DATA
-    # TODO: DELETE - AGENT DELETE ALL AGENT DATA
-    return jsonify(
-        {
+        return jsonify(
+          {
             'output': output,
             'status': 'success',
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
-        }
-    )
+          }
+        )
+    if request.method == 'POST':
+        pass
+    if request.method == 'DELETE':
+        pass
 
 @app.route('/siaas-server/agents/configs', methods = ['GET'], strict_slashes=False)
 def agents_configs():
@@ -125,20 +123,18 @@ def agents_configs_id(agent_uid):
         collection = get_db_collection()
         merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
         output = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
-    if request.method == 'POST':
-        pass
-    if request.method == 'DELETE':
-        pass
-    # TODO: POST - SERVER POST LATEST CONFIGS
-    # TODO: DELETE - AGENT DELETE ALL AGENT CONFIGS
-    return jsonify(
-        {
+        return jsonify(
+          {
             'output': output,
             'status': 'success',
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
-        }
-    )
+          }
+        )
+    if request.method == 'POST':
+        pass
+    if request.method == 'DELETE':
+        pass
 
 @app.route('/siaas-server/agents/historical', methods = ['GET'], strict_slashes=False)
 def agents_historical():
