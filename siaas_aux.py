@@ -420,6 +420,54 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 
     return dict(sorted(out_dict.items()))
 
+def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days=365):
+    """
+    Delete records older than n-days
+    We can select a list of agent_uuids or scope, else it will pick all scopes and all agents
+    Returns a list of records. Returns empty dict if data can't be read
+    """
+    logger.debug("Removing data from the DB server ...")
+    out_dict={}
+
+    if agent_uid == None:
+        try:
+            last_d = datetime.utcnow() - timedelta(days=int(days))
+            print(str(last_d))
+            if scope == None:
+                db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}
+                       ]}
+                     )
+            else:
+                db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}
+                       ]}
+                     )
+        except Exception as e:
+            logger.error("Can't delete data from the DB server: "+str(e))
+            return False
+
+    else:
+        agent_list=[]
+        for u in agent_uid.split(','):
+            agent_list.append("agent_"+u.lstrip().rstrip())
+        try:
+            last_d = datetime.utcnow() - timedelta(days=int(days))
+            print(str(last_d))
+            if scope == None:
+                db_collection.delete_many(
+                   {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
+                  )
+            else:
+                db_collection.delete_many(
+                   {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
+                  )
+        except Exception as e:
+            logger.error("Can't delete data from the DB server: "+str(e))
+            return False
+            
+    return True
+
 def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, include_broadcast=False, convert_to_string=False):
     """
     Reads data from the Mongo DB collection, specifically published by the server, for agents

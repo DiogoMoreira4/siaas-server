@@ -82,6 +82,10 @@ if __name__ == "__main__":
     #results = siaas_aux.get_dict_historical_agent_data(collection, days=1)
     #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
 
+    siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=agent_uid, days=-1)
+    results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=0)
+    #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
+
     if results != None:
         pprint.pprint(results)
         #for doc in results:
