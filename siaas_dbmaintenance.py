@@ -9,10 +9,10 @@ from copy import copy
 
 logger = logging.getLogger(__name__)
 
-def delete_historical_data(db_collection=None, num_days_to_keep=365):
+def delete_historical_data(db_collection=None, days_to_keep=365):
 
-    logger.info("Performing historical database cleanup, keeping last "+str(num_days_to_keep)+" days ...")
-    if siaas_aux.delete_all_records_older_than(db_collection, scope="agent_data", agent_uid=None, num_days_to_keep=num_days_to_keep):
+    logger.info("Performing historical database cleanup, keeping last "+str(days_to_keep)+" days ...")
+    if siaas_aux.delete_all_records_older_than(db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep) >= 0:
        logger.info("DB cleanup finished.")
        return True
     else:
@@ -60,12 +60,12 @@ def loop():
         logger.debug("Loop running ...")
 
         try:
-            num_days_to_keep = int(siaas_aux.get_config_from_configs_db(config_name="dbmaintenance_historical_days_to_keep"))
+            days_to_keep = int(siaas_aux.get_config_from_configs_db(config_name="dbmaintenance_historical_days_to_keep"))
         except:
             logger.debug("The number of days to keep in the database is not configured or is invalid. Defaulting to 10 years.")
-            num_days_to_keep = 3650
+            days_to_keep = 3650
 
-        delete_historical_data(db_collection, num_days_to_keep)
+        delete_historical_data(db_collection, days_to_keep)
 
         # Sleep before next loop
         try:
@@ -111,7 +111,7 @@ if __name__ == "__main__":
 
     logger.info("Cleaning up the DB ...")
 
-    if delete_historical_data(collection, num_days_to_keep=3650):
+    if delete_historical_data(collection, days_to_keep=3650):
         logger.info("All OK!")
     else:
         logger.info("Error detected.")

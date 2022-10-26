@@ -189,11 +189,7 @@ def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_di
     complete_dict["payload"] = dict(sorted(config_dict.items()))
     complete_dict["timestamp"] = get_now_utc_obj()
 
-    ret_db = create_or_update_in_mongodb_collection(db_collection, complete_dict)
-    if ret_db:
-        return False
-
-    return True
+    return create_or_update_in_mongodb_collection(db_collection, complete_dict)
 
 
 def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-000000000000"):
@@ -420,28 +416,31 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 
     return dict(sorted(out_dict.items()))
 
-def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, num_days_to_keep=3650):
+def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days_to_keep=3650):
     """
     Delete records older than n-days
     We can select a list of agent_uuids or scope, else it will pick all scopes and all agents
-    Returns a list of records. Returns empty dict if data can't be read
+    Returns number of deleted records as a string, or False if error
     """
     logger.debug("Removing data from the DB server ...")
     out_dict={}
+    count=0
 
     if agent_uid == None:
         try:
-            last_d = datetime.utcnow() - timedelta(days=int(num_days_to_keep))
+            last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                db_collection.delete_many(
+                c=db_collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}
                        ]}
                      )
+                count+=c.deleted_count
             else:
-                db_collection.delete_many(
+                c=db_collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}
                        ]}
                      )
+                count+=c.deleted_count
         except Exception as e:
             logger.error("Can't delete data from the DB server: "+str(e))
             return False
@@ -451,20 +450,22 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip())
         try:
-            last_d = datetime.utcnow() - timedelta(days=int(num_days_to_keep))
+            last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                db_collection.delete_many(
+                c=db_collection.delete_many(
                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
                   )
+                count+=c.deleted_count
             else:
-                db_collection.delete_many(
+                c=db_collection.delete_many(
                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
                   )
+                count+=c.deleted_count
         except Exception as e:
             logger.error("Can't delete data from the DB server: "+str(e))
             return False
             
-    return True
+    return str(count) # equivalent to True, and also has the number of deleted documents in it
 
 def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, include_broadcast=False, convert_to_string=False):
     """
@@ -530,7 +531,7 @@ def insert_in_mongodb_collection(collection, data_to_insert):
 def create_or_update_in_mongodb_collection(collection, data_to_insert):
     """
     Creates or updates an object with data
-    Returns True if all was OK. Returns False if the insertion failed
+    Returns 1 if all was OK. Returns -1 if the insertion failed
     """
     logger.info("Inserting data in the DB server ...")
     try:

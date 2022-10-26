@@ -62,6 +62,7 @@ if __name__ == "__main__":
         MONGO_USER, MONGO_PWD, MONGO_HOST+":"+MONGO_PORT, MONGO_DB, MONGO_COLLECTION)
 
     siaas_aux.create_or_update_agent_configs(collection, agent_uid, config)
+    siaas_aux.create_or_update_agent_configs(collection, agent_uid, config)
     siaas_aux.create_or_update_agent_configs(collection, agent_uid_2, config_2)
     siaas_aux.create_or_update_agent_configs(
         collection, "ffffffff-ffff-ffff-ffff-ffffffffffff", bc_config)
@@ -71,20 +72,12 @@ if __name__ == "__main__":
 
     results = siaas_aux.read_mongodb_collection(collection, siaas_uid)
 
-    results = siaas_aux.get_dict_current_agent_data(collection, agent_uid=agent_uid+","+agent_uid_2, module="neighborhood")
-    #results = siaas_aux.get_dict_current_agent_data(collection)
-    #results = siaas_aux.get_dict_active_agents(collection)
-
-
-    results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=0)
-    #results = siaas_aux.get_dict_current_agent_configs(collection, include_broadcast=True)
-
-    #results = siaas_aux.get_dict_historical_agent_data(collection, days=1)
-    #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
-
-    #siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=agent_uid, days=-1)
+    #siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=agent_uid, days_to_keep=1)
+    #print(siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=agent_uid+","+agent_uid_2, days_to_keep=0))
+    #print(siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=0))
     #results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=0)
-    results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
+    #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
+    results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid+","+agent_uid_2+","+"ffffffff-ffff-ffff-ffff-ffffffffffff")
 
     if results != None:
         pprint.pprint(results)
