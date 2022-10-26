@@ -155,16 +155,24 @@ def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_di
 
     if type(config_dict) is not dict:
         logger.error(
-            "No valid dict received. No data was uploaded.")
+            "No valid configuration dict received. No data was uploaded.")
         return False
 
     if "#" in str(config_dict):
         logger.error(
-            "Detected invalid character '#' in the input configuration dict. No data was uploaded.")
+            "Detected invalid character '#' in the input configuration dict keys or values. No data was uploaded.")
         return False
 
     pattern = "^[A-Za-z0-9_-]*$"
     for k in config_dict.keys():
+        if type(k) is not str:
+            logger.error(
+               "This configuration dict has a key which is not a string. No data was uploaded.")
+            return False
+        if len(k or '') == 0:
+            logger.error(
+                "This configuration dict has an empty or invalid key. No data was uploaded.")
+            return False
         if not bool(re.match(pattern, k)):
             logger.error(
                "Invalid character detected in configuration dict keys. No data was uploaded.")
