@@ -43,7 +43,7 @@ def merge_module_dicts(modules=""):
 
 def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config_orig.db'), output=os.path.join(sys.path[0], 'var/config.db'), upstream_dict={}):
     """
-    Merges the configs downloaded from the server to the local configs DB;
+    Merges the upstream configs to the local configs DB;
     If the config disappears from the server, it reverts to the local config.
     """
     merged_config_dict = {}
@@ -53,11 +53,11 @@ def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config
         if len(upstream_dict) > 0:
             logger.debug("The following configurations are being applied/overwritten from the server: "+str(upstream_dict))
         else:
-            logger.debug("No configurations were found in the remote server. Using local configurations only.")
+            logger.debug("No configurations were found in the upstream dict. Using local configurations only.")
         merged_config_dict = dict(list(local_config_dict.items())+list(upstream_dict.items()))
     except:
         logger.error(
-            "Could not merge configurations from remote server with the local configs.")
+            "Could not merge configurations from the upstream dict.")
     return write_to_local_file(output, dict(sorted(merged_config_dict.items())))
 
 
@@ -202,7 +202,7 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
     If the UID is "nil" it will return all records. Else, it will return records only for the inputted UID
     Returns a list of records. Returns None if data can't be read
     """
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     try:
 
         if(siaas_uid == "00000000-0000-0000-0000-000000000000"):
@@ -215,7 +215,7 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
             logger.debug("Record read: "+str(doc))
         return results
     except Exception as e:
-        logger.error("Can't read data from remote DB server: "+str(e))
+        logger.error("Can't read data from the DB server: "+str(e))
         return None
 
 def get_dict_active_agents(collection):
@@ -223,7 +223,7 @@ def get_dict_active_agents(collection):
     Reads a list of active agents
     Returns a list of records. Returns empty dict if data can't be read
     """
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     out_dict={}
 
     try:
@@ -236,7 +236,7 @@ def get_dict_active_agents(collection):
                  ] )
         results=list(cursor)
     except Exception as e:
-        logger.error("Can't read data from remote DB server: "+str(e))
+        logger.error("Can't read data from the DB server: "+str(e))
         return out_dict
 
     for r in results:
@@ -255,7 +255,7 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
     We can select a list of agents and modules to display
     Returns a list of records. Returns empty dict if data can't be read
     """
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     out_dict={}
 
 
@@ -268,7 +268,7 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
                      ).sort('_id', -1).limit(int(limit_outputs))
             results=list(cursor)
         except Exception as e:
-            logger.error("Can't read data from remote DB server: "+str(e))
+            logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
@@ -283,7 +283,7 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
                  ).sort('_id', -1).limit(int(limit_outputs))
             results=results+list(cursor)
         except Exception as e:
-            logger.error("Can't read data from remote DB server: "+str(e))
+            logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
@@ -312,7 +312,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     We can select a list of agents and modules to display
     Returns a list of records. Returns empty dict if data can't be read
     """
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     out_dict={}
 
     if agent_uid == None:
@@ -326,7 +326,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                       ] )
             results=list(cursor)
         except Exception as e:
-            logger.error("Can't read data from remote DB server: "+str(e))
+            logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
@@ -339,7 +339,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                      ).sort('_id', -1).limit(1)
                 results=results+list(cursor)
             except Exception as e:
-                logger.error("Can't read data from remote DB server: "+str(e))
+                logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
@@ -365,7 +365,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     We can select a list of agents and modules to display
     Returns a list of records. Returns empty dict if data can't be read
     """
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     out_dict={}
 
     if agent_uid == None:
@@ -379,7 +379,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                       ] )
             results=list(cursor)
         except Exception as e:
-            logger.error("Can't read data from remote DB server: "+str(e))
+            logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
@@ -392,7 +392,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                      ).sort('_id', -1).limit(1)
                 results=results+list(cursor)
             except Exception as e:
-                logger.error("Can't read data from remote DB server: "+str(e))
+                logger.error("Can't read data from the DB server: "+str(e))
             
     if merge_broadcast:
         results_bc=[]
@@ -402,7 +402,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                  ).sort('_id', -1).limit(1)
             results_bc=list(cursor)
         except Exception as e:
-            logger.error("Can't read data from remote DB server: "+str(e))
+            logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
@@ -420,7 +420,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 
     return dict(sorted(out_dict.items()))
 
-def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days=365):
+def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, num_days_to_keep=3650):
     """
     Delete records older than n-days
     We can select a list of agent_uuids or scope, else it will pick all scopes and all agents
@@ -431,16 +431,15 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
 
     if agent_uid == None:
         try:
-            last_d = datetime.utcnow() - timedelta(days=int(days))
-            print(str(last_d))
+            last_d = datetime.utcnow() - timedelta(days=int(num_days_to_keep))
             if scope == None:
                 db_collection.delete_many(
-                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}
+                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}
                        ]}
                      )
             else:
                 db_collection.delete_many(
-                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}
+                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}
                        ]}
                      )
         except Exception as e:
@@ -452,8 +451,7 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip())
         try:
-            last_d = datetime.utcnow() - timedelta(days=int(days))
-            print(str(last_d))
+            last_d = datetime.utcnow() - timedelta(days=int(num_days_to_keep))
             if scope == None:
                 db_collection.delete_many(
                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
@@ -476,7 +474,7 @@ def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-
     my_configs = {}
     broadcasted_configs = {}
     out_dict = {}
-    logger.debug("Reading data from the remote DB server ...")
+    logger.debug("Reading data from the DB server ...")
     try:
         if len(scope or '') > 0:
             cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid, "scope": scope}, {'_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
@@ -508,7 +506,7 @@ def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-
 
         logger.debug("Records read from the server: "+str(out_dict))
     except Exception as e:
-        logger.error("Can't read data from remote DB server: "+str(e))
+        logger.error("Can't read data from the DB server: "+str(e))
     return out_dict
 
 
@@ -517,15 +515,15 @@ def insert_in_mongodb_collection(collection, data_to_insert):
     Inserts data (usually a dict) into a said collection
     Returns True if all was OK. Returns False if the insertion failed
     """
-    logger.debug("Inserting data in the remote DB server ...")
+    logger.debug("Inserting data in the DB server ...")
     try:
         logger.debug("All data that will now be written to the database:\n" +
                      pprint.pformat(data_to_insert))
         collection.insert_one(copy(data_to_insert))
-        logger.debug("Data successfully uploaded to the remote DB server.")
+        logger.debug("Data successfully uploaded to the DB server.")
         return True
     except Exception as e:
-        logger.error("Can't upload data to remote DB server: "+str(e))
+        logger.error("Can't upload data to the DB server: "+str(e))
         return False
 
 
@@ -534,17 +532,17 @@ def create_or_update_in_mongodb_collection(collection, data_to_insert):
     Creates or updates an object with data
     Returns True if all was OK. Returns False if the insertion failed
     """
-    logger.info("Inserting data in the remote DB server ...")
+    logger.info("Inserting data in the DB server ...")
     try:
         logger.debug("All data that will now be written to the database:\n" +
                      pprint.pformat(data_to_insert))
         data = copy(data_to_insert)
         collection.find_one_and_update(
             {'destiny': data["destiny"], 'scope': data["scope"]}, {'$set': data}, upsert=True)
-        logger.info("Data successfully uploaded to the remote DB server.")
+        logger.info("Data successfully uploaded to the DB server.")
         return True
     except Exception as e:
-        logger.error("Can't upload data to remote DB server: "+str(e))
+        logger.error("Can't upload data to the DB server: "+str(e))
         return False
 
 
@@ -553,7 +551,7 @@ def connect_mongodb_collection(mongo_user="siaas", mongo_password="siaas", mongo
     Set up a MongoDB collection connection based on the inputs
     Returns the collection obj if succeeded. Returns None if it failed
     """
-    logger.debug("Connecting to remote DB server at "+str(mongo_host)+" ...")
+    logger.debug("Connecting to the DB server at "+str(mongo_host)+" ...")
     try:
         uri = "mongodb://%s:%s@%s/%s" % (quote_plus(mongo_user),
                                          quote_plus(mongo_password), mongo_host, mongo_db)
@@ -561,10 +559,10 @@ def connect_mongodb_collection(mongo_user="siaas", mongo_password="siaas", mongo
         db = client[mongo_db]
         collection = db[mongo_collection]
         logger.info(
-            "Correctly configured the remote DB server connection to collection '"+mongo_collection+"'.")
+            "Correctly configured the DB server connection to collection '"+mongo_collection+"'.")
         return collection
     except Exception as e:
-        logger.error("Can't connect to remote DB server: "+str(e))
+        logger.error("Can't connect to the DB server: "+str(e))
         return None
 
 

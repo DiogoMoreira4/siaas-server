@@ -1,6 +1,7 @@
 # SIAAS - Sistema Inteligente para Automação de Auditorias de Segurança
 # By João Pedro Seara
 
+import siaas_dbmaintenance
 import siaas_platform
 import siaas_aux
 import os
@@ -102,7 +103,10 @@ if __name__ == "__main__":
 
     # Main logic
     platform = Process(target=siaas_platform.loop, args=(SIAAS_VERSION,))
+    dbmaintenance = Process(target=siaas_dbmaintenance.loop, args=())
     platform.start()
+    dbmaintenance.start()
     app.run(debug=True, use_reloader=False, host="0.0.0.0", port="5000")
     #serve(app, host="0.0.0.0", port="5000")
     platform.join()
+    dbmaintenance.join()
