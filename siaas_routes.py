@@ -83,12 +83,12 @@ def agents_data():
 
 @app.route('/siaas-server/agents/data/<agent_uid>', methods = ['GET','POST','DELETE'], strict_slashes=False)
 def agents_data_id(agent_uid):
+    collection = get_db_collection()
     if request.method == 'GET':
         module = request.args.get('module', default='*', type=str)
         for m in module.split(','):
             if m.lstrip().rstrip() == "*":
                 module = None
-        collection = get_db_collection()
         output = siaas_aux.get_dict_current_agent_data(collection, agent_uid=agent_uid, module=module)
         return jsonify(
           {
@@ -101,7 +101,21 @@ def agents_data_id(agent_uid):
     if request.method == 'POST':
         pass
     if request.method == 'DELETE':
-        pass
+        days = request.args.get('days', default=0, type=int)
+        output = siaas_aux.delete_all_records_older_than(collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
+        if output:
+           status="success"
+           count_deleted=int(output)
+        else:
+           status="failure"
+           count_deleted=0
+        return jsonify(
+        {
+            'deleted_count': count_deleted,
+            'status': status,
+            'time': siaas_aux.get_now_utc_str()
+        }
+    )
 
 @app.route('/siaas-server/agents/configs', methods = ['GET'], strict_slashes=False)
 def agents_configs():
@@ -119,8 +133,8 @@ def agents_configs():
 
 @app.route('/siaas-server/agents/configs/<agent_uid>', methods = ['GET','POST','DELETE'], strict_slashes=False)
 def agents_configs_id(agent_uid):
+    collection = get_db_collection()
     if request.method == 'GET':
-        collection = get_db_collection()
         merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
         output = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
         return jsonify(
@@ -134,7 +148,20 @@ def agents_configs_id(agent_uid):
     if request.method == 'POST':
         pass
     if request.method == 'DELETE':
-        pass
+        output = siaas_aux.delete_all_records_older_than(collection, scope="agent_configs", agent_uid=agent_uid, days_to_keep=0)
+        if output:
+           status="success"
+           count_deleted=int(output)
+        else:
+           status="failure"
+           count_deleted=0
+        return jsonify(
+        {
+            'deleted_count': count_deleted,
+            'status': status,
+            'time': siaas_aux.get_now_utc_str()
+        }
+    )
 
 @app.route('/siaas-server/agents/historical', methods = ['GET'], strict_slashes=False)
 def agents_historical():
