@@ -9,27 +9,33 @@ from copy import copy
 
 logger = logging.getLogger(__name__)
 
+
 def delete_historical_data(db_collection=None, days_to_keep=365):
 
-    logger.info("Performing historical database cleanup, keeping last "+str(days_to_keep)+" days ...")
-    deleted_count = siaas_aux.delete_all_records_older_than(db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep)
+    logger.info("Performing historical database cleanup, keeping last " +
+                str(days_to_keep)+" days ...")
+    deleted_count = siaas_aux.delete_all_records_older_than(
+        db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep)
     if deleted_count:
-       logger.info("DB cleanup finished. "+str(deleted_count)+" records deleted.")
-       return True
+        logger.info("DB cleanup finished. " +
+                    str(deleted_count)+" records deleted.")
+        return True
     else:
-       logger.error("DB could not be cleaned up. This might result in an eventual disk exhaustion in the server!")
-       return False
+        logger.error(
+            "DB could not be cleaned up. This might result in an eventual disk exhaustion in the server!")
+        return False
+
 
 def loop():
 
     # Generate global variables from the configuration file
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
-    MONGO_USER=None
-    MONGO_PWD=None
-    MONGO_HOST=None
-    MONGO_PORT=None
-    MONGO_DB=None
-    MONGO_COLLECTION=None
+    MONGO_USER = None
+    MONGO_PWD = None
+    MONGO_HOST = None
+    MONGO_PORT = None
+    MONGO_DB = None
+    MONGO_COLLECTION = None
     for config_name in config_dict.keys():
         if config_name.upper() == "MONGO_USER":
             MONGO_USER = config_dict[config_name]
@@ -45,25 +51,28 @@ def loop():
             MONGO_COLLECTION = config_dict[config_name]
 
     if len(MONGO_PORT or '') > 0:
-       mongo_host_port = MONGO_HOST+":"+MONGO_PORT
+        mongo_host_port = MONGO_HOST+":"+MONGO_PORT
     else:
-       mongo_host_port = MONGO_HOST
+        mongo_host_port = MONGO_HOST
     db_collection = siaas_aux.connect_mongodb_collection(
-          MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+        MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
 
-    run=True
+    run = True
     if db_collection == None:
-            logger.error("No valid DB collection received. No DB maintenance will be performed.")
-            run=False
+        logger.error(
+            "No valid DB collection received. No DB maintenance will be performed.")
+        run = False
 
     while run:
 
         logger.debug("Loop running ...")
 
         try:
-            days_to_keep = int(siaas_aux.get_config_from_configs_db(config_name="dbmaintenance_historical_days_to_keep"))
+            days_to_keep = int(siaas_aux.get_config_from_configs_db(
+                config_name="dbmaintenance_historical_days_to_keep"))
         except:
-            logger.debug("The number of days to keep in the database is not configured or is invalid. Defaulting to 10 years.")
+            logger.debug(
+                "The number of days to keep in the database is not configured or is invalid. Defaulting to 10 years.")
             days_to_keep = 3650
 
         delete_historical_data(db_collection, days_to_keep)
@@ -94,7 +103,7 @@ if __name__ == "__main__":
     print('\nThis script is being directly run, so it will just read data from the DB!\n')
 
     siaas_uid = siaas_aux.get_or_create_unique_system_id()
-    #siaas_uid = "00000000-0000-0000-0000-000000000000" # hack to show data from all agents
+    # siaas_uid = "00000000-0000-0000-0000-000000000000" # hack to show data from all agents
 
     MONGO_USER = "siaas"
     MONGO_PWD = "siaas"

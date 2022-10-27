@@ -1,9 +1,6 @@
 # SIAAS - Sistema Inteligente para Automação de Auditorias de Segurança
 # By João Pedro Seara
 
-import siaas_dbmaintenance
-import siaas_platform
-import siaas_aux
 import os
 import sys
 import logging
@@ -16,25 +13,33 @@ from waitress import serve
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
+DB_COLLECTION_OBJ = None
 SIAAS_VERSION = "0.0.1"
+
 
 def get_db_collection():
     return DB_COLLECTION_OBJ
 
+
 if __name__ == "__main__":
 
+    import siaas_aux
+    import siaas_dbmaintenance
+    import siaas_platform
     import siaas_routes
 
     print('\n')
 
     # No Windows can do ; - )
     if os.name != "posix":
-        logger.critical("\nThis program can only be run in Linux or Raspberry Pi. Exiting!\n")
+        logger.critical(
+            "\nThis program can only be run in Linux or Raspberry Pi. Exiting!\n")
         sys.exit(1)
 
     # Needs to be root
     if os.geteuid() != 0:
-        logger.critical("\nThis script must be run as root or using sudo!\n", file=sys.stderr)
+        logger.critical(
+            "\nThis script must be run as root or using sudo!\n", file=sys.stderr)
         sys.exit(2)
 
     # Create local directories
@@ -52,12 +57,12 @@ if __name__ == "__main__":
 
     # Get all values
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
-    MONGO_USER=None
-    MONGO_PWD=None
-    MONGO_HOST=None
-    MONGO_PORT=None
-    MONGO_DB=None
-    MONGO_COLLECTION=None
+    MONGO_USER = None
+    MONGO_PWD = None
+    MONGO_HOST = None
+    MONGO_PORT = None
+    MONGO_DB = None
+    MONGO_COLLECTION = None
     for config_name in config_dict.keys():
         if config_name.upper() == "MONGO_USER":
             MONGO_USER = config_dict[config_name]
@@ -87,7 +92,8 @@ if __name__ == "__main__":
     # Grabbing a unique system ID before proceeding
     server_uid = siaas_aux.get_or_create_unique_system_id()
     if server_uid == "00000000-0000-0000-0000-000000000000":
-        logger.critical("\nCan't proceed without an unique system ID. Aborting !\n")
+        logger.critical(
+            "\nCan't proceed without an unique system ID. Aborting !\n")
         sys.exit(3)
 
     # Create connection to MongoDB
@@ -95,7 +101,8 @@ if __name__ == "__main__":
         mongo_host_port = MONGO_HOST+":"+MONGO_PORT
     else:
         mongo_host_port = MONGO_HOST
-    DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+    DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(
+        MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
 
     print("\nSIAAS Server v"+SIAAS_VERSION +
           " starting ["+server_uid+"]\n\nLogging to: "+os.path.join(sys.path[0], log_file)+"\n")

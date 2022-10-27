@@ -34,7 +34,7 @@ def merge_module_dicts(modules=""):
                 next_dict_to_merge = {}
                 next_dict_to_merge[module] = module_dict
                 merged_dict = dict(
-                  list(merged_dict.items())+list(next_dict_to_merge.items()))
+                    list(merged_dict.items())+list(next_dict_to_merge.items()))
         except:
             logger.warning("Couldn't merge dict: " +
                            str(next_dict_to_merge))
@@ -51,10 +51,13 @@ def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config
     try:
         local_config_dict = get_config_from_configs_db(local_dict=local_dict)
         if len(upstream_dict) > 0:
-            logger.debug("The following configurations are being applied/overwritten from the server: "+str(upstream_dict))
+            logger.debug(
+                "The following configurations are being applied/overwritten from the server: "+str(upstream_dict))
         else:
-            logger.debug("No configurations were found in the upstream dict. Using local configurations only.")
-        merged_config_dict = dict(list(local_config_dict.items())+list(upstream_dict.items()))
+            logger.debug(
+                "No configurations were found in the upstream dict. Using local configurations only.")
+        merged_config_dict = dict(
+            list(local_config_dict.items())+list(upstream_dict.items()))
     except:
         logger.error(
             "Could not merge configurations from the upstream dict.")
@@ -76,9 +79,9 @@ def get_config_from_configs_db(local_dict=os.path.join(sys.path[0], 'var/config.
             out_dict = {}
             for k in config_dict.keys():
                 if convert_to_string:
-                   out_dict[k]=str(config_dict[k])
+                    out_dict[k] = str(config_dict[k])
                 else:
-                   out_dict[k]=config_dict[k]
+                    out_dict[k] = config_dict[k]
             return config_dict
 
         logger.error("Couldn't get configuration dictionary from local DB.")
@@ -92,9 +95,9 @@ def get_config_from_configs_db(local_dict=os.path.join(sys.path[0], 'var/config.
             local_dict)
         if len(config_dict or '') > 0:
             if config_name in config_dict.keys():
-                value=config_dict[config_name]
+                value = config_dict[config_name]
                 if convert_to_string:
-                    value=str(value)
+                    value = str(value)
                 return config_dict[config_name]
 
         logger.debug("Couldn't get configuration named '" +
@@ -132,10 +135,12 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
             config_value = line_uncommented.split("=", 1)[1].rstrip().lstrip()
             config_dict[config_name] = config_value
         except:
-            logger.warning("Invalid line from local configuration file was ignored: "+str(line))
+            logger.warning(
+                "Invalid line from local configuration file was ignored: "+str(line))
             continue
 
     return write_to_local_file(output, dict(sorted(config_dict.items())))
+
 
 def upload_agent_data(db_collection=None, agent_uid=None, data_dict={}):
     """
@@ -180,6 +185,7 @@ def upload_agent_data(db_collection=None, agent_uid=None, data_dict={}):
     complete_dict["timestamp"] = get_now_utc_obj()
 
     return insert_in_mongodb_collection(db_collection, complete_dict)
+
 
 def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_dict={}):
     """
@@ -243,9 +249,11 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
     try:
 
         if(siaas_uid == "00000000-0000-0000-0000-000000000000"):
-            cursor = collection.find({"payload": {'$exists': True}}).sort('_id', -1).limit(15) # show everything
+            cursor = collection.find({"payload": {'$exists': True}}).sort(
+                '_id', -1).limit(15)  # show everything
         else:
-            cursor = collection.find({'$and': [{"payload": {'$exists': True}}, {'$or':[{"origin": "server_"+siaas_uid}, {"destiny": {'$in': ["server_"+siaas_uid, "server_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}]}]}).sort('_id', -1).limit(15)  # destinated or originated to/from the server
+            cursor = collection.find({'$and': [{"payload": {'$exists': True}}, {'$or': [{"origin": "server_"+siaas_uid}, {"destiny": {'$in': [
+                                     "server_"+siaas_uid, "server_ffffffff-ffff-ffff-ffff-ffffffffffff"]}}]}]}).sort('_id', -1).limit(15)  # destinated or originated to/from the server
 
         results = list(cursor)
         for doc in results:
@@ -255,36 +263,41 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
         logger.error("Can't read data from the DB server: "+str(e))
         return None
 
+
 def get_dict_active_agents(collection):
     """
     Reads a list of active agents
     Returns a list of records. Returns empty dict if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
-    out_dict={}
+    out_dict = {}
 
     try:
         if "timestamp" not in str(list(collection.index_information())):
-             collection.create_index("timestamp", unique=False)
+            collection.create_index("timestamp", unique=False)
         cursor = collection.aggregate([
-             { "$match": {"origin": { "$regex": "^agent_" }}},
-             { "$sort": { "timestamp": 1 } },
-             { "$group": { "_id": {"origin": "$origin"}, "origin": {"$last":"$origin"}, "timestamp": { "$last": "$timestamp" } } }
-                 ] )
-        results=list(cursor)
+            {"$match": {"origin": {"$regex": "^agent_"}}},
+            {"$sort": {"timestamp": 1}},
+            {"$group": {"_id": {"origin": "$origin"}, "origin": {
+                "$last": "$origin"}, "timestamp": {"$last": "$timestamp"}}}
+        ])
+        results = list(cursor)
     except Exception as e:
         logger.error("Can't read data from the DB server: "+str(e))
         return out_dict
 
     for r in results:
         try:
-            uid=r["origin"].split("_",1)[1]
-            out_dict[uid]={}
-            out_dict[uid]["last_seen"]=r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+            uid = r["origin"].split("_", 1)[1]
+            out_dict[uid] = {}
+            out_dict[uid]["last_seen"] = r["timestamp"].strftime(
+                '%Y-%m-%dT%H:%M:%SZ')
         except:
-            logger.debug("Ignoring invalid entry when grabbing active agents data.")
+            logger.debug(
+                "Ignoring invalid entry when grabbing active agents data.")
 
     return out_dict
+
 
 def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999):
     """
@@ -293,50 +306,50 @@ def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limi
     Returns a list of records. Returns empty dict if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
-    out_dict={}
-
+    out_dict = {}
 
     if agent_uid == None:
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
-                    {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp":{"$gte": last_d}}
-                       ]}
-                     ).sort('_id', -1).limit(int(limit_outputs))
-            results=list(cursor)
+                {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp": {"$gte": last_d}}
+                          ]}
+            ).sort('_id', -1).limit(int(limit_outputs))
+            results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
-        results=[]
-        agent_list=[]
+        results = []
+        agent_list = []
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip())
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
-               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp":{"$gte": last_d}}, {"origin": {'$in': agent_list}}]}
-                 ).sort('_id', -1).limit(int(limit_outputs))
-            results=results+list(cursor)
+                {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {
+                    "timestamp": {"$gte": last_d}}, {"origin": {'$in': agent_list}}]}
+            ).sort('_id', -1).limit(int(limit_outputs))
+            results = results+list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
             if r["origin"].startswith("agent_"):
-                uid=r["origin"].split("_",1)[1]
-                timestamp=r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+                uid = r["origin"].split("_", 1)[1]
+                timestamp = r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
                 if timestamp not in out_dict.keys():
-                   out_dict[timestamp]={}
+                    out_dict[timestamp] = {}
                 if module == None:
-                   out_dict[timestamp][uid]=r["payload"]
+                    out_dict[timestamp][uid] = r["payload"]
                 else:
-                   out_dict[timestamp][uid]={}
-                   for m in module.split(','):
-                       mod=m.lstrip().rstrip()
-                       if mod in r["payload"].keys():
-                           out_dict[timestamp][uid][mod]=r["payload"][mod]
+                    out_dict[timestamp][uid] = {}
+                    for m in module.split(','):
+                        mod = m.lstrip().rstrip()
+                        if mod in r["payload"].keys():
+                            out_dict[timestamp][uid][mod] = r["payload"][mod]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
@@ -350,46 +363,49 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     Returns a list of records. Returns empty dict if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
-    out_dict={}
+    out_dict = {}
 
     if agent_uid == None:
         try:
             if "timestamp" not in str(list(collection.index_information())):
                 collection.create_index("timestamp", unique=False)
             cursor = collection.aggregate([
-                { "$match": {'$and': [{"origin": { "$regex": "^agent_" }}, {"scope": "agent_data"}]}},
-                { "$sort": { "timestamp": 1 } },
-                { "$group": { "_id": {"origin": "$origin"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
-                      ] )
-            results=list(cursor)
+                {"$match": {
+                    '$and': [{"origin": {"$regex": "^agent_"}}, {"scope": "agent_data"}]}},
+                {"$sort": {"timestamp": 1}},
+                {"$group": {"_id": {"origin": "$origin"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
+                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}}
+            ])
+            results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
-        results=[]
+        results = []
         for u in agent_uid.split(','):
-            uid=u.lstrip().rstrip()
+            uid = u.lstrip().rstrip()
             try:
                 cursor = collection.find(
-                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"origin": "agent_"+uid}]}
-                     ).sort('_id', -1).limit(1)
-                results=results+list(cursor)
+                    {'$and': [{"payload": {'$exists': True}}, {
+                        "scope": "agent_data"}, {"origin": "agent_"+uid}]}
+                ).sort('_id', -1).limit(1)
+                results = results+list(cursor)
             except Exception as e:
                 logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
             if r["origin"].startswith("agent_"):
-                uid=r["origin"].split("_",1)[1]
+                uid = r["origin"].split("_", 1)[1]
                 if module == None:
-                   out_dict[uid]=r["payload"]
+                    out_dict[uid] = r["payload"]
                 else:
-                   out_dict[uid]={}
-                   for m in module.split(','):
-                       mod=m.lstrip().rstrip()
-                       if mod in r["payload"].keys():
-                           out_dict[uid][mod]=r["payload"][mod]
+                    out_dict[uid] = {}
+                    for m in module.split(','):
+                        mod = m.lstrip().rstrip()
+                        if mod in r["payload"].keys():
+                            out_dict[uid][mod] = r["payload"][mod]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
@@ -403,60 +419,66 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     Returns a list of records. Returns empty dict if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
-    out_dict={}
+    out_dict = {}
 
     if agent_uid == None:
         try:
             if "timestamp" not in str(list(collection.index_information())):
                 collection.create_index("timestamp", unique=False)
             cursor = collection.aggregate([
-                { "$match": {'$and': [{"destiny": { "$regex": "^agent_" }}, {"scope": "agent_configs"}]}},
-                { "$sort": { "timestamp": 1 } },
-                { "$group": { "_id": {"destiny": "$destiny"}, "scope": {"$last":"$scope"}, "origin": {"$last":"$origin"}, "destiny": {"$last":"$destiny"}, "payload": {"$last":"$payload"}, "timestamp": { "$last": "$timestamp" } } }
-                      ] )
-            results=list(cursor)
+                {"$match": {'$and': [{"destiny": {"$regex": "^agent_"}}, {
+                    "scope": "agent_configs"}]}},
+                {"$sort": {"timestamp": 1}},
+                {"$group": {"_id": {"destiny": "$destiny"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
+                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}}
+            ])
+            results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
             return out_dict
 
     else:
-        results=[]
+        results = []
         for u in agent_uid.split(','):
-            uid=u.lstrip().rstrip()
+            uid = u.lstrip().rstrip()
             try:
                 cursor = collection.find(
-                   {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {"destiny": "agent_"+uid}]}
-                     ).sort('_id', -1).limit(1)
-                results=results+list(cursor)
+                    {'$and': [{"payload": {'$exists': True}}, {
+                        "scope": "agent_configs"}, {"destiny": "agent_"+uid}]}
+                ).sort('_id', -1).limit(1)
+                results = results+list(cursor)
             except Exception as e:
                 logger.error("Can't read data from the DB server: "+str(e))
-            
+
     if merge_broadcast:
-        results_bc=[]
+        results_bc = []
         try:
             cursor = collection.find(
-               {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {"destiny": "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"}]}
-                 ).sort('_id', -1).limit(1)
-            results_bc=list(cursor)
+                {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {
+                    "destiny": "agent_ffffffff-ffff-ffff-ffff-ffffffffffff"}]}
+            ).sort('_id', -1).limit(1)
+            results_bc = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
 
     for r in results:
         try:
             if r["destiny"].startswith("agent_"):
-                    uid=r["destiny"].split("_",1)[1]
-                    if merge_broadcast:
-                        if len(results_bc)>0:
-                            out_dict[uid]=dict(list(results_bc[0]["payload"].items())+list(r["payload"].items()))
-                        else:
-                            out_dict[uid]=r["payload"]
+                uid = r["destiny"].split("_", 1)[1]
+                if merge_broadcast:
+                    if len(results_bc) > 0:
+                        out_dict[uid] = dict(
+                            list(results_bc[0]["payload"].items())+list(r["payload"].items()))
                     else:
-                       out_dict[uid]=r["payload"]
-                    out_dict[uid]=dict(sorted(out_dict[uid].items()))
+                        out_dict[uid] = r["payload"]
+                else:
+                    out_dict[uid] = r["payload"]
+                out_dict[uid] = dict(sorted(out_dict[uid].items()))
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
     return out_dict
+
 
 def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days_to_keep=3650):
     """
@@ -465,49 +487,53 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
     Returns number of deleted records as a string, or False if error
     """
     logger.debug("Removing data from the DB server ...")
-    out_dict={}
-    count=0
+    out_dict = {}
+    count = 0
 
     if agent_uid == None:
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                c=db_collection.delete_many(
-                    {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}
-                       ]}
-                     )
-                count+=c.deleted_count
+                c = db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"timestamp": {"$lt": last_d}}
+                              ]}
+                )
+                count += c.deleted_count
             else:
-                c=db_collection.delete_many(
-                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}
-                       ]}
-                     )
-                count+=c.deleted_count
+                c = db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp": {"$lt": last_d}}
+                              ]}
+                )
+                count += c.deleted_count
         except Exception as e:
             logger.error("Can't delete data from the DB server: "+str(e))
             return False
 
     else:
-        agent_list=[]
+        agent_list = []
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip())
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                c=db_collection.delete_many(
-                   {'$and': [{"payload": {'$exists': True}}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
-                  )
-                count+=c.deleted_count
+                c = db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"timestamp": {"$lt": last_d}}, {
+                        '$or': [{"destiny": {'$in': agent_list}}, {"origin": {'$in': agent_list}}]}]}
+                )
+                count += c.deleted_count
             else:
-                c=db_collection.delete_many(
-                   {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp":{"$lt": last_d}}, {'$or':[{"destiny": {'$in': agent_list}},{"origin": {'$in': agent_list}}]}]}
-                  )
-                count+=c.deleted_count
+                c = db_collection.delete_many(
+                    {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp": {"$lt": last_d}}, {
+                        '$or': [{"destiny": {'$in': agent_list}}, {"origin": {'$in': agent_list}}]}]}
+                )
+                count += c.deleted_count
         except Exception as e:
             logger.error("Can't delete data from the DB server: "+str(e))
             return False
-            
-    return str(count) # equivalent to True, and also has the number of deleted documents in it
+
+    # equivalent to True, and also has the number of deleted documents in it
+    return str(count)
+
 
 def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, include_broadcast=False, convert_to_string=False):
     """
@@ -520,32 +546,36 @@ def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-
     logger.debug("Reading data from the DB server ...")
     try:
         if len(scope or '') > 0:
-            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid, "scope": scope}, {'_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
+            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid, "scope": scope}, {
+                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
         else:
-            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}, {'_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
+            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}, {
+                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
         results1 = list(cursor1)
         for doc in results1:
             my_configs = doc["payload"]
 
         if len(scope or '') > 0:
-            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff", "scope": scope}, {'_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
+            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff", "scope": scope}, {
+                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
         else:
-            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff"}, {'_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
+            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff"}, {
+                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
         results2 = list(cursor2)
         for doc in results2:
             broadcasted_configs = doc["payload"]
 
         if include_broadcast:
             final_results = dict(
-                list(broadcasted_configs.items())+list(my_configs.items())) # configs directed to the agent have precedence over broadcasted ones
+                list(broadcasted_configs.items())+list(my_configs.items()))  # configs directed to the agent have precedence over broadcasted ones
         else:
             final_results = my_configs
 
         for k in final_results.keys():
             if convert_to_string:
-                out_dict[k]=str(final_results[k])
+                out_dict[k] = str(final_results[k])
             else:
-                out_dict[k]=final_results[k]
+                out_dict[k] = final_results[k]
 
         logger.debug("Records read from the server: "+str(out_dict))
     except Exception as e:
@@ -718,21 +748,23 @@ def get_or_create_unique_system_id():
         return "00000000-0000-0000-0000-000000000000"
     return new_uid
 
+
 def validate_string_key(string):
     pattern = "^[A-Za-z0-9_-]*$"
     if type(string) is not str:
-       logger.debug(
+        logger.debug(
             "This data dict has a key which is not a string. No data was uploaded.")
-       return False
+        return False
     if len(string or '') == 0:
-       logger.debug(
+        logger.debug(
             "This data dict has an empty or invalid key. No data was uploaded.")
-       return False
+        return False
     if not bool(re.match(pattern, string)):
-       logger.debug(
+        logger.debug(
             "Invalid character detected in data dict keys. No data was uploaded.")
-       return False
+        return False
     return True
+
 
 def get_size(bytes, suffix="B"):
     """
@@ -777,11 +809,11 @@ def sort_ip_dict(ip_dict):
     """
     Sorts a dict by their keys considering they're IPs
     """
-    out_dict={}
+    out_dict = {}
     try:
-        sorted_keys=sorted(ip_dict.keys(), key=ip_sorter)
+        sorted_keys = sorted(ip_dict.keys(), key=ip_sorter)
         for k in sorted_keys:
-            out_dict[k]=ip_dict[k]
+            out_dict[k] = ip_dict[k]
     except:
         pass
     return out_dict

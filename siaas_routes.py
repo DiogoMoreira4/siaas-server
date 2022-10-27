@@ -8,6 +8,7 @@ import sys
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
 
+
 @app.route('/', strict_slashes=False)
 @app.route('/index', strict_slashes=False)
 def index():
@@ -55,7 +56,7 @@ def siaas_server():
     )
 
 
-@app.route('/siaas-server/agents', methods = ['GET'], strict_slashes=False)
+@app.route('/siaas-server/agents', methods=['GET'], strict_slashes=False)
 def agents():
     collection = get_db_collection()
     output = siaas_aux.get_dict_active_agents(collection)
@@ -68,7 +69,8 @@ def agents():
         }
     )
 
-@app.route('/siaas-server/agents/data', methods = ['GET'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/data', methods=['GET'], strict_slashes=False)
 def agents_data():
     module = request.args.get('module', default='*', type=str)
     for m in module.split(','):
@@ -85,7 +87,8 @@ def agents_data():
         }
     )
 
-@app.route('/siaas-server/agents/data/<agent_uid>', methods = ['GET','POST','DELETE'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/data/<agent_uid>', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
 def agents_data_id(agent_uid):
     collection = get_db_collection()
     if request.method == 'GET':
@@ -93,50 +96,55 @@ def agents_data_id(agent_uid):
         for m in module.split(','):
             if m.lstrip().rstrip() == "*":
                 module = None
-        output = siaas_aux.get_dict_current_agent_data(collection, agent_uid=agent_uid, module=module)
+        output = siaas_aux.get_dict_current_agent_data(
+            collection, agent_uid=agent_uid, module=module)
         return jsonify(
-          {
-            'output': output,
-            'status': 'success',
-            'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str()
-          }
+            {
+                'output': output,
+                'status': 'success',
+                'total_entries': len(output),
+                'time': siaas_aux.get_now_utc_str()
+            }
         )
     if request.method == 'POST':
         content = request.json
-        output = siaas_aux.upload_agent_data(collection, agent_uid=agent_uid, data_dict=content)
+        output = siaas_aux.upload_agent_data(
+            collection, agent_uid=agent_uid, data_dict=content)
         if output:
-           status="success"
+            status = "success"
         else:
-           status="failure"
+            status = "failure"
         return jsonify(
-        {
-            'status': status,
-            'time': siaas_aux.get_now_utc_str()
-        }
-    )
+            {
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
     if request.method == 'DELETE':
         days = request.args.get('days', default=0, type=int)
-        output = siaas_aux.delete_all_records_older_than(collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
+        output = siaas_aux.delete_all_records_older_than(
+            collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
         if output:
-           status="success"
-           count_deleted=int(output)
+            status = "success"
+            count_deleted = int(output)
         else:
-           status="failure"
-           count_deleted=0
+            status = "failure"
+            count_deleted = 0
         return jsonify(
-        {
-            'deleted_count': count_deleted,
-            'status': status,
-            'time': siaas_aux.get_now_utc_str()
-        }
-    )
+            {
+                'deleted_count': count_deleted,
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
 
-@app.route('/siaas-server/agents/configs', methods = ['GET'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/configs', methods=['GET'], strict_slashes=False)
 def agents_configs():
     collection = get_db_collection()
     merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
-    output = siaas_aux.get_dict_current_agent_configs(collection, merge_broadcast=merge_broadcast)
+    output = siaas_aux.get_dict_current_agent_configs(
+        collection, merge_broadcast=merge_broadcast)
     return jsonify(
         {
             'output': output,
@@ -146,50 +154,56 @@ def agents_configs():
         }
     )
 
-@app.route('/siaas-server/agents/configs/<agent_uid>', methods = ['GET','POST','DELETE'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/configs/<agent_uid>', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
 def agents_configs_id(agent_uid):
     collection = get_db_collection()
     if request.method == 'GET':
-        merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
-        output = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
+        merge_broadcast = request.args.get(
+            'merge_broadcast', default=0, type=int)
+        output = siaas_aux.get_dict_current_agent_configs(
+            collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
         return jsonify(
-          {
-            'output': output,
-            'status': 'success',
-            'total_entries': len(output),
-            'time': siaas_aux.get_now_utc_str()
-          }
+            {
+                'output': output,
+                'status': 'success',
+                'total_entries': len(output),
+                'time': siaas_aux.get_now_utc_str()
+            }
         )
     if request.method == 'POST':
         content = request.json
-        output = siaas_aux.create_or_update_agent_configs(collection, agent_uid=agent_uid, config_dict=content)
+        output = siaas_aux.create_or_update_agent_configs(
+            collection, agent_uid=agent_uid, config_dict=content)
         if output:
-           status="success"
+            status = "success"
         else:
-           status="failure"
+            status = "failure"
         return jsonify(
-        {
-            'status': status,
-            'time': siaas_aux.get_now_utc_str()
-        }
-    )
+            {
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
     if request.method == 'DELETE':
-        output = siaas_aux.delete_all_records_older_than(collection, scope="agent_configs", agent_uid=agent_uid, days_to_keep=0)
+        output = siaas_aux.delete_all_records_older_than(
+            collection, scope="agent_configs", agent_uid=agent_uid, days_to_keep=0)
         if output:
-           status="success"
-           count_deleted=int(output)
+            status = "success"
+            count_deleted = int(output)
         else:
-           status="failure"
-           count_deleted=0
+            status = "failure"
+            count_deleted = 0
         return jsonify(
-        {
-            'deleted_count': count_deleted,
-            'status': status,
-            'time': siaas_aux.get_now_utc_str()
-        }
-    )
+            {
+                'deleted_count': count_deleted,
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
 
-@app.route('/siaas-server/agents/historical', methods = ['GET'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/historical', methods=['GET'], strict_slashes=False)
 def agents_historical():
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=25, type=int)
@@ -198,10 +212,11 @@ def agents_historical():
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0 or days <=0:
-        output={}
+    if limit_outputs <= 0 or days <= 0:
+        output = {}
     else:
-        output = siaas_aux.get_dict_historical_agent_data(collection, module=module, limit_outputs=limit_outputs, days=days)
+        output = siaas_aux.get_dict_historical_agent_data(
+            collection, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
             'output': output,
@@ -211,7 +226,8 @@ def agents_historical():
         }
     )
 
-@app.route('/siaas-server/agents/historical/<agent_uid>', methods = ['GET'], strict_slashes=False)
+
+@app.route('/siaas-server/agents/historical/<agent_uid>', methods=['GET'], strict_slashes=False)
 def agents_historical_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=25, type=int)
@@ -220,10 +236,11 @@ def agents_historical_id(agent_uid):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0 or days <=0:
-        output={}
+    if limit_outputs <= 0 or days <= 0:
+        output = {}
     else:
-        output = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
+        output = siaas_aux.get_dict_historical_agent_data(
+            collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
     return jsonify(
         {
             'output': output,

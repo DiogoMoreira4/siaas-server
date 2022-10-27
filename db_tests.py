@@ -40,13 +40,12 @@ if __name__ == "__main__":
         "silent_mode": "false"
     }
 
-
     bc_config = {
         "datatransfer_loop_interval_sec": 120,
         "disable_portscanner": "true",
         "ignore_neighborhood": "",
         "silent_mode": "true",
-        "testing_a_dict": { "oi": 123 }
+        "testing_a_dict": {"oi": 123}
     }
 
     #config = {}
@@ -68,7 +67,7 @@ if __name__ == "__main__":
         collection, "ffffffff-ffff-ffff-ffff-ffffffffffff", bc_config)
 
     siaas_uid = siaas_aux.get_or_create_unique_system_id()
-    #siaas_uid = "00000000-0000-0000-0000-000000000000" # hack to show data from all servers
+    # siaas_uid = "00000000-0000-0000-0000-000000000000" # hack to show data from all servers
 
     results = siaas_aux.read_mongodb_collection(collection, siaas_uid)
 
@@ -77,13 +76,13 @@ if __name__ == "__main__":
     #print(siaas_aux.delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=0))
     #results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid, merge_broadcast=0)
     #results = siaas_aux.get_dict_historical_agent_data(collection, agent_uid=agent_uid)
-    results = siaas_aux.get_dict_current_agent_configs(collection, agent_uid=agent_uid+","+agent_uid_2+","+"ffffffff-ffff-ffff-ffff-ffffffffffff")
+    results = siaas_aux.get_dict_current_agent_configs(
+        collection, agent_uid=agent_uid+","+agent_uid_2+","+"ffffffff-ffff-ffff-ffff-ffffffffffff")
 
     if results != None:
         pprint.pprint(results)
-        #for doc in results:
-            # print('\n'+str(pprint.pformat(doc)))
-            #print('\n'+str(doc))
+        # for doc in results:
+        # print('\n'+str(pprint.pformat(doc)))
+        # print('\n'+str(doc))
 
     print('\nAll done. Bye!\n')
-
