@@ -40,7 +40,11 @@ def siaas_server():
             len(output["config"]["mongo_pwd"])
     except:
         pass
-
+    try:
+        output["config"]["api_pwd"] = '*' * \
+            len(output["config"]["api_pwd"])
+    except:
+        pass
     return jsonify(
         {
             'output': output,
