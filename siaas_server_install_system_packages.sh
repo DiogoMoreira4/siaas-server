@@ -17,17 +17,14 @@ apt-get install -y apache2
 cat <<EOF | tee /etc/apache2/sites-available/siaas.conf
 <VirtualHost *:80>
 
-  ServerAlias siaas
-  ProxyPreserveHost On
+  ServerName siaas
 
+  ProxyPreserveHost On
   ProxyPass "/api" http://127.0.0.1:5000
   ProxyPassReverse "/api" http://127.0.0.1:5000
 
-  LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b" common_forwarded
-  ErrorLog  ${APACHE_LOG_DIR}/siaas_error.log
-  CustomLog ${APACHE_LOG_DIR}/siaas_forwarded.log common_forwarded
-  CustomLog ${APACHE_LOG_DIR}/siaas_access.log combined env=!dontlog
-  CustomLog ${APACHE_LOG_DIR}/siaas.log combined
+  CustomLog /\${APACHE_LOG_DIR}/siaas-access.log combined
+  ErrorLog /\${APACHE_LOG_DIR}/siaas-error.log
 
 </VirtualHost>
 EOF
@@ -40,6 +37,7 @@ a2enmod proxy
 a2enmod proxy_http
 a2enmod headers
 rm -f /etc/apache2/sites-enabled/000-default.conf
+rm -f /etc/apache2/sites-enabled/default-ssl.conf
 systemctl restart apache2
 systemctl enable apache2
 
