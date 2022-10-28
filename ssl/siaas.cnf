@@ -1,0 +1,18 @@
+[ req ]
+default_bits = 4096
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+x509_extensions = v3_req
+prompt = no
+[ req_distinguished_name ]
+countryName = PT
+stateOrProvinceName = Lisbon
+localityName = Lisbon
+organizationName = ISCTE
+organizationalUnitName = METI
+commonName = siaas
+#emailAddress = ""
+[ v3_req ]
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = siaas
