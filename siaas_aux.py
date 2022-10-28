@@ -154,7 +154,7 @@ def upload_agent_data(db_collection=None, agent_uid=None, data_dict={}):
     complete_dict["scope"] = "agent_data"
     complete_dict["origin"] = "agent_"+agent_uid
     complete_dict["destiny"] = "*"
-    complete_dict["payload"] = dict(sorted(data_dict.items()))
+    complete_dict["payload"] = data_dict
     complete_dict["timestamp"] = get_now_utc_obj()
 
     return insert_in_mongodb_collection(db_collection, complete_dict)
