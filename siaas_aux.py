@@ -115,16 +115,11 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
     return write_to_local_file(output, dict(sorted(config_dict.items())))
 
 
-def upload_agent_data(db_collection=None, agent_uid=None, data_dict={}):
+def upload_agent_data(collection, agent_uid=None, data_dict={}):
     """
     Receives a dict with agent data, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
     """
-
-    if db_collection == None:
-        logger.error(
-            "No valid DB collection object received. No data was uploaded.")
-        return False
 
     if type(data_dict) is not dict:
         logger.error(
@@ -157,19 +152,14 @@ def upload_agent_data(db_collection=None, agent_uid=None, data_dict={}):
     complete_dict["payload"] = data_dict
     complete_dict["timestamp"] = get_now_utc_obj()
 
-    return insert_in_mongodb_collection(db_collection, complete_dict)
+    return insert_in_mongodb_collection(collection, complete_dict)
 
 
-def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_dict={}):
+def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     """
     Receives a dict with agent configs, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
     """
-
-    if db_collection == None:
-        logger.error(
-            "No valid DB collection object received. No data was uploaded.")
-        return False
 
     if type(config_dict) is not dict:
         logger.error(
@@ -209,7 +199,7 @@ def create_or_update_agent_configs(db_collection=None, agent_uid=None, config_di
     complete_dict["payload"] = dict(sorted(config_dict.items()))
     complete_dict["timestamp"] = get_now_utc_obj()
 
-    return create_or_update_in_mongodb_collection(db_collection, complete_dict)
+    return create_or_update_in_mongodb_collection(collection, complete_dict)
 
 
 def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-000000000000"):
@@ -464,7 +454,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     return out_dict
 
 
-def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None, days_to_keep=3650):
+def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=3650):
     """
     Delete records older than n-days
     We can select a list of agent_uuids or scope, else it will pick all scopes and all agents
@@ -478,13 +468,13 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                c = db_collection.delete_many(
+                c = collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"timestamp": {"$lt": last_d}}
                               ]}
                 )
                 count += c.deleted_count
             else:
-                c = db_collection.delete_many(
+                c = collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp": {"$lt": last_d}}
                               ]}
                 )
@@ -500,13 +490,13 @@ def delete_all_records_older_than(db_collection=None, scope=None, agent_uid=None
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
-                c = db_collection.delete_many(
+                c = collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"timestamp": {"$lt": last_d}}, {
                         '$or': [{"destiny": {'$in': agent_list}}, {"origin": {'$in': agent_list}}]}]}
                 )
                 count += c.deleted_count
             else:
-                c = db_collection.delete_many(
+                c = collection.delete_many(
                     {'$and': [{"payload": {'$exists': True}}, {"scope": scope}, {"timestamp": {"$lt": last_d}}, {
                         '$or': [{"destiny": {'$in': agent_list}}, {"origin": {'$in': agent_list}}]}]}
                 )
