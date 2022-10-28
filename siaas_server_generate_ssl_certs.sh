@@ -19,4 +19,4 @@ openssl x509 -in ./certs/siaas.csr -out ./certs/siaas.crt -req -signkey ./certs/
 chmod 644 ./certs/*
 cd -
 
-echo -e "\nFiles siaas.crt and siaas.key can now be used in Apache configuration.\nFile siiaas.crt should be used in the agent as the 'ssl_ca_bundle' config.\n"
+echo -e "\nCerts placed in: ${SCRIPT_DIR}/ssl/certs\n\nFiles siaas.crt and siaas.key can now be used in Apache configuration;\nFile siiaas.crt should be used in the agent as the 'ssl_ca_bundle' config.\n"

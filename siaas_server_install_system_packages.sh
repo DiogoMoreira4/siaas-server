@@ -20,6 +20,10 @@ chmod 644 /etc/ssl/certs/siaas.crt
 cp -p ./ssl/certs/siaas.key /etc/ssl/private/
 chown root:root /etc/ssl/private/siaas.key
 chmod 640 /etc/ssl/private/siaas.key
+cd /etc/ssl/certs
+for f in `find . -type l`; do [ `readlink $f` == siaas.crt ] && rm -f $f; done;
+ln -fs siaas.crt `openssl x509 -hash -noout -in /etc/ssl/certs/siaas.crt`.0
+cd -
 
 # APACHE CONFIGURATION
 cp -f ./apache/*.conf /etc/apache2/sites-available/
