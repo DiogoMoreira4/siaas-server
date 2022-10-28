@@ -13,7 +13,7 @@ apt-get update
 apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl
 
 # SSL CONFIGURATION
-#./siaas_server_generate_ssl_certs.sh # only if you want to generate new certs
+#./siaas_server_generate_ssl_certs.sh # only if we want to generate new certs
 cp -p ./ssl/certs/siaas.crt /etc/ssl/certs/
 chown root:root /etc/ssl/certs/siaas.crt
 chmod 644 /etc/ssl/certs/siaas.crt

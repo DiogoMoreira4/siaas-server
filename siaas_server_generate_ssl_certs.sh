@@ -14,9 +14,8 @@ mkdir -p ${SSL_DIR}
 
 cd ${SSL_DIR}
 mkdir -p certs
-openssl req -nodes -newkey rsa:2048 -keyout ./certs/siaas.key -out ./certs/siaas.csr -subj "/C=PT/ST=Lisbon/L=Lisbon/O=ISCTE/OU=METI/CN=siaas"
 openssl req -nodes -newkey rsa:2048 -keyout ./certs/siaas.key -out ./certs/siaas.csr -config ./siaas.cnf
-openssl x509 -in ./certs/siaas.csr -out ./certs/siaas.crt -req -signkey ./certs/siaas.key -days 3650 -extfile ./siaas.cnf -extensions v3_req
+openssl x509 -in ./certs/siaas.csr -out ./certs/siaas.crt -req -signkey ./certs/siaas.key -extfile ./siaas.cnf -extensions v3_req -days 3650
 chmod 644 ./certs/*
 cd -
 
