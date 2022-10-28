@@ -18,4 +18,8 @@ __
 
  - How to stop: `sudo ./siaas_server_kill.sh`
 
- - How to generate a project archive (it is recommended to kill all processes before): `sudo ./siaas_server_archive.sh`
+ - RECOMMENDED WAY TO START/STOP SERVICES: `sudo systemctl [start/stop/restart] siaas-server`
+
+ - Logs: `tail -100f /var/log/siaas/siaas-server.log`
+
+ - How to generate a project archive (it is recommended to stop all processes before): `sudo ./siaas_server_archive.sh`
