@@ -25,7 +25,13 @@ for f in `find . -type l`; do [ `readlink $f` == siaas.crt ] && rm -f $f; done;
 ln -fs siaas.crt `openssl x509 -hash -noout -in /etc/ssl/certs/siaas.crt`.0
 cd -
 
-# APACHE CONFIGURATION
+# APACHE CONFIGURATIONS
+APACHE_AUTH_PWD=siaas
+echo $APACHE_AUTH_PWD > .siaas_apache_pwd
+htpasswd -c -i /etc/apache2/.htpasswd siaas < .siaas_apache_pwd
+rm -f .siaas_apache_pwd
+sudo chown root:www-data /etc/apache2/.htpasswd
+sudo chmod 640 /etc/apache2/.htpasswd
 cp -f ./apache/*.conf /etc/apache2/sites-available/
 cd /etc/apache2/sites-enabled/
 rm -f 000-default.conf

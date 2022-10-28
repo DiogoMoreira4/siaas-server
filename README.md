@@ -10,7 +10,7 @@ __
 
 **Instructions (tested on Ubuntu 20.04 "Focal")**
 
- - Set up system and Pyhon packages: `sudo ./siaas_server_install_system_packages.sh`
+ - Set up system and Pyhon packages: `sudo ./siaas_server_install_and_configure.sh`
  
  - How to initialize MongoDB: `sudo ./siaas_server_initialize_mongodb.sh`
 
