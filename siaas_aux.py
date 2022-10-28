@@ -1,9 +1,5 @@
 import ipaddress
-import scapy.config
-import scapy.layers.l2
-import scapy.route
 import math
-import dns.resolver
 import pprint
 import logging
 import uuid
@@ -39,29 +35,6 @@ def merge_module_dicts(modules=""):
             logger.warning("Couldn't merge dict: " +
                            str(next_dict_to_merge))
     return merged_dict
-
-
-def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config_orig.db'), output=os.path.join(sys.path[0], 'var/config.db'), upstream_dict={}):
-    """
-    Merges the upstream configs to the local configs DB;
-    If the config disappears from the server, it reverts to the local config.
-    """
-    merged_config_dict = {}
-    delta_dict = {}
-    try:
-        local_config_dict = get_config_from_configs_db(local_dict=local_dict)
-        if len(upstream_dict) > 0:
-            logger.debug(
-                "The following configurations are being applied/overwritten from the server: "+str(upstream_dict))
-        else:
-            logger.debug(
-                "No configurations were found in the upstream dict. Using local configurations only.")
-        merged_config_dict = dict(
-            list(local_config_dict.items())+list(upstream_dict.items()))
-    except:
-        logger.error(
-            "Could not merge configurations from the upstream dict.")
-    return write_to_local_file(output, dict(sorted(merged_config_dict.items())))
 
 
 def get_config_from_configs_db(local_dict=os.path.join(sys.path[0], 'var/config.db'), config_name=None, convert_to_string=True):
@@ -805,49 +778,6 @@ def get_now_utc_obj():
     return datetime.strptime(datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'), '%Y-%m-%dT%H:%M:%SZ')
 
 
-def ip_sorter(s):
-    """
-    IP sorter to use in sorted function
-    """
-    try:
-        ip = int(ipaddress.ip_address(s))
-    except ValueError:
-        return (1, s)
-    return (0, ip)
-
-
-def sort_ip_dict(ip_dict):
-    """
-    Sorts a dict by their keys considering they're IPs
-    """
-    out_dict = {}
-    try:
-        sorted_keys = sorted(ip_dict.keys(), key=ip_sorter)
-        for k in sorted_keys:
-            out_dict[k] = ip_dict[k]
-    except:
-        pass
-    return out_dict
-
-
-def is_ipv4_or_ipv6(ip):
-    """
-    Returns "6" if input IP is IPv6
-    Returns "4" if input IP is IPv4
-    Else returns None
-    """
-    try:
-        ipaddress.IPv4Network(ip)
-        return "4"
-    except:
-        pass
-    try:
-        ipaddress.IPv6Network(ip)
-        return "6"
-    except:
-        return None
-
-
 def get_ipv6_cidr(mask):
     """
     Returns the IPv6 short netmask from a long netmask input
@@ -865,64 +795,3 @@ def get_ipv6_cidr(mask):
         return None
         logger.warning("Bad IPv6 netmask: "+mask)
     return count
-
-
-def get_all_ips_for_name(host):
-    """
-    Checks all registered DNS IPs for a said host and returns them in a set
-    If the input is already an IP address, returns it
-    Returns an empty set if no IPs are found 
-    """
-    ips = set()
-
-    # Check if the host is already an IP and return it
-    try:
-        ipaddress.IPv4Network(host)
-        ips.add(host)
-        return ips
-    except:
-        pass
-    try:
-        ipaddress.IPv6Network(host)
-        ips.add(host)
-        return ips
-    except:
-        pass
-
-    # IPv4 name resolution
-    try:
-        result = dns.resolver.resolve(host, "A")
-        for ipval in result:
-            ips.add(ipval.to_text())
-    except:
-        pass
-
-    # IPv6 name resolution
-    try:
-        result6 = dns.resolver.resolve(host, "AAAA")
-        for ipval in result6:
-            ips.add(ipval.to_text())
-    except:
-        pass
-
-    return ips
-
-
-def long2net(arg):
-    """
-    Converts an hexadecimal IPv4 netmask to a 0-32 integer
-    """
-    if (arg <= 0 or arg >= 0xFFFFFFFF):
-        raise ValueError("Illegal netmask value", hex(arg))
-    return 32 - int(round(math.log(0xFFFFFFFF - arg, 2)))
-
-
-def to_cidr_notation(bytes_network, bytes_netmask):
-    """
-    Converts a network and network mask inputs in bytes to a network/short_mask IPv4 CIDR notation
-    """
-    network = scapy.utils.ltoa(bytes_network)
-    netmask = long2net(bytes_netmask)
-    net = "%s/%s" % (network, netmask)
-
-    return net
