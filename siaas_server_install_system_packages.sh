@@ -10,41 +10,39 @@ fi
 cd ${SCRIPT_DIR}
 
 apt-get update
-apt-get install -y python3 python3-pip python3-venv git mongodb apache2
+apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl
+
+# SSL CONFIGURATION
+#./siaas_server_generate_ssl_certs.sh # only if you want to generate new certs
+cp -p ./ssl/certs/siaas.crt /etc/ssl/certs/
+chown root:root /etc/ssl/certs/siaas.crt
+chmod 644 /etc/ssl/certs/siaas.crt
+cp -p ./ssl/certs/siaas.key /etc/ssl/private/
+chown root:root /etc/ssl/private/siaas.key
+chmod 640 /etc/ssl/private/siaas.key
 
 # APACHE CONFIGURATION
-apt-get install -y apache2
-cat <<EOF | tee /etc/apache2/sites-available/siaas.conf
-<VirtualHost *:80>
-
-  ServerName siaas
-
-  ProxyPreserveHost On
-  ProxyPass "/api" http://127.0.0.1:5000
-  ProxyPassReverse "/api" http://127.0.0.1:5000
-
-  CustomLog /\${APACHE_LOG_DIR}/siaas-access.log combined
-  ErrorLog /\${APACHE_LOG_DIR}/siaas-error.log
-
-</VirtualHost>
-EOF
+cp -f ./apache/*.conf /etc/apache2/sites-available/
 cd /etc/apache2/sites-enabled/
-ln -fs ../sites-available/siaas.conf
+rm -f 000-default.conf
+rm -f default-ssl.conf
+rm -f siaas*.conf
+#ln -fs ../sites-available/siaas.conf # HTTP only (no HTTPS)
+ln -fs ../sites-available/siaas-ssl.conf
 cd -
 a2enmod rewrite
 a2enmod ssl
 a2enmod proxy
 a2enmod proxy_http
 a2enmod headers
-rm -f /etc/apache2/sites-enabled/000-default.conf
-rm -f /etc/apache2/sites-enabled/default-ssl.conf
 systemctl restart apache2
 systemctl enable apache2
 
 # MONGO DB CONFIGURATION
-#sed -i 's|bind_ip[[:space:]]*=[[:space:]]*127.0.0.1|bind_ip = 0.0.0.0|g' /etc/mongodb.conf
+#sed -i 's|bind_ip[[:space:]]*=[[:space:]]*127.0.0.1|bind_ip = 0.0.0.0|g' /etc/mongodb.conf # Open DB to the world (only for testing purposes)
 systemctl restart mongodb
 systemctl enable mongodb
+sleep 3 && ./siaas_server_initialize_mongodb.sh # initialize the SIAAS users in MongoDB (resets all databases as well!)
 
 ln -fs ${SCRIPT_DIR}/siaas_server_run.sh /usr/local/bin/
 ln -fs ${SCRIPT_DIR}/siaas_server_kill.sh /usr/local/bin/
