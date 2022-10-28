@@ -435,7 +435,6 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
             results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
-            return out_dict
 
     else:
         results = []
@@ -476,6 +475,18 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                 out_dict[uid] = dict(sorted(out_dict[uid].items()))
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
+
+    # We have to make sure that even if the Agent UID doesn't exist in the config DB, we return the broadcast values if merge_broadcast is on
+    if merge_broadcast and len(agent_uid or '') > 0:
+        for u in agent_uid.split(','):
+            try:
+               uid = u.lstrip().rstrip()
+               if uid not in out_dict.keys():
+                   if len(results_bc) > 0:
+                       out_dict[uid]=results_bc[0]["payload"]
+                       out_dict[uid] = dict(sorted(out_dict[uid].items()))
+            except:
+               logger.debug("Ignoring invalid entry when grabbing agent data.")
 
     return out_dict
 
