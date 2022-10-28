@@ -13,13 +13,13 @@ from waitress import serve
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
-DB_COLLECTION_OBJ = None
 SIAAS_VERSION = "0.0.1"
+#LOG_DIR = "log"
+LOG_DIR = "/var/log/siaas"
 
-
+DB_COLLECTION_OBJ = None
 def get_db_collection():
     return DB_COLLECTION_OBJ
-
 
 if __name__ == "__main__":
 
@@ -44,7 +44,6 @@ if __name__ == "__main__":
 
     # Create local directories
     os.makedirs(os.path.join(sys.path[0], 'conf'), exist_ok=True)
-    os.makedirs(os.path.join(sys.path[0], 'log'), exist_ok=True)
     os.makedirs(os.path.join(sys.path[0], 'tmp'), exist_ok=True)
     os.makedirs(os.path.join(sys.path[0], 'var'), exist_ok=True)
 
@@ -78,7 +77,8 @@ if __name__ == "__main__":
             MONGO_COLLECTION = config_dict[config_name]
 
     # Define logging level according to user config
-    log_file = "log/siaas-server.log"
+    os.makedirs(os.path.join(sys.path[0], LOG_DIR), exist_ok=True)
+    log_file = os.path.join(os.path.join(sys.path[0], LOG_DIR), "siaas-server.log")
     log_level = siaas_aux.get_config_from_configs_db(config_name="log_level")
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
