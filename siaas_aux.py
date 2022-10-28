@@ -272,7 +272,7 @@ def get_dict_active_agents(collection):
     return out_dict
 
 
-def get_dict_historical_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999):
+def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999):
     """
     Reads historical agent data from the Mongo DB collection
     We can select a list of agents and modules to display
