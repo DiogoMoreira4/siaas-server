@@ -1,5 +1,5 @@
-dbmaintenance_history_days_to_keep=1
-dbmaintenance_loop_interval_sec=15
+dbmaintenance_history_days_to_keep = 1
+dbmaintenance_loop_interval_sec = 15
 log_level = debug
 mongo_collection = siaas
 mongo_db = siaas
