@@ -10,7 +10,7 @@ from copy import copy
 logger = logging.getLogger(__name__)
 
 
-def delete_history_data(db_collection=None, days_to_keep=99999):
+def delete_history_data(db_collection=None, days_to_keep=3650):
 
     logger.info("Performing history database cleanup, keeping last " +
                 str(days_to_keep)+" days ...")

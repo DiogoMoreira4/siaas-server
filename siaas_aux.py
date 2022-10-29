@@ -454,7 +454,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     return out_dict
 
 
-def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=3650):
+def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=99999):
     """
     Delete records older than n-days
     We can select a list of agent_uuids or scope, else it will pick all scopes and all agents
