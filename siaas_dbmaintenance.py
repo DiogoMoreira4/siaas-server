@@ -70,6 +70,8 @@ def loop():
         try:
             days_to_keep = int(siaas_aux.get_config_from_configs_db(
                 config_name="dbmaintenance_history_days_to_keep"))
+            if days_to_keep < 0:
+                raise
         except:
             logger.debug(
                 "The number of days to keep in the database is not configured or is invalid. Defaulting to 10 years.")
