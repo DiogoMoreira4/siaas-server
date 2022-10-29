@@ -104,7 +104,7 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
                 continue
             config_name = line_uncommented.split("=", 1)[0].rstrip().lstrip()
             if not bool(re.match(pattern, config_name)):
-                raise
+                raise ValueError("Invalid character in config key.")
             config_value = line_uncommented.split("=", 1)[1].rstrip().lstrip()
             config_dict[config_name] = config_value
         except:
