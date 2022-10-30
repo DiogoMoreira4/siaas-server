@@ -121,12 +121,9 @@ def agents_data_id(agent_uid):
             }
         )
     if request.method == 'DELETE':
-        days = request.args.get('days', default=-1, type=int)
-        if days < 0:
-            output = "0"
-        else:
-            output = siaas_aux.delete_all_records_older_than(
-                collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
+        days = request.args.get('days', default=0, type=int)
+        output = siaas_aux.delete_all_records_older_than(
+            collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
         if output:
             status = "success"
             count_deleted = int(output)
@@ -215,8 +212,8 @@ def agents_history():
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs < 0 or days < 0:
-        output = {}
+    if limit_outputs < 0:
+        limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     else:
         output = siaas_aux.get_dict_history_agent_data(
             collection, module=module, limit_outputs=limit_outputs, days=days)
@@ -239,8 +236,8 @@ def agents_history_id(agent_uid):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs < 0 or days < 0:
-        output = {}
+    if limit_outputs < 0:
+        limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     else:
         output = siaas_aux.get_dict_history_agent_data(
             collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
