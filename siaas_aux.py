@@ -340,7 +340,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                     '$and': [{"origin": {"$regex": "^agent_"}}, {"scope": "agent_data"}]}},
                 {"$group": {"_id": {"origin": "$origin"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
                     "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}},
-                {"$sort": {"timestamp": -1}}
+                {"$sort": {"origin": 1}}
             ])
             results = list(cursor)
         except Exception as e:
@@ -397,7 +397,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                     "scope": "agent_configs"}]}},
                 {"$group": {"_id": {"destiny": "$destiny"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
                     "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}},
-                {"$sort": {"timestamp": -1}}
+                {"$sort": {"destiny": 1}}
             ])
             results = list(cursor)
         except Exception as e:
