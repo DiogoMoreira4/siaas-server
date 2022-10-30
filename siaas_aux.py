@@ -238,13 +238,13 @@ def get_dict_active_agents(collection):
     out_dict = {}
 
     try:
-        if "timestamp" not in str(list(collection.index_information())):
-            collection.create_index("timestamp", unique=False)
+        if "origin" not in str(list(collection.index_information())):
+            collection.create_index("origin", unique=False)
         cursor = collection.aggregate([
             {"$match": {"origin": {"$regex": "^agent_"}}},
-            {"$sort": {"timestamp": 1}},
             {"$group": {"_id": {"origin": "$origin"}, "origin": {
-                "$last": "$origin"}, "timestamp": {"$last": "$timestamp"}}}
+                "$last": "$origin"}, "timestamp": {"$last": "$timestamp"}}},
+            {"$sort": {"timestamp": -1}}
         ])
         results = list(cursor)
     except Exception as e:
@@ -333,14 +333,14 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
 
     if agent_uid == None:
         try:
-            if "timestamp" not in str(list(collection.index_information())):
-                collection.create_index("timestamp", unique=False)
+            if "origin" not in str(list(collection.index_information())):
+                collection.create_index("origin", unique=False)
             cursor = collection.aggregate([
                 {"$match": {
                     '$and': [{"origin": {"$regex": "^agent_"}}, {"scope": "agent_data"}]}},
-                {"$sort": {"timestamp": 1}},
                 {"$group": {"_id": {"origin": "$origin"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
-                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}}
+                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}},
+                {"$sort": {"timestamp": -1}}
             ])
             results = list(cursor)
         except Exception as e:
@@ -390,14 +390,14 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 
     if agent_uid == None:
         try:
-            if "timestamp" not in str(list(collection.index_information())):
-                collection.create_index("timestamp", unique=False)
+            if "destiny" not in str(list(collection.index_information())):
+                collection.create_index("destiny", unique=False)
             cursor = collection.aggregate([
                 {"$match": {'$and': [{"destiny": {"$regex": "^agent_"}}, {
                     "scope": "agent_configs"}]}},
-                {"$sort": {"timestamp": 1}},
                 {"$group": {"_id": {"destiny": "$destiny"}, "scope": {"$last": "$scope"}, "origin": {"$last": "$origin"}, "destiny": {
-                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}}
+                    "$last": "$destiny"}, "payload": {"$last": "$payload"}, "timestamp": {"$last": "$timestamp"}}},
+                {"$sort": {"timestamp": -1}}
             ])
             results = list(cursor)
         except Exception as e:
@@ -514,57 +514,6 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
 
     # equivalent to True, and also has the number of deleted documents in it
     return str(count)
-
-
-def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-0000-0000-000000000000", scope=None, include_broadcast=False, convert_to_string=False):
-    """
-    Reads data from the Mongo DB collection, specifically published by the server, for agents
-    Returns a config dict. Returns an empty dict if anything failed
-    """
-    my_configs = {}
-    broadcasted_configs = {}
-    out_dict = {}
-    logger.debug("Reading data from the DB server ...")
-    try:
-        if len(scope or '') > 0:
-            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid, "scope": scope}, {
-                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
-        else:
-            cursor1 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+siaas_uid}, {
-                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
-        results1 = list(cursor1)
-        for doc in results1:
-            my_configs = doc["payload"]
-
-        if len(scope or '') > 0:
-            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff", "scope": scope}, {
-                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
-        else:
-            cursor2 = collection.find({"payload": {'$exists': True}, "destiny": "agent_"+"ffffffff-ffff-ffff-ffff-ffffffffffff"}, {
-                                      '_id': False, 'timestamp': False, 'origin': False, 'destiny': False, 'scope': False}).sort('_id', -1).limit(1)
-        results2 = list(cursor2)
-        for doc in results2:
-            broadcasted_configs = doc["payload"]
-
-        if include_broadcast:
-            final_results = dict(
-                list(broadcasted_configs.items())+list(my_configs.items()))  # configs directed to the agent have precedence over broadcasted ones
-        else:
-            final_results = my_configs
-
-        for k in final_results.keys():
-            if convert_to_string:
-                out_dict[k] = str(final_results[k])
-            else:
-                out_dict[k] = final_results[k]
-
-        logger.debug("Records read from the server: "+str(out_dict))
-
-    except Exception as e:
-        logger.error("Can't read data from the DB server: "+str(e))
-        return False
-
-    return out_dict
 
 
 def insert_in_mongodb_collection(collection, data_to_insert):
