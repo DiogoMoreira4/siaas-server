@@ -1,6 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "`readlink -f ${BASH_SOURCE[0]}`" )" &> /dev/null && pwd )
+THIS_HOST=$(hostname -f)
 
 if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as root or using sudo!"
@@ -13,11 +14,11 @@ apt-get update
 apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl
 
 # SSL CONFIGURATION WITH SELF-SIGNED CERTS
-[ ! -f "./ssl/certs/siaas.crt" ] && ./siaas_server_generate_ssl_certs.sh # generate new self-signed certs on first run
-cp -p ./ssl/certs/siaas.crt /etc/ssl/certs/
+[ ! -f "./ssl/siaas.crt" ] && ./siaas_server_generate_ssl_certs.sh # generate new self-signed certs on first run
+cp -p ./ssl/siaas.crt /etc/ssl/certs/
 chown root:root /etc/ssl/certs/siaas.crt
 chmod 644 /etc/ssl/certs/siaas.crt
-cp -p ./ssl/certs/siaas.key /etc/ssl/private/
+cp -p ./ssl/siaas.key /etc/ssl/private/
 chown root:root /etc/ssl/private/siaas.key
 chmod 640 /etc/ssl/private/siaas.key
 cd /etc/ssl/certs
@@ -32,7 +33,49 @@ htpasswd -c -i /etc/apache2/.htpasswd siaas < .siaas_apache_pwd
 rm -f .siaas_apache_pwd
 sudo chown root:www-data /etc/apache2/.htpasswd
 sudo chmod 640 /etc/apache2/.htpasswd
-cp -f ./apache/*.conf /etc/apache2/sites-available/
+cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
+<VirtualHost *:80>
+
+  ServerName ${THIS_HOST}
+  ServerAlias siaas
+
+  RewriteEngine On
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+
+</VirtualHost>
+EOF
+cat << EOF | sudo tee /etc/apache2/sites-available/siaas-ssl.conf
+<VirtualHost *:443>
+
+  ServerName ${THIS_HOST}
+  ServerAlias siaas
+
+  ProxyPreserveHost On
+  ProxyPass "/api" http://127.0.0.1:5000
+  ProxyPassReverse "/api" http://127.0.0.1:5000
+
+  <Location "/api">
+    Deny from all
+    # IP access allowed
+    Allow from 127.0.0.1
+    #Allow from 192.168.122.0/24
+    AuthUserFile /etc/apache2/.htpasswd
+    AuthName "Restricted Area"
+    AuthType Basic
+    # Satisfy Any will allow either IP or authentication; Satisfy All will enforce both IP and authentication
+    Satisfy Any
+    Require valid-user
+  </Location>
+
+  SSLEngine On
+  SSLCertificateFile /etc/ssl/certs/siaas.crt
+  SSLCertificateKeyFile /etc/ssl/private/siaas.key
+
+  CustomLog /${APACHE_LOG_DIR}/siaas-access.log combined
+  ErrorLog /${APACHE_LOG_DIR}/siaas-error.log
+
+</VirtualHost>
+EOF
 cd /etc/apache2/sites-enabled/
 rm -f 000-default.conf
 rm -f default-ssl.conf
