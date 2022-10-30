@@ -238,8 +238,6 @@ def get_dict_active_agents(collection):
     out_dict = {}
 
     try:
-        if "origin" not in str(list(collection.index_information())):
-            collection.create_index("origin", unique=False)
         cursor = collection.aggregate([
             {"$match": {"origin": {"$regex": "^agent_"}}},
             {"$group": {"_id": {"origin": "$origin"}, "origin": {
@@ -333,8 +331,6 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
 
     if agent_uid == None:
         try:
-            if "origin" not in str(list(collection.index_information())):
-                collection.create_index("origin", unique=False)
             cursor = collection.aggregate([
                 {"$match": {
                     '$and': [{"origin": {"$regex": "^agent_"}}, {"scope": "agent_data"}]}},
@@ -390,8 +386,6 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 
     if agent_uid == None:
         try:
-            if "destiny" not in str(list(collection.index_information())):
-                collection.create_index("destiny", unique=False)
             cursor = collection.aggregate([
                 {"$match": {'$and': [{"destiny": {"$regex": "^agent_"}}, {
                     "scope": "agent_configs"}]}},
@@ -647,21 +641,21 @@ def get_or_create_unique_system_id():
             new_uid = content.split('\n')[0]
     except:
         pass
-    if len(new_uid) == 0:
+    if len(new_uid or '') == 0 or new_uid == "NA" or new_uid == "N/A":
         try:
             with open("/sys/class/dmi/id/product_uuid", 'r') as file:
                 content = file.read()
                 new_uid = content.split('\n')[0]
         except:
             pass
-    if len(new_uid) == 0:
+    if len(new_uid or '') == 0 or new_uid == "NA" or new_uid == "N/A": 
         try:
             with open("/var/lib/dbus/machine-id", 'r') as file:
                 content = file.read()
                 new_uid = content.split('\n')[0]
         except:
             pass
-    if len(new_uid) == 0:
+    if len(new_uid or '') == 0 or new_uid == "NA" or new_uid == "N/A":
         logger.warning(
             "Couldn't create a new UID from the system info. Creating a new one on-the-fly ...")
         try:

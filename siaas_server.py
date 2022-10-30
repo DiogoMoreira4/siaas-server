@@ -103,6 +103,11 @@ if __name__ == "__main__":
     DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(
         MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
 
+    # Create MongoDB indexes
+    DB_COLLECTION_OBJ.create_index("origin", unique=False, name="agent_origin_index")
+    DB_COLLECTION_OBJ.create_index("destiny", unique=False, name="agent_destiny_index")
+    DB_COLLECTION_OBJ.create_index("timestamp", unique=False, name="agent_timestamp_index")
+
     print("\nSIAAS Server v"+SIAAS_VERSION +
           " starting ["+server_uid+"]\n\nLogging to: "+os.path.join(sys.path[0], log_file)+"\n")
     logger.info("SIAAS Server v"+SIAAS_VERSION+" starting ["+server_uid+"]")
