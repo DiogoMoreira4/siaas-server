@@ -121,9 +121,12 @@ def agents_data_id(agent_uid):
             }
         )
     if request.method == 'DELETE':
-        days = request.args.get('days', default=0, type=int)
-        output = siaas_aux.delete_all_records_older_than(
-            collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
+        days = request.args.get('days', default=-1, type=int)
+        if days < 0:
+            output = "0"
+        else:
+            output = siaas_aux.delete_all_records_older_than(
+                collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
         if output:
             status = "success"
             count_deleted = int(output)
