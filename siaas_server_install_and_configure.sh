@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "`readlink -f ${BASH_SOURCE[0]}`" )" &> /dev/null && pwd )
-THIS_HOST=$(hostname -f)
+THIS_HOST=$(hostname -f | tr '[:upper:]' '[:lower:]')
 
 if [[ $EUID -ne 0 ]]; then
   echo "This script must be run as root or using sudo!"
