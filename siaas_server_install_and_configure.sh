@@ -54,7 +54,8 @@ systemctl restart mongodb
 systemctl enable mongodb
 sleep 3 && ./siaas_server_initialize_mongodb.sh # initialize the SIAAS users in MongoDB (resets all databases as well!)
 
-# SYSTEMD CONFIGURATION
+# SERVICE CONFIGURATION
+cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
 ln -fs ${SCRIPT_DIR}/siaas_server_run.sh /usr/local/bin/
 ln -fs ${SCRIPT_DIR}/siaas_server_kill.sh /usr/local/bin/
 ln -fs ${SCRIPT_DIR}/log /var/log/siaas-server
