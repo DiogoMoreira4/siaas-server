@@ -206,13 +206,13 @@ def agents_configs_id(agent_uid):
 @app.route('/siaas-server/agents/history', methods=['GET'], strict_slashes=False)
 def agents_history():
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=25, type=int)
-    days = request.args.get('days', default=7, type=int)
+    limit_outputs = request.args.get('limit', default=0, type=int)
+    days = request.args.get('days', default=365, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0 or days <= 0:
+    if limit_outputs < 0 or days < 0:
         output = {}
     else:
         output = siaas_aux.get_dict_history_agent_data(
@@ -230,13 +230,13 @@ def agents_history():
 @app.route('/siaas-server/agents/history/<agent_uid>', methods=['GET'], strict_slashes=False)
 def agents_history_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=25, type=int)
-    days = request.args.get('days', default=7, type=int)
+    limit_outputs = request.args.get('limit', default=0, type=int)
+    days = request.args.get('days', default=365, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
-    if limit_outputs <= 0 or days <= 0:
+    if limit_outputs < 0 or days < 0:
         output = {}
     else:
         output = siaas_aux.get_dict_history_agent_data(
