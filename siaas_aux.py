@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 def merge_module_dicts(modules=""):
     """
-    Grabs all DB files from the module list and concatenate them
-    Returns an empty dict if it fails
+    Grabs all local DBs (dicts) from the module list and concatenates them;
+    Returns False if it fails. 
     """
     merged_dict = {}
     for module in modules.split(','):
@@ -32,8 +32,10 @@ def merge_module_dicts(modules=""):
                 merged_dict = dict(
                     list(merged_dict.items())+list(next_dict_to_merge.items()))
         except:
-            logger.warning("Couldn't merge dict: " +
+            logger.error("Couldn't merge dict: " +
                            str(next_dict_to_merge))
+            return False
+
     return merged_dict
 
 
@@ -247,7 +249,7 @@ def get_dict_active_agents(collection):
         results = list(cursor)
     except Exception as e:
         logger.error("Can't read data from the DB server: "+str(e))
-        return out_dict
+        return False
 
     for r in results:
         try:
@@ -266,7 +268,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
     """
     Reads historical agent data from the Mongo DB collection
     We can select a list of agents and modules to display
-    Returns a list of records. Returns empty dict if data can't be read
+    Returns a list of records. Returns False if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
     out_dict = {}
@@ -281,7 +283,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
             results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
-            return out_dict
+            return False
 
     else:
         results = []
@@ -297,6 +299,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
             results = results+list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
+            return False
 
     for r in results:
         try:
@@ -323,7 +326,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     """
     Reads agent data from the Mongo DB collection
     We can select a list of agents and modules to display
-    Returns a list of records. Returns empty dict if data can't be read
+    Returns a list of records. Returns False if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
     out_dict = {}
@@ -342,7 +345,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
             results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
-            return out_dict
+            return False
 
     else:
         results = []
@@ -356,6 +359,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                 results = results+list(cursor)
             except Exception as e:
                 logger.error("Can't read data from the DB server: "+str(e))
+                return False
 
     for r in results:
         try:
@@ -379,7 +383,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     """
     Reads agent data from the Mongo DB collection
     We can select a list of agents and modules to display
-    Returns a list of records. Returns empty dict if data can't be read
+    Returns a list of records. Returns False if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
     out_dict = {}
@@ -398,6 +402,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
             results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
+            return False
 
     else:
         results = []
@@ -411,6 +416,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                 results = results+list(cursor)
             except Exception as e:
                 logger.error("Can't read data from the DB server: "+str(e))
+                return False
 
     if merge_broadcast:
         results_bc = []
@@ -422,6 +428,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
             results_bc = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
+            return False
 
     for r in results:
         try:
@@ -552,8 +559,11 @@ def read_published_data_for_agents_mongodb(collection, siaas_uid="00000000-0000-
                 out_dict[k] = final_results[k]
 
         logger.debug("Records read from the server: "+str(out_dict))
+
     except Exception as e:
         logger.error("Can't read data from the DB server: "+str(e))
+        return False
+
     return out_dict
 
 

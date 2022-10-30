@@ -36,6 +36,11 @@ def siaas_server():
         if m.lstrip().rstrip() == "*":
             module = all_existing_modules
     output = siaas_aux.merge_module_dicts(module)
+    if output:
+        status = "success"
+    else:
+        status = "failure"
+        output = {}
     try:
         output["config"]["mongo_pwd"] = '*' * \
             len(output["config"]["mongo_pwd"])
@@ -49,7 +54,7 @@ def siaas_server():
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
@@ -60,10 +65,15 @@ def siaas_server():
 def agents():
     collection = get_db_collection()
     output = siaas_aux.get_dict_active_agents(collection)
+    if output:
+        status = "success"
+    else:
+        status = "failure"
+        output = {}
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
@@ -78,10 +88,15 @@ def agents_data():
             module = None
     collection = get_db_collection()
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
+    if output:
+        status = "success"
+    else:
+        status = "failure"
+        output = {}
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
@@ -98,10 +113,15 @@ def agents_data_id(agent_uid):
                 module = None
         output = siaas_aux.get_dict_current_agent_data(
             collection, agent_uid=agent_uid, module=module)
+        if output:
+            status = "success"
+        else:
+            status = "failure"
+            output = {}
         return jsonify(
             {
                 'output': output,
-                'status': 'success',
+                'status': status,
                 'total_entries': len(output),
                 'time': siaas_aux.get_now_utc_str()
             }
@@ -145,10 +165,15 @@ def agents_configs():
     merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
     output = siaas_aux.get_dict_current_agent_configs(
         collection, merge_broadcast=merge_broadcast)
+    if output:
+        status = "success"
+    else:
+        status = "failure"
+        output = {}
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
@@ -163,10 +188,15 @@ def agents_configs_id(agent_uid):
             'merge_broadcast', default=0, type=int)
         output = siaas_aux.get_dict_current_agent_configs(
             collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
+        if output:
+            status = "success"
+        else:
+            status = "failure"
+            output = {}
         return jsonify(
             {
                 'output': output,
-                'status': 'success',
+                'status': status,
                 'total_entries': len(output),
                 'time': siaas_aux.get_now_utc_str()
             }
@@ -214,13 +244,17 @@ def agents_history():
     collection = get_db_collection()
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
+    output = siaas_aux.get_dict_history_agent_data(
+        collection, module=module, limit_outputs=limit_outputs, days=days)
+    if output:
+        status = "success"
     else:
-        output = siaas_aux.get_dict_history_agent_data(
-            collection, module=module, limit_outputs=limit_outputs, days=days)
+        status = "failure"
+        output = {}
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
@@ -238,13 +272,17 @@ def agents_history_id(agent_uid):
     collection = get_db_collection()
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
+    output = siaas_aux.get_dict_history_agent_data(
+        collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
+    if output:
+        status = "success"
     else:
-        output = siaas_aux.get_dict_history_agent_data(
-            collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
+        status = "failure"
+        output = {}
     return jsonify(
         {
             'output': output,
-            'status': 'success',
+            'status': status,
             'total_entries': len(output),
             'time': siaas_aux.get_now_utc_str()
         }
