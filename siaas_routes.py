@@ -206,7 +206,7 @@ def agents_configs_id(agent_uid):
 @app.route('/siaas-server/agents/history', methods=['GET'], strict_slashes=False)
 def agents_history():
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=0, type=int)
+    limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
     days = request.args.get('days', default=365, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
@@ -230,7 +230,7 @@ def agents_history():
 @app.route('/siaas-server/agents/history/<agent_uid>', methods=['GET'], strict_slashes=False)
 def agents_history_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=0, type=int)
+    limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
     days = request.args.get('days', default=365, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
