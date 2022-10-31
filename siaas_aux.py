@@ -403,6 +403,8 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
+    out_dict = dict(sorted(out_dict.items()))
+
     return out_dict
 
 
@@ -482,7 +484,8 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                        out_dict[uid] = dict(sorted(out_dict[uid].items()))
             except:
                logger.debug("Ignoring invalid entry when grabbing agent data.")
-        out_dict = dict(sorted(out_dict.items()))
+    
+    out_dict = dict(sorted(out_dict.items()))
 
     return out_dict
 
@@ -538,8 +541,7 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
             logger.error("Can't delete data from the DB server: "+str(e))
             return False
 
-    # equivalent to True, and also has the number of deleted documents in it
-    return str(count)
+    return count
 
 
 def insert_in_mongodb_collection(collection, data_to_insert):

@@ -36,11 +36,11 @@ def siaas_server():
         if m.lstrip().rstrip() == "*":
             module = all_existing_modules
     output = siaas_aux.merge_module_dicts(module)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
     try:
         output["config"]["mongo_pwd"] = '*' * \
             len(output["config"]["mongo_pwd"])
@@ -65,11 +65,11 @@ def siaas_server():
 def agents():
     collection = get_db_collection()
     output = siaas_aux.get_dict_active_agents(collection)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
     return jsonify(
         {
             'output': output,
@@ -88,11 +88,11 @@ def agents_data():
             module = None
     collection = get_db_collection()
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
     return jsonify(
         {
             'output': output,
@@ -113,11 +113,11 @@ def agents_data_id(agent_uid):
                 module = None
         output = siaas_aux.get_dict_current_agent_data(
             collection, agent_uid=agent_uid, module=module)
-        if output:
-            status = "success"
-        else:
+        if type(output) == bool and output == False:
             status = "failure"
             output = {}
+        else:
+            status = "success"
         return jsonify(
             {
                 'output': output,
@@ -144,12 +144,12 @@ def agents_data_id(agent_uid):
         days = request.args.get('days', default=0, type=int)
         output = siaas_aux.delete_all_records_older_than(
             collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
-        if output:
-            status = "success"
-            count_deleted = int(output)
-        else:
+        if type(output) == bool and output == False:
             status = "failure"
             count_deleted = 0
+        else:
+            status = "success"
+            count_deleted = int(output)
         return jsonify(
             {
                 'deleted_count': count_deleted,
@@ -165,11 +165,11 @@ def agents_configs():
     merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
     output = siaas_aux.get_dict_current_agent_configs(
         collection, merge_broadcast=merge_broadcast)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
     return jsonify(
         {
             'output': output,
@@ -188,11 +188,11 @@ def agents_configs_id(agent_uid):
             'merge_broadcast', default=0, type=int)
         output = siaas_aux.get_dict_current_agent_configs(
             collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
-        if output:
-            status = "success"
-        else:
+        if type(output) == bool and output == False:
             status = "failure"
             output = {}
+        else:
+            status = "success"
         return jsonify(
             {
                 'output': output,
@@ -218,12 +218,12 @@ def agents_configs_id(agent_uid):
     if request.method == 'DELETE':
         output = siaas_aux.delete_all_records_older_than(
             collection, scope="agent_configs", agent_uid=agent_uid, days_to_keep=0)
-        if output:
-            status = "success"
-            count_deleted = int(output)
-        else:
+        if type(output) == bool and output == False:
             status = "failure"
             count_deleted = 0
+        else:
+            status = "success"
+            count_deleted = int(output)
         return jsonify(
             {
                 'deleted_count': count_deleted,
@@ -248,11 +248,12 @@ def agents_history():
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
         collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
+
     return jsonify(
         {
             'output': output,
@@ -277,11 +278,11 @@ def agents_history_id(agent_uid):
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
         collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first)
-    if output:
-        status = "success"
-    else:
+    if type(output) == bool and output == False:
         status = "failure"
         output = {}
+    else:
+        status = "success"
     return jsonify(
         {
             'output': output,
