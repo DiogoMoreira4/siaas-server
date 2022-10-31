@@ -39,12 +39,39 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
   ServerName ${THIS_HOST}
   ServerAlias siaas
 
-  RewriteEngine On
-  RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+  ProxyPreserveHost On
+  ProxyPass "/api" http://127.0.0.1:5000
+  ProxyPassReverse "/api" http://127.0.0.1:5000
+
+  <Location "/api">
+    Deny from all
+    # IP access allowed
+    Allow from 127.0.0.1
+    #Allow from 192.168.122.0/24
+    AuthUserFile /etc/apache2/.htpasswd
+    AuthName "Restricted Area"
+    AuthType Basic
+    # Satisfy Any will allow either IP or authentication; Satisfy All will enforce both IP and authentication
+    Satisfy Any
+    Require valid-user
+  </Location>
+
+  CustomLog /${APACHE_LOG_DIR}/siaas-access.log combined
+  ErrorLog /${APACHE_LOG_DIR}/siaas-error.log
 
 </VirtualHost>
 EOF
 cat << EOF | sudo tee /etc/apache2/sites-available/siaas-ssl.conf
+<VirtualHost *:80>
+
+  ServerName ${THIS_HOST}
+  ServerAlias siaas
+
+  RewriteEngine On
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}\$1 [R=301,L]
+
+</VirtualHost>
+
 <VirtualHost *:443>
 
   ServerName ${THIS_HOST}
