@@ -139,4 +139,4 @@ WantedBy=multi-user.target
 EOF
 systemctl daemon-reload
 systemctl enable siaas-server
-echo -e "\nSIAAS Server will be started on boot.\n\nTo start/stop manually: sudo systemctl start siaas-server\n"
+echo -e "\nSIAAS Server will be started on boot.\n\nTo start (or restart) manually right now: sudo systemctl [start/restart] siaas-server\n"
