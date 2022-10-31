@@ -238,6 +238,8 @@ def agents_history():
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
     days = request.args.get('days', default=365, type=int)
+    sort_by = request.args.get('sort', default="date", type=str)
+    reverse = request.args.get('reverse', default=1, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
@@ -245,7 +247,7 @@ def agents_history():
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
-        collection, module=module, limit_outputs=limit_outputs, days=days)
+        collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, reverse=reverse)
     if output:
         status = "success"
     else:
@@ -266,6 +268,8 @@ def agents_history_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
     days = request.args.get('days', default=365, type=int)
+    sort_by = request.args.get('sort', default="date", type=str)
+    reverse = request.args.get('reverse', default=1, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
@@ -273,7 +277,7 @@ def agents_history_id(agent_uid):
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
-        collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days)
+        collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, reverse=reverse)
     if output:
         status = "success"
     else:
