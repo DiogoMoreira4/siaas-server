@@ -262,7 +262,7 @@ def get_dict_active_agents(collection):
     return out_dict
 
 
-def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999, sort_by="date", reverse=0):
+def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999, sort_by="date", older_first=False):
     """
     Reads historical agent data from the Mongo DB collection
     We can select a list of agents and modules to display
@@ -271,15 +271,15 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
     logger.debug("Reading data from the DB server ...")
     out_dict = {}
 
-    if sort_by.lower == "agent":
+    if sort_by.lower() == "agent":
        sort_field = "origin"
     else:
        sort_field = "_id"
 
-    if str(reverse) == "1":
-       sort_type = -1
+    if older_first:
+       id_sort_type = 1
     else:
-       sort_type = 1
+       id_sort_type = -1
 
     if agent_uid == None:
         try:
@@ -287,7 +287,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
             cursor = collection.find(
                 {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {"timestamp": {"$gte": last_d}}
                           ]}
-            ).sort(sort_field, sort_type).limit(int(limit_outputs))
+            ).sort('_id', id_sort_type).limit(int(limit_outputs))
             results = list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
@@ -303,29 +303,50 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
             cursor = collection.find(
                 {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {
                     "timestamp": {"$gte": last_d}}, {"origin": {'$in': agent_list}}]}
-            ).sort(sort_field, sort_type).limit(int(limit_outputs))
+            ).sort('_id', id_sort_type).limit(int(limit_outputs))
             results = results+list(cursor)
         except Exception as e:
             logger.error("Can't read data from the DB server: "+str(e))
             return False
 
-    for r in results:
-        try:
-            if r["origin"].startswith("agent_"):
-                uid = r["origin"].split("_", 1)[1]
-                timestamp = r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
-                if timestamp not in out_dict.keys():
-                    out_dict[timestamp] = {}
-                if module == None:
-                    out_dict[timestamp][uid] = r["payload"]
-                else:
-                    out_dict[timestamp][uid] = {}
-                    for m in module.split(','):
-                        mod = m.lstrip().rstrip()
-                        if mod in r["payload"].keys():
-                            out_dict[timestamp][uid][mod] = r["payload"][mod]
-        except:
-            logger.debug("Ignoring invalid entry when grabbing agent data.")
+    if sort_field == "origin":
+        for r in results:
+            try:
+                if r["origin"].startswith("agent_"):
+                    uid = r["origin"].split("_", 1)[1]
+                    timestamp = r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+                    if uid not in out_dict.keys():
+                        out_dict[uid] = {}
+                    if module == None:
+                        out_dict[uid][timestamp] = r["payload"]
+                    else:
+                        out_dict[uid][timestamp] = {}
+                        for m in module.split(','):
+                            mod = m.lstrip().rstrip()
+                            if mod in r["payload"].keys():
+                                out_dict[uid][timestamp][mod] = r["payload"][mod]
+            except:
+                logger.debug("Ignoring invalid entry when grabbing agent data.")
+        out_dict = dict(sorted(out_dict.items()))
+
+    else:
+        for r in results:
+            try:
+                if r["origin"].startswith("agent_"):
+                    uid = r["origin"].split("_", 1)[1]
+                    timestamp = r["timestamp"].strftime('%Y-%m-%dT%H:%M:%SZ')
+                    if timestamp not in out_dict.keys():
+                        out_dict[timestamp] = {}
+                    if module == None:
+                        out_dict[timestamp][uid] = r["payload"]
+                    else:
+                        out_dict[timestamp][uid] = {}
+                        for m in module.split(','):
+                            mod = m.lstrip().rstrip()
+                            if mod in r["payload"].keys():
+                                out_dict[timestamp][uid][mod] = r["payload"][mod]
+            except:
+                logger.debug("Ignoring invalid entry when grabbing agent data.")
 
     return out_dict
 
@@ -457,10 +478,11 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                uid = u.lstrip().rstrip()
                if uid not in out_dict.keys():
                    if len(results_bc) > 0:
-                       out_dict[uid]=results_bc[0]["payload"]
+                       out_dict[uid] = results_bc[0]["payload"]
                        out_dict[uid] = dict(sorted(out_dict[uid].items()))
             except:
                logger.debug("Ignoring invalid entry when grabbing agent data.")
+        out_dict = dict(sorted(out_dict.items()))
 
     return out_dict
 
