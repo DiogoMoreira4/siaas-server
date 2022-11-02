@@ -237,7 +237,7 @@ def agents_configs_id(agent_uid):
 def agents_history():
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
-    days = request.args.get('days', default=365, type=int)
+    days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
     for m in module.split(','):
@@ -268,7 +268,7 @@ def agents_history():
 def agents_history_id(agent_uid):
     module = request.args.get('module', default='*', type=str)
     limit_outputs = request.args.get('limit', default=0, type=int) # 0 equates to having no output limit (as per MongoDB spec)
-    days = request.args.get('days', default=365, type=int)
+    days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
     for m in module.split(','):

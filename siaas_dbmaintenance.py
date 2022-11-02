@@ -10,20 +10,20 @@ from copy import copy
 logger = logging.getLogger(__name__)
 
 
-def delete_history_data(db_collection=None, days_to_keep=3650):
+def delete_history_data(db_collection, days_to_keep):
 
     logger.info("Performing history database cleanup, keeping last " +
                 str(days_to_keep)+" days ...")
     deleted_count = siaas_aux.delete_all_records_older_than(
         db_collection, scope="agent_data", agent_uid=None, days_to_keep=days_to_keep)
-    if deleted_count:
-        logger.info("DB cleanup finished. " +
-                    str(deleted_count)+" records deleted.")
-        return True
-    else:
+    if type(deleted_count) == bool and deleted_count == False:
         logger.error(
             "DB could not be cleaned up. This might result in an eventual disk exhaustion in the server!")
         return False
+    else:
+        logger.info("DB cleanup finished. " +
+                    str(deleted_count)+" records deleted.")
+        return True
 
 
 def loop():
@@ -74,8 +74,8 @@ def loop():
                 raise ValueError("Number of historical days can't be negative.")
         except:
             logger.debug(
-                "The number of days to keep in the database is not configured or is invalid. Defaulting to 10 years.")
-            days_to_keep = 3650
+                "The number of days to keep in the database is not configured or is invalid. Defaulting to 3 years.")
+            days_to_keep = 1095
 
         delete_history_data(db_collection, days_to_keep)
 
@@ -123,9 +123,6 @@ if __name__ == "__main__":
 
     logger.info("Cleaning up the DB ...")
 
-    if delete_history_data(collection, days_to_keep=3650):
-        logger.info("All OK!")
-    else:
-        logger.info("Error detected.")
+    delete_history_data(collection, days_to_keep=1095)
 
     print('\nAll done. Bye!\n')
