@@ -297,7 +297,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
         results = []
         agent_list = []
         for u in agent_uid.split(','):
-            agent_list.append("agent_"+u.lstrip().rstrip())
+            agent_list.append("agent_"+u.lstrip().rstrip().lower())
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
@@ -378,7 +378,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     else:
         results = []
         for u in agent_uid.split(','):
-            uid = u.lstrip().rstrip()
+            uid = u.lstrip().rstrip().lower()
             try:
                 cursor = collection.find(
                     {'$and': [{"payload": {'$exists': True}}, {
@@ -437,7 +437,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     else:
         results = []
         for u in agent_uid.split(','):
-            uid = u.lstrip().rstrip()
+            uid = u.lstrip().rstrip().lower()
             try:
                 cursor = collection.find(
                     {'$and': [{"payload": {'$exists': True}}, {
@@ -480,7 +480,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     if merge_broadcast and len(agent_uid or '') > 0:
         for u in agent_uid.split(','):
             try:
-               uid = u.lstrip().rstrip()
+               uid = u.lstrip().rstrip().lower()
                if uid not in out_dict.keys():
                    if len(results_bc) > 0:
                        out_dict[uid] = results_bc[0]["payload"]
@@ -525,7 +525,7 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
     else:
         agent_list = []
         for u in agent_uid.split(','):
-            agent_list.append("agent_"+u.lstrip().rstrip())
+            agent_list.append("agent_"+u.lstrip().rstrip().lower())
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
