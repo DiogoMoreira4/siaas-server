@@ -22,7 +22,7 @@ def merge_module_dicts(modules=""):
     """
     merged_dict = {}
     for module in sorted(modules.split(','), key=lambda x: x[0].casefold()):
-        module = module.lstrip().rstrip()
+        module = module.lstrip().rstrip().lower()
         try:
             module_dict = read_from_local_file(
                 os.path.join(sys.path[0], 'var/'+str(module)+'.db'))
@@ -149,7 +149,7 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
 
     complete_dict = {}
     complete_dict["scope"] = "agent_data"
-    complete_dict["origin"] = "agent_"+agent_uid
+    complete_dict["origin"] = "agent_"+agent_uid.lower()
     complete_dict["destiny"] = "*"
     complete_dict["payload"] = data_dict
     complete_dict["timestamp"] = get_now_utc_obj()
@@ -196,8 +196,8 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
     complete_dict = {}
     complete_dict["scope"] = "agent_configs"
-    complete_dict["origin"] = "server_"+siaas_uid
-    complete_dict["destiny"] = "agent_"+agent_uid
+    complete_dict["origin"] = "server_"+siaas_uid.lower()
+    complete_dict["destiny"] = "agent_"+agent_uid.lower()
     complete_dict["payload"] = dict(sorted(config_dict.items(), key=lambda x: x[0].casefold()))
     complete_dict["timestamp"] = get_now_utc_obj()
 
@@ -322,7 +322,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                     else:
                         out_dict[uid][timestamp] = {}
                         for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
-                            mod = m.lstrip().rstrip()
+                            mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
             except:
@@ -342,7 +342,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                     else:
                         out_dict[timestamp][uid] = {}
                         for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
-                            mod = m.lstrip().rstrip()
+                            mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
                     out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=lambda x: x[0].casefold()))
@@ -398,7 +398,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                 else:
                     out_dict[uid] = {}
                     for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
-                        mod = m.lstrip().rstrip()
+                        mod = m.lstrip().rstrip().lower()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
         except:
@@ -666,7 +666,7 @@ def get_or_create_unique_system_id():
                     "Invalid ID, reserved for broadcast. Returning a nil UID.")
                 return "00000000-0000-0000-0000-000000000000"
             logger.debug("Reusing existing UID: "+str(content))
-            return content.split('\n')[0]
+            return content.split('\n')[0].lower()
     except:
         pass
     logger.debug(
@@ -710,7 +710,7 @@ def get_or_create_unique_system_id():
         logger.error("There was an error while writing to the local UID file: " +
                      str(e)+". Returning a nil UID.")
         return "00000000-0000-0000-0000-000000000000"
-    return new_uid
+    return new_uid.lower()
 
 
 def validate_bool_string(input_string, default_output=False):
