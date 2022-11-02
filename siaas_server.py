@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 SIAAS_VERSION = "0.0.1"
 LOG_DIR = "log"
+API_PORT = 5000
 
 DB_COLLECTION_OBJ = None
 def get_db_collection():
@@ -117,7 +118,9 @@ if __name__ == "__main__":
     dbmaintenance = Process(target=siaas_dbmaintenance.loop, args=())
     platform.start()
     dbmaintenance.start()
-    app.run(debug=True, use_reloader=False, host="0.0.0.0", port="5000")
-    #serve(app, host="0.0.0.0", port="5000")
+
+    #app.run(debug=False, use_reloader=False, host="127.0.0.1", port=API_PORT)
+    serve(app, host="127.0.0.1", port=API_PORT)
+
     platform.join()
     dbmaintenance.join()
