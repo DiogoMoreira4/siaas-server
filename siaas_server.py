@@ -119,7 +119,7 @@ if __name__ == "__main__":
     platform.start()
     dbmaintenance.start()
 
-    #app.run(debug=False, use_reloader=False, host="127.0.0.1", port=API_PORT)
+    #app.run(debug=True, use_reloader=False, host="127.0.0.1", port=API_PORT)
     serve(app, host="127.0.0.1", port=API_PORT)
 
     platform.join()
