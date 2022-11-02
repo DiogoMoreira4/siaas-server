@@ -21,7 +21,7 @@ def merge_module_dicts(modules=""):
     Returns False if it fails. 
     """
     merged_dict = {}
-    for module in sorted(modules.split(',')):
+    for module in sorted(modules.split(','), key=str.casefold):
         module = module.lstrip().rstrip()
         try:
             module_dict = read_from_local_file(
@@ -114,7 +114,7 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
                 "Invalid line from local configuration file was ignored: "+str(line))
             continue
 
-    return write_to_local_file(output, dict(sorted(config_dict.items())))
+    return write_to_local_file(output, dict(sorted(config_dict.items(), key=str.casefold)))
 
 
 def upload_agent_data(collection, agent_uid=None, data_dict={}):
@@ -198,7 +198,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     complete_dict["scope"] = "agent_configs"
     complete_dict["origin"] = "server_"+siaas_uid
     complete_dict["destiny"] = "agent_"+agent_uid
-    complete_dict["payload"] = dict(sorted(config_dict.items()))
+    complete_dict["payload"] = dict(sorted(config_dict.items(), key=str.casefold))
     complete_dict["timestamp"] = get_now_utc_obj()
 
     return create_or_update_in_mongodb_collection(collection, complete_dict)
@@ -321,13 +321,13 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[uid][timestamp] = r["payload"]
                     else:
                         out_dict[uid][timestamp] = {}
-                        for m in sorted(module.split(',')):
+                        for m in sorted(module.split(','), key=str.casefold):
                             mod = m.lstrip().rstrip()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
             except:
                 logger.debug("Ignoring invalid entry when grabbing agent data.")
-        out_dict = dict(sorted(out_dict.items()))
+        out_dict = dict(sorted(out_dict.items(), key=str.casefold))
 
     else:
         for r in results:
@@ -341,10 +341,11 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[timestamp][uid] = r["payload"]
                     else:
                         out_dict[timestamp][uid] = {}
-                        for m in sorted(module.split(',')):
+                        for m in sorted(module.split(','), key=str.casefold):
                             mod = m.lstrip().rstrip()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
+                    out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=str.casefold))
             except:
                 logger.debug("Ignoring invalid entry when grabbing agent data.")
 
@@ -396,14 +397,14 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                     out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = {}
-                    for m in sorted(module.split(',')):
+                    for m in sorted(module.split(','), key=str.casefold):
                         mod = m.lstrip().rstrip()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
-    out_dict = dict(sorted(out_dict.items()))
+    out_dict = dict(sorted(out_dict.items(), key=str.casefold))
 
     return out_dict
 
@@ -469,7 +470,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                         out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = r["payload"]
-                out_dict[uid] = dict(sorted(out_dict[uid].items()))
+                out_dict[uid] = dict(sorted(out_dict[uid].items(), key=str.casefold))
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
@@ -481,11 +482,11 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                if uid not in out_dict.keys():
                    if len(results_bc) > 0:
                        out_dict[uid] = results_bc[0]["payload"]
-                       out_dict[uid] = dict(sorted(out_dict[uid].items()))
+                       out_dict[uid] = dict(sorted(out_dict[uid].items(), key=str.casefold))
             except:
                logger.debug("Ignoring invalid entry when grabbing agent data.")
     
-    out_dict = dict(sorted(out_dict.items()))
+    out_dict = dict(sorted(out_dict.items(), key=str.casefold))
 
     return out_dict
 
