@@ -5,6 +5,7 @@ curl -X DELETE http://localhost:5000/siaas-server/agents/configs/TEST
 curl -X DELETE http://localhost:5000/siaas-server/agents/configs/TEST2
 curl -X DELETE http://localhost:5000/siaas-server/agents/configs/TEST3
 curl -X DELETE http://localhost:5000/siaas-server/agents/configs/0924aa8b-6dc9-4fec-9716-d1601fc8b6c6
+curl -X DELETE http://localhost:5000/siaas-server/agents/configs/f895d9f0-4014-11e2-b6b9-5453edb96641
 curl -X DELETE http://localhost:5000/siaas-server/agents/configs/L1HF89B0091
 curl -X DELETE http://localhost:5000/siaas-server/agents/configs/ffffffff-ffff-ffff-ffff-ffffffffffff
 
@@ -16,6 +17,7 @@ curl -X POST http://localhost:5000/siaas-server/agents/configs/TEST2 -H "Content
 curl -X POST http://localhost:5000/siaas-server/agents/configs/TEST3 -H "Content-Type: application/json" -d @config.json 
 curl -X POST http://localhost:5000/siaas-server/agents/configs/0924aa8b-6dc9-4fec-9716-d1601fc8b6c6 -H "Content-Type: application/json" -d @config_2.json
 curl -X POST http://localhost:5000/siaas-server/agents/configs/L1HF89B0091 -H "Content-Type: application/json" -d @config_3.json
+curl -X POST http://localhost:5000/siaas-server/agents/configs/f895d9f0-4014-11e2-b6b9-5453edb96641 -H "Content-Type: application/json" -d @config_4.json
 curl -X POST http://localhost:5000/siaas-server/agents/configs/ffffffff-ffff-ffff-ffff-ffffffffffff -H "Content-Type: application/json" -d @config_bc.json
 
 curl -X GET http://localhost:5000/siaas-server/agents/data/TEST
@@ -27,6 +29,9 @@ curl -X GET http://localhost:5000/siaas-server/agents/configs/TEST
 curl -X GET http://localhost:5000/siaas-server/agents/configs/TEST2
 curl -X GET http://localhost:5000/siaas-server/agents/configs/TEST3
 curl -X GET http://localhost:5000/siaas-server/agents/configs/TEST?merge_broadcast=1
+curl -X GET http://localhost:5000/siaas-server/agents/configs/0924aa8b-6dc9-4fec-9716-d1601fc8b6c6?merge_broadcast=1
+curl -X GET http://localhost:5000/siaas-server/agents/configs/L1HF89B0091?merge_broadcast=1
+curl -X GET http://localhost:5000/siaas-server/agents/configs/f895d9f0-4014-11e2-b6b9-5453edb96641?merge_broadcast=1
 
 # Test SSL and BasicAuth (needs hostname of the server)
 
