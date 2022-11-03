@@ -229,7 +229,7 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
         return None
 
 
-def get_dict_active_agents(collection, sort_by="date"):
+def get_dict_active_agents(collection):
     """
     Reads a list of active agents
     Returns a list of records. Returns empty dict if data can't be read
@@ -258,9 +258,6 @@ def get_dict_active_agents(collection, sort_by="date"):
         except:
             logger.debug(
                 "Ignoring invalid entry when grabbing active agents data.")
-
-    if sort_by == "agent":
-        out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
 
     return out_dict
 

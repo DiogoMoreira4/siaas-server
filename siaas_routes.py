@@ -64,7 +64,8 @@ def siaas_server():
 @app.route('/siaas-server/agents', methods=['GET'], strict_slashes=False)
 def agents():
     collection = get_db_collection()
-    output = siaas_aux.get_dict_active_agents(collection)
+    sort_by = request.args.get('sort', default="date", type=str)
+    output = siaas_aux.get_dict_active_agents(collection, sort_by=sort_by)
     if type(output) == bool and output == False:
         status = "failure"
         output = {}
