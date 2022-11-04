@@ -75,7 +75,7 @@ def loop():
         except:
             logger.debug(
                 "The number of days to keep in the database is not configured or is invalid. Defaulting to 3 years.")
-            days_to_keep = 1095
+            days_to_keep = 365
 
         delete_history_data(db_collection, days_to_keep)
 
@@ -123,6 +123,6 @@ if __name__ == "__main__":
 
     logger.info("Cleaning up the DB ...")
 
-    delete_history_data(collection, days_to_keep=1095)
+    delete_history_data(collection, days_to_keep=365)
 
     print('\nAll done. Bye!\n')
