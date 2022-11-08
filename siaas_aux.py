@@ -265,10 +265,11 @@ def get_dict_active_agents(collection, sort_by="date"):
     return out_dict
 
 
-def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999, sort_by="date", older_first=False):
+def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_outputs=99999, days=99999, sort_by="date", older_first=False, hide_empty=False):
     """
     Reads historical agent data from the Mongo DB collection
     We can select a list of agents and modules to display
+    We can sort, select a day limit, limit outputs, order by older records first, and hide empty records
     Returns a list of records. Returns False if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
@@ -328,6 +329,12 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                             mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
+                    if hide_empty:
+                        for k in list(out_dict[uid][timestamp].keys()):
+                            if len(out_dict[uid][timestamp][k]) == 0:
+                                 out_dict[uid][timestamp].pop(k, None)
+                        if len(out_dict[uid][timestamp]) == 0:
+                            out_dict[uid].pop(timestamp, None)
             except:
                 logger.debug("Ignoring invalid entry when grabbing agent data.")
         out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
@@ -349,8 +356,19 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
                     out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=lambda x: x[0].casefold()))
+                    if hide_empty:
+                        for k in list(out_dict[timestamp][uid].keys()):
+                            if len(out_dict[timestamp][uid][k]) == 0:
+                                out_dict[timestamp][uid].pop(k, None)
+                        if len(out_dict[timestamp][uid]) == 0:
+                            out_dict[timestamp].pop(uid, None)
             except:
                 logger.debug("Ignoring invalid entry when grabbing agent data.")
+
+    if hide_empty:
+        for k in list(out_dict.keys()):
+            if len(out_dict[k]) == 0:
+                out_dict.pop(k, None)
 
     return out_dict
 
@@ -408,8 +426,6 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
     out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
-
-    print(str(out_dict))
 
     return out_dict
 

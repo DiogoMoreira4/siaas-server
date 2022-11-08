@@ -241,6 +241,7 @@ def agents_history():
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
+    hide_empty = request.args.get('hide', default=0, type=int)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = None
@@ -248,7 +249,7 @@ def agents_history():
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
-        collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first)
+        collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:
         status = "failure"
         output = {}
@@ -272,13 +273,14 @@ def agents_history_id(agent_uid):
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
+    hide_empty = request.args.get('hide', default=0, type=int)
     for m in module.split(','):
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:
         limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
-        collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first)
+        collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:
         status = "failure"
         output = {}
