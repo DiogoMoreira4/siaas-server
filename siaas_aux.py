@@ -182,10 +182,14 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
             logger.error("Data dict is not valid. No data was uploaded.")
             return False
 
-    # Turn all keys to lowercase
+    # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
     corrected_config_dict = {}
     for k in config_dict.keys():
-        corrected_config_dict[k.lower().lstrip().rstrip()] = config_dict[k]
+        formatted_key = k.lower().lstrip().rstrip()
+        if (formatted_key == "nickname" or formatted_key == "description") and agent_uid == "ffffffff-ffff-ffff-ffff-ffffffffffff":
+            logger.warning("Ignoring '"+formatted_key+"' key from broadcast configuration insertion.")
+            continue
+        corrected_config_dict[formatted_key] = config_dict[k]
 
     siaas_uid = get_or_create_unique_system_id()
 
