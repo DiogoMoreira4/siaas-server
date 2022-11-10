@@ -1,4 +1,6 @@
 {
+	"nickname": "AgentVM",
+	"Description": "An Ubuntu VM",
         "datatransfer_loop_interval_sec": 305,
         "disable_portscanner": "false",
         "silent_mode": "false"

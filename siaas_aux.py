@@ -182,6 +182,11 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
             logger.error("Data dict is not valid. No data was uploaded.")
             return False
 
+    # Turn all keys to lowercase
+    corrected_config_dict = {}
+    for k in config_dict.keys():
+        corrected_config_dict[k.lower().lstrip().rstrip()] = config_dict[k]
+
     siaas_uid = get_or_create_unique_system_id()
 
     # Creating a new dict with a date object and date transfer direction so we can easily filter it and order entries in MongoDB
@@ -198,7 +203,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     complete_dict["scope"] = "agent_configs"
     complete_dict["origin"] = "server_"+siaas_uid.lower()
     complete_dict["destiny"] = "agent_"+agent_uid.lower()
-    complete_dict["payload"] = dict(sorted(config_dict.items(), key=lambda x: x[0].casefold()))
+    complete_dict["payload"] = dict(sorted(corrected_config_dict.items(), key=lambda x: x[0].casefold()))
     complete_dict["timestamp"] = get_now_utc_obj()
 
     return create_or_update_in_mongodb_collection(collection, complete_dict)
@@ -253,6 +258,14 @@ def get_dict_active_agents(collection, sort_by="date"):
         try:
             uid = r["origin"].split("_", 1)[1]
             out_dict[uid] = {}
+            try:
+                out_dict[uid]["nickname"] = str(get_dict_current_agent_configs(collection, agent_uid=uid, merge_broadcast=False)[uid]["nickname"])
+            except:
+                pass
+            try:
+                out_dict[uid]["description"] = str(get_dict_current_agent_configs(collection, agent_uid=uid, merge_broadcast=False)[uid]["description"])
+            except:
+                pass
             out_dict[uid]["last_seen"] = r["timestamp"].strftime(
                 '%Y-%m-%dT%H:%M:%SZ')
         except:
