@@ -236,8 +236,8 @@ def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-00000
 
 def get_dict_active_agents(collection, sort_by="date"):
     """
-    Reads a list of active agents
-    Returns a list of records. Returns empty dict if data can't be read
+    Reads a list of active agents. Returns nickname and description if they exist in configs DB
+    Returns a list of records. Returns False if data can't be read
     """
     logger.debug("Reading data from the DB server ...")
     out_dict = {}
