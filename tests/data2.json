@@ -1,5 +1,4 @@
 {
-  "output": {
     "config": {
       "api_pwd": "*****",
       "api_ssl_ca_bundle": "./ssl/siaas.crt",
@@ -178,8 +177,4 @@
       "last_check": "2022-11-17T16:41:43Z"
     },
     "portscanner": {}
-  },
-  "status": "success",
-  "total_entries": 4,
-  "time": "2022-11-17T16:41:45Z"
 }
