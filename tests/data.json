@@ -1,1 +1,185 @@
-{"platform": {"uid": "TEST", "version": "0.0.1", "system_info": {"cpu": {"percentage": "27.8 %", "physical_cores": 4, "total_cores": 4, "current_freq": "1992.00 MHz"}, "memory": {"percentage": "7.2 %", "total": "7.77 GB", "used": "320.58 MB", "available": "7.21 GB", "swap": {"percentage": "0.0 %", "total": "4.00 GB", "used": "0.00 B", "free": "4.00 GB"}}, "io": {"volumes": {"/dev/mapper/ubuntu--vg-ubuntu--lv": {"partition_mountpoint": "/", "partition_fstype": "ext4", "usage": {"percentage": "36.3 %", "total": "22.47 GB", "used": "7.72 GB", "free": "13.58 GB"}}, "/dev/vda2": {"partition_mountpoint": "/boot", "partition_fstype": "ext4", "usage": {"percentage": "5.8 %", "total": "1.90 GB", "used": "105.74 MB", "free": "1.68 GB"}}}, "total_read": "795.70 MB", "total_written": "3.63 GB"}, "network": {"interfaces": {"enp1s0": ["192.168.122.172/24", "2a01:7c8:aab5:4cd::1/48"], "enp7s0": ["192.168.123.1/24", "2a01:7c8:aab5:4cd::10/48"]}, "total_received": "1.07 GB", "total_sent": "501.24 MB"}, "last_boot": "2022-10-26T22:25:54Z"}, "last_check": "2022-10-27T14:03:30Z"}, "neighborhood": {}, "portscanner": {}, "config": {"datatransfer_loop_interval_sec": "120", "log_level": "debug", "manual_hosts": "109.51.61.78,sapo.pt,google.com,focal62", "mongo_collection": "siaas", "mongo_db": "siaas", "mongo_host": "192.168.122.172", "mongo_port": "27017", "mongo_pwd": "siaas", "mongo_user": "siaas", "neighborhood_arp_timeout_sec": "5", "neighborhood_loop_interval_sec": "60", "nmap_portscan_timeout_sec": "300", "nmap_scripts": "nmap-vulners,vulscan,vuln,http-csrf,http-sherlock,http-slowloris-attack,http-vmware-path-vuln,http-passwd,http-internal-ip-disclosure,http-vuln-cve2013-0156", "nmap_sysinfo_timeout_sec": "600", "platform_loop_interval_sec": "60", "portscanner_loop_interval_sec": "60"}}
+{
+  "output": {
+    "config": {
+      "api_pwd": "*****",
+      "api_ssl_ca_bundle": "./ssl/siaas.crt",
+      "api_uri": "https://siaas/api",
+      "api_user": "siaas",
+      "datatransfer_loop_interval_sec": 305,
+      "disable_portscanner": "false",
+      "dummy_from_bc": "dummy",
+      "enable_internal_api": "true",
+      "log_level": "debug",
+      "manual_hosts": "cgsa-dev.aitecservdevenv.local,aisense-qas.aitecservdevenv.local,focal62,google.com,sapo.pt",
+      "neighborhood_arp_timeout_sec": "5",
+      "neighborhood_loop_interval_sec": "60",
+      "nmap_portscan_timeout_sec": "300",
+      "nmap_scripts": "vuln,discovery",
+      "nmap_sysinfo_timeout_sec": "600",
+      "platform_loop_interval_sec": "60",
+      "portscanner_loop_interval_sec": "60",
+      "silent_mode": "false",
+      "testing_a_dict": {
+        "oi": 123
+      }
+    },
+    "neighborhood": {
+      "192.168.122.1": {
+        "discovery_type": "arp_ndp",
+        "domain_name": "_gateway",
+        "ping_status": "up",
+        "ip_version": "4",
+        "mac_address": "52:54:00:bd:bd:24",
+        "seen_on_interface": "enp1s0",
+        "last_check": "2022-11-17T16:41:16Z"
+      },
+      "192.168.122.51": {
+        "discovery_type": "manual",
+        "manual_entry_addresses": [
+          "aisense-qas.aitecservdevenv.local",
+          "cgsa-dev.aitecservdevenv.local"
+        ],
+        "domain_name": "aitecservdevenv.local",
+        "ping_status": "down",
+        "ip_version": "4",
+        "last_check": "2022-11-17T16:40:52Z"
+      },
+      "213.13.146.142": {
+        "discovery_type": "manual",
+        "manual_entry_addresses": [
+          "sapo.pt"
+        ],
+        "domain_name": "sapo.pt",
+        "ping_status": "up",
+        "ip_version": "4",
+        "last_check": "2022-11-17T16:40:56Z"
+      },
+      "216.58.215.174": {
+        "discovery_type": "manual",
+        "manual_entry_addresses": [
+          "google.com"
+        ],
+        "domain_name": "mad41s07-in-f14.1e100.net",
+        "ping_status": "up",
+        "ip_version": "4",
+        "last_check": "2022-11-17T16:40:56Z"
+      },
+      "2a00:1450:4003:803::200e": {
+        "discovery_type": "manual",
+        "manual_entry_addresses": [
+          "google.com"
+        ],
+        "domain_name": "mad41s11-in-x0e.1e100.net",
+        "ping_status": "down",
+        "ip_version": "6",
+        "last_check": "2022-11-17T16:40:56Z"
+      },
+      "2a01:7c8:aab5:4cd::1": {
+        "discovery_type": "arp_ndp",
+        "domain_name": "siaas",
+        "ping_status": "up",
+        "ip_version": "6",
+        "mac_address": "52:54:00:e7:6d:4b",
+        "seen_on_interface": "enp7s0",
+        "last_check": "2022-11-17T16:41:06Z"
+      },
+      "2a01:7c8:aab5:4cd::10": {
+        "discovery_type": "arp_ndp",
+        "domain_name": "siaas",
+        "ping_status": "up",
+        "ip_version": "6",
+        "mac_address": "52:54:00:53:e0:de",
+        "seen_on_interface": "enp1s0",
+        "last_check": "2022-11-17T16:41:11Z"
+      },
+      "2a01:7c8:aab5:4cd::30": {
+        "discovery_type": "manual",
+        "manual_entry_addresses": [
+          "focal62"
+        ],
+        "domain_name": "focal62",
+        "ping_status": "down",
+        "ip_version": "6",
+        "last_check": "2022-11-17T16:40:55Z"
+      }
+    },
+    "platform": {
+      "version": "0.0.1",
+      "uid": "test",
+      "system_info": {
+        "system": {
+          "os": "Linux",
+          "node_name": "siaas",
+          "kernel": "5.4.0-131-generic",
+          "flavor": "#147-Ubuntu SMP Fri Oct 14 17:07:22 UTC 2022",
+          "arch": "x86_64",
+          "processor": "Intel(R) Core(TM) i7-8550U CPU @ 1.80GHz"
+        },
+        "cpu": {
+          "percentage": "3.3 %",
+          "physical_cores": 4,
+          "total_cores": 4,
+          "current_freq": "1992.00 MHz"
+        },
+        "memory": {
+          "percentage": "13.1 %",
+          "total": "7.77 GB",
+          "used": "773.25 MB",
+          "available": "6.76 GB",
+          "swap": {
+            "percentage": "0.0 %",
+            "total": "4.00 GB",
+            "used": "0.00 B",
+            "free": "4.00 GB"
+          }
+        },
+        "io": {
+          "volumes": {
+            "/dev/mapper/ubuntu--vg-ubuntu--lv": {
+              "partition_mountpoint": "/",
+              "partition_fstype": "ext4",
+              "usage": {
+                "percentage": "51.9 %",
+                "total": "22.47 GB",
+                "used": "11.05 GB",
+                "free": "10.25 GB"
+              }
+            },
+            "/dev/vda2": {
+              "partition_mountpoint": "/boot",
+              "partition_fstype": "ext4",
+              "usage": {
+                "percentage": "11.7 %",
+                "total": "1.90 GB",
+                "used": "214.45 MB",
+                "free": "1.58 GB"
+              }
+            }
+          },
+          "total_read": "1.31 GB",
+          "total_written": "750.00 MB"
+        },
+        "network": {
+          "interfaces": {
+            "enp1s0": [
+              "192.168.122.172/24",
+              "2a01:7c8:aab5:4cd::1/48"
+            ],
+            "enp7s0": [
+              "192.168.123.1/24",
+              "2a01:7c8:aab5:4cd::10/48"
+            ]
+          },
+          "total_received": "744.18 MB",
+          "total_sent": "419.88 MB"
+        },
+        "last_boot": "2022-11-17T12:40:21Z"
+      },
+      "last_check": "2022-11-17T16:41:43Z"
+    },
+    "portscanner": {}
+  },
+  "status": "success",
+  "total_entries": 4,
+  "time": "2022-11-17T16:41:45Z"
+}
