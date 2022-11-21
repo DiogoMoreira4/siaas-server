@@ -21,7 +21,7 @@ def merge_module_dicts(modules=""):
     Returns False if it fails. 
     """
     merged_dict = {}
-    for module in sorted(modules.split(','), key=lambda x: x[0].casefold()):
+    for module in sorted(modules.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
         module = module.lstrip().rstrip().lower()
         try:
             module_dict = read_from_local_file(
@@ -114,7 +114,7 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
                 "Invalid line from local configuration file was ignored: "+str(line))
             continue
 
-    return write_to_local_file(output, dict(sorted(config_dict.items(), key=lambda x: x[0].casefold())))
+    return write_to_local_file(output, dict(sorted(config_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None)))
 
 
 def upload_agent_data(collection, agent_uid=None, data_dict={}):
@@ -207,7 +207,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     complete_dict["scope"] = "agent_configs"
     complete_dict["origin"] = "server_"+siaas_uid.lower()
     complete_dict["destiny"] = "agent_"+agent_uid.lower()
-    complete_dict["payload"] = dict(sorted(corrected_config_dict.items(), key=lambda x: x[0].casefold()))
+    complete_dict["payload"] = dict(sorted(corrected_config_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
     complete_dict["timestamp"] = get_now_utc_obj()
 
     return create_or_update_in_mongodb_collection(collection, complete_dict)
@@ -277,7 +277,7 @@ def get_dict_active_agents(collection, sort_by="date"):
                 "Ignoring invalid entry when grabbing active agents data.")
 
     if sort_by == "agent":
-        out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
+        out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0  else None))
 
     return out_dict
 
@@ -342,7 +342,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[uid][timestamp] = r["payload"]
                     else:
                         out_dict[uid][timestamp] = {}
-                        for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
+                        for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                             mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
@@ -354,7 +354,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                             out_dict[uid].pop(timestamp, None)
             except:
                 logger.debug("Ignoring invalid entry when grabbing agent data.")
-        out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
+        out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
 
     else:
         for r in results:
@@ -368,11 +368,11 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[timestamp][uid] = r["payload"]
                     else:
                         out_dict[timestamp][uid] = {}
-                        for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
+                        for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                             mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
-                    out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=lambda x: x[0].casefold()))
+                    out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
                     if hide_empty:
                         for k in list(out_dict[timestamp][uid].keys()):
                             if len(out_dict[timestamp][uid][k]) == 0:
@@ -435,14 +435,14 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                     out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = {}
-                    for m in sorted(module.split(','), key=lambda x: x[0].casefold()):
+                    for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                         mod = m.lstrip().rstrip().lower()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
-    out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
+    out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
 
     return out_dict
 
@@ -508,7 +508,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                         out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = r["payload"]
-                out_dict[uid] = dict(sorted(out_dict[uid].items(), key=lambda x: x[0].casefold()))
+                out_dict[uid] = dict(sorted(out_dict[uid].items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
         except:
             logger.debug("Ignoring invalid entry when grabbing agent data.")
 
@@ -520,11 +520,11 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                if uid not in out_dict.keys():
                    if len(results_bc) > 0:
                        out_dict[uid] = results_bc[0]["payload"]
-                       out_dict[uid] = dict(sorted(out_dict[uid].items(), key=lambda x: x[0].casefold()))
+                       out_dict[uid] = dict(sorted(out_dict[uid].items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
             except:
                logger.debug("Ignoring invalid entry when grabbing agent data.")
     
-    out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold()))
+    out_dict = dict(sorted(out_dict.items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
 
     return out_dict
 
