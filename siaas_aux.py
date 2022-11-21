@@ -21,8 +21,8 @@ def merge_module_dicts(modules=""):
     Returns False if it fails. 
     """
     merged_dict = {}
-    for module in sorted(set(modules.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
-        module = module.lstrip().rstrip().lower()
+    for module in sorted(set(modules.lower().split(','))):
+        module = module.lstrip().rstrip()
         try:
             module_dict = read_from_local_file(
                 os.path.join(sys.path[0], 'var/'+str(module)+'.db'))
@@ -342,8 +342,8 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[uid][timestamp] = r["payload"]
                     else:
                         out_dict[uid][timestamp] = {}
-                        for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
-                            mod = m.lstrip().rstrip().lower()
+                        for m in sorted(set(module.lower().split(','))):
+                            mod = m.lstrip().rstrip()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
                     if hide_empty:
@@ -368,8 +368,8 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[timestamp][uid] = r["payload"]
                     else:
                         out_dict[timestamp][uid] = {}
-                        for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
-                            mod = m.lstrip().rstrip().lower()
+                        for m in sorted(set(module.lower().split(','))):
+                            mod = m.lstrip().rstrip()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
                     out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(), key=lambda x: x[0].casefold() if len(x or "")>0 else None))
@@ -435,8 +435,8 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                     out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = {}
-                    for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
-                        mod = m.lstrip().rstrip().lower()
+                    for m in sorted(set(module.lower().split(','))):
+                        mod = m.lstrip().rstrip()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
         except:
