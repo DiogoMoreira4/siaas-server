@@ -21,7 +21,7 @@ def merge_module_dicts(modules=""):
     Returns False if it fails. 
     """
     merged_dict = {}
-    for module in sorted(modules.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
+    for module in sorted(set(modules.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
         module = module.lstrip().rstrip().lower()
         try:
             module_dict = read_from_local_file(
@@ -342,7 +342,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[uid][timestamp] = r["payload"]
                     else:
                         out_dict[uid][timestamp] = {}
-                        for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
+                        for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                             mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
@@ -368,7 +368,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                         out_dict[timestamp][uid] = r["payload"]
                     else:
                         out_dict[timestamp][uid] = {}
-                        for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
+                        for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                             mod = m.lstrip().rstrip().lower()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
@@ -435,7 +435,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                     out_dict[uid] = r["payload"]
                 else:
                     out_dict[uid] = {}
-                    for m in sorted(module.split(','), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
+                    for m in sorted(set(module.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0 else None):
                         mod = m.lstrip().rstrip().lower()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
