@@ -11,7 +11,7 @@ fi
 cd ${SCRIPT_DIR}
 
 apt-get update
-apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl
+apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl dmidecode
 
 # SSL CONFIGURATION WITH SELF-SIGNED CERTS
 [ ! -f "./ssl/siaas.crt" ] && ./siaas_server_generate_ssl_certs.sh # generate new self-signed certs on first run
