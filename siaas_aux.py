@@ -757,6 +757,9 @@ def get_or_create_unique_system_id():
 
 
 def validate_bool_string(input_string, default_output=False):
+   """
+   Validates string format and if it's not empty and returns a boolean
+   """
    if type(default_output) is not bool:
       return None
    if default_output == False:
@@ -772,6 +775,9 @@ def validate_bool_string(input_string, default_output=False):
 
 
 def validate_string_key(string):
+    """
+    Validates the proper format of a string configuration key and returns a boolean
+    """
     pattern = "^[A-Za-z0-9_-]*$"
     if type(string) is not str:
         logger.debug(
@@ -800,6 +806,28 @@ def get_size(bytes, suffix="B"):
         if bytes < factor:
             return f"{bytes:.2f} {unit}{suffix}"
         bytes /= factor
+
+
+def convert_sec_to_pretty_format(seconds):
+   """
+   Converts a number of seconds to a pretty day/hr/min/sec format
+   """
+   time = float(seconds)
+   day = time // (24 * 3600)
+   time = time % (24 * 3600)
+   hour = time // 3600
+   time %= 3600
+   mins = time // 60
+   time %= 60
+   secs = time
+   if day != 0:
+      return "%d day %d hr %d min %d sec" % (day, hour, mins, secs)
+   if hour != 0:
+      return "%d hr %d min %d sec" % (hour, mins, secs)
+   if mins != 0:
+      return "%d min %d sec" % (mins, secs)
+   else:
+      return "%d sec" % (secs)
 
 
 def get_now_utc_str():
