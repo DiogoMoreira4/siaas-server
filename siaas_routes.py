@@ -42,13 +42,9 @@ def siaas_server():
     else:
         status = "success"
     try:
-        output["config"]["mongo_pwd"] = '*' * \
-            len(output["config"]["mongo_pwd"])
-    except:
-        pass
-    try:
-        output["config"]["api_pwd"] = '*' * \
-            len(output["config"]["api_pwd"])
+        for k in output["config"].keys():
+            if k.endswith("_pwd") or k.endswith("_passwd") or k.endswith("_password"):
+                output["config"][k] = '*' * len(output["config"][k])
     except:
         pass
     return jsonify(
