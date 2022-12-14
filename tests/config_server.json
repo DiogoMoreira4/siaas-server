@@ -1,0 +1,6 @@
+{
+	"alarm_recipients": "tester@siaas.com",
+	"smtp_server": "ola.com",
+	"smtp_port": "25",
+	"dbmaintenance_history_days_to_keep": "3"
+}

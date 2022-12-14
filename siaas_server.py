@@ -39,8 +39,8 @@ if __name__ == "__main__":
     # Needs to be root
     if os.geteuid() != 0:
         logger.critical(
-            "\nThis script must be run as root or using sudo!\n", file=sys.stderr)
-        sys.exit(2)
+            "\nThis script must be run as root or using sudo!\n")
+        sys.exit(1)
 
     # Create local directories
     os.makedirs(os.path.join(sys.path[0], 'conf'), exist_ok=True)
@@ -50,9 +50,14 @@ if __name__ == "__main__":
     # Initializing local databases for configurations
     siaas_aux.write_to_local_file(
         os.path.join(sys.path[0], 'var/config.db'), {})
+    siaas_aux.write_to_local_file(os.path.join(
+        sys.path[0], 'var/config_local.db'), {})
 
-    # Read local configuration file and insert in local database
-    siaas_aux.write_config_db_from_conf_file()
+    # Read local configuration file and insert in local databases
+    siaas_aux.write_config_db_from_conf_file(
+        output=os.path.join(sys.path[0], 'var/config.db'))
+    siaas_aux.write_config_db_from_conf_file(
+        output=os.path.join(sys.path[0], 'var/config_local.db'))
 
     # Get all values
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
@@ -93,8 +98,8 @@ if __name__ == "__main__":
     server_uid = siaas_aux.get_or_create_unique_system_id()
     if server_uid == "00000000-0000-0000-0000-000000000000":
         logger.critical(
-            "\nCan't proceed without an unique system ID. Aborting !\n")
-        sys.exit(3)
+            "Can't proceed without an unique system ID. Aborting !")
+        sys.exit(1)
 
     # Create connection to MongoDB
     if len(MONGO_PORT or '') > 0:
@@ -103,6 +108,12 @@ if __name__ == "__main__":
         mongo_host_port = MONGO_HOST
     DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(
         MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+
+    # Check if DB is alive
+    if not siaas_aux.mongodb_ping(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION):
+       logger.critical(
+           "DB is down. Aborting !")
+       sys.exit(1)
 
     # Create MongoDB indexes
     DB_COLLECTION_OBJ.create_index("origin", unique=False, name="agent_origin_index")
@@ -124,3 +135,5 @@ if __name__ == "__main__":
 
     platform.join()
     dbmaintenance.join()
+
+    sys.exit(0)

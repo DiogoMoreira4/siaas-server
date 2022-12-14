@@ -63,19 +63,19 @@ def loop():
             "No valid DB collection received. No DB maintenance will be performed.")
         run = False
 
-    try:
-        days_to_keep = int(siaas_aux.get_config_from_configs_db(
-            config_name="dbmaintenance_history_days_to_keep"))
-        if days_to_keep < 0:
-            raise ValueError("Number of historical days can't be negative.")
-    except:
-        logger.warning(
-            "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year as a precaution against deleting any recent data.")
-        days_to_keep = 365
-
     while run:
 
         logger.debug("Loop running ...")
+
+        try:
+            days_to_keep = int(siaas_aux.get_config_from_configs_db(
+                config_name="dbmaintenance_history_days_to_keep"))
+            if days_to_keep < 0:
+                raise ValueError("Number of historical days can't be negative.")
+        except:
+            logger.warning(
+                "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year as a precaution against deleting any recent data.")
+            days_to_keep = 365
 
         delete_history_data(db_collection, days_to_keep)
 

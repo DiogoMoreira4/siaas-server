@@ -40,6 +40,10 @@ curl -X GET http://localhost:5000/siaas-server/agents/configs/10000000dbb5bbc1?m
 curl -X GET http://localhost:5000/siaas-server/agents/configs/000000007ab1b3b3?merge_broadcast=1
 curl -X GET http://localhost:5000/siaas-server/agents/configs/ffffffff-ffff-ffff-ffff-ffffffffffff?merge_broadcast=1
 
+curl -X DELETE http://localhost:5000/siaas-server/configs
+curl -X POST http://localhost:5000/siaas-server/configs -H "Content-Type: application/json" -d @config_server.json
+curl -X GET http://localhost:5000/siaas-server/configs
+
 # Test SSL and BasicAuth (needs hostname of the server)
 
 THIS_HOST=$(hostname -f | tr '[:upper:]' '[:lower:]')

@@ -31,6 +31,7 @@ def index():
 def siaas_server():
     module = request.args.get('module', default='*', type=str)
     all_existing_modules = "platform,config"
+    siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(get_db_collection()))
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = all_existing_modules
@@ -58,6 +59,59 @@ def siaas_server():
             'time': siaas_aux.get_now_utc_str()
         }
     )
+
+
+@app.route('/siaas-server/configs', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
+def server_configs():
+    collection = get_db_collection()
+    if request.method == 'GET':
+        output = siaas_aux.get_dict_current_server_configs(
+            collection)
+        if type(output) == bool and output == False:
+            status = "failure"
+            output = {}
+        else:
+            status = "success"
+        return jsonify(
+            {
+                'output': output,
+                'status': status,
+                'total_entries': len(output),
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
+    if request.method == 'POST':
+        content = request.json
+        output = siaas_aux.create_or_update_server_configs(
+            collection, config_dict=content)
+        if output:
+            siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
+            status = "success"
+        else:
+            status = "failure"
+        return jsonify(
+            {
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
+    if request.method == 'DELETE':
+        output = siaas_aux.delete_all_records_older_than(
+            collection, scope="server_configs", days_to_keep=0)
+        if type(output) == bool and output == False:
+            status = "failure"
+            count_deleted = 0
+        else:
+            siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
+            status = "success"
+            count_deleted = int(output)
+        return jsonify(
+            {
+                'deleted_count': count_deleted,
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        )
 
 
 @app.route('/siaas-server/agents', methods=['GET'], strict_slashes=False)
