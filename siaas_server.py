@@ -115,6 +115,9 @@ if __name__ == "__main__":
            "DB is down. Aborting !")
        sys.exit(1)
 
+    # Merge upstream configs
+    siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(DB_COLLECTION_OBJ))
+
     # Create MongoDB indexes
     DB_COLLECTION_OBJ.create_index("origin", unique=False, name="agent_origin_index")
     DB_COLLECTION_OBJ.create_index("destiny", unique=False, name="agent_destiny_index")
