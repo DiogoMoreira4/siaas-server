@@ -19,7 +19,7 @@ receiver_email = "siaas.iscte@gmail.com"
 smtp_pwd = "mdbnifhmquaexxka"
 smtp_server = "smtp.gmail.com"
 smtp_tls_port = "587"
-report_type = "vuln_only" # all, vuln_only, exploit_only
+report_type = "all" # all, vuln_only, exploit_only
 
 # Generate global variables from the configuration file
 config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
@@ -69,7 +69,7 @@ else:
                                         if f == "scan_results":
                                             for g in out_dict[a][b][c][d][e][f].keys():
                                                 for h in out_dict[a][b][c][d][e][f][g].keys():
-                                                    if h == "vulners" or h == "vulscan":
+                                                    if "vulners" in h or "vulscan" in h:
                                                         if report_type.lower() == "vuln_only":
                                                             if a not in new_dict.keys():
                                                                  new_dict[a]={}
