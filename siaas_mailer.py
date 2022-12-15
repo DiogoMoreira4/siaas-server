@@ -65,7 +65,7 @@ with open(file_to_write, 'w') as f:
 #print(out_dict_str)
 
 message = MIMEMultipart("alternative")
-message["Subject"] = "SIAAS Report from "+datetime.now().strftime('%Y-%m-%d at %H:%M')
+message["Subject"] = "SIAAS Report from "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
 #message["From"] = smtp_email
 message["From"] = formataddr(("SIAAS ("+platform.node().split('.', 1)[0]+")", smtp_email))
 message["To"] = receiver_email
