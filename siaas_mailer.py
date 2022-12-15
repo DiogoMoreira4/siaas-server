@@ -19,7 +19,7 @@ receiver_email = "siaas.iscte@gmail.com"
 smtp_pwd = "mdbnifhmquaexxka"
 smtp_server = "smtp.gmail.com"
 smtp_tls_port = "587"
-report_type = "all" # all, vuln_only, exploit_only
+report_type = "vuln_only" # all, vuln_only, exploit_only
 
 # Generate global variables from the configuration file
 config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
@@ -63,6 +63,14 @@ else:
                 if b == "portscanner":
                     for c in out_dict[a][b].keys():
                         for d in out_dict[a][b][c].keys():
+                            if d == "last_check":
+                                if a not in new_dict.keys():
+                                    new_dict[a]={}
+                                if b not in new_dict[a].keys():
+                                    new_dict[a][b]={}
+                                if c not in new_dict[a][b].keys():
+                                    new_dict[a][b][c]={}
+                                new_dict[a][b][c]["last_check"] = out_dict[a][b][c]["last_check"]
                             if d == "scanned_ports":
                                 for e in out_dict[a][b][c][d].keys():
                                     for f in out_dict[a][b][c][d][e].keys():
@@ -109,6 +117,7 @@ else:
                                                                         if i not in new_dict[a][b][c][d][e][f][g][h].keys():
                                                                             new_dict[a][b][c][d][e][f][g][h][i]={}
                                                                         new_dict[a][b][c][d][e][f][g][h][i][j]=out_dict[a][b][c][d][e][f][g][h][i][j]
+
     except Exception as e:
         print(str(e))
 
