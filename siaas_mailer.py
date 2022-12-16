@@ -206,8 +206,8 @@ def loop():
         mailer_smtp_report_type=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_report_type")
 
         if len(mailer_smtp_account or '') == 0 or len(mailer_smtp_pwd or '') == 0 or len(mailer_smtp_receivers or '') == 0 or len(mailer_smtp_server or '') == 0:
-            logger.error(
-                "One of the mailer configuration fields is undefined or invalid. Not sending mail.")
+            logger.warning(
+                "One or more of the mailer configuration fields are undefined or invalid. Not sending mail.")
             send_mail=False
 
         if send_mail:
