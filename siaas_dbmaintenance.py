@@ -126,3 +126,4 @@ if __name__ == "__main__":
     delete_history_data(collection, days_to_keep=3650)
 
     print('\nAll done. Bye!\n')
+

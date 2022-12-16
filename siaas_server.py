@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     import siaas_aux
     import siaas_dbmaintenance
+    import siaas_mailer
     import siaas_platform
     import siaas_routes
 
@@ -130,13 +131,16 @@ if __name__ == "__main__":
     # Main logic
     platform = Process(target=siaas_platform.loop, args=(SIAAS_VERSION,))
     dbmaintenance = Process(target=siaas_dbmaintenance.loop, args=())
+    mailer = Process(target=siaas_mailer.loop, args=())
     platform.start()
     dbmaintenance.start()
+    mailer.start()
 
     #app.run(debug=True, use_reloader=False, host="127.0.0.1", port=API_PORT)
     serve(app, host="127.0.0.1", port=API_PORT)
 
     platform.join()
     dbmaintenance.join()
+    mailer.join()
 
     sys.exit(0)
