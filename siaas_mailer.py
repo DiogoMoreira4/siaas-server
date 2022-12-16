@@ -210,20 +210,22 @@ def loop():
                 "One of the mailer configuration fields is undefined or invalid. Not sending mail.")
             send_mail=False
 
-        if len(mailer_smtp_report_type or '') == 0:
-            logger.debug("No report type configured. Defaulting to only mailing exploits.")
-            mailer_smtp_report_type="exploit_only"
-
-        try:
-            smtp_tls_port = int(mailer_smtp_tls_port)
-            if smtp_tls_port < 1:
-                raise ValueError("SMTP TLS port can't be less 1.")
-        except:
-            smtp_tls_port = 25
-            logger.warning("SMTP TLS port is invalid. Using port 25.")
-
         if send_mail:
-            last_dict = send_siaas_email(db_collection, mailer_smtp_account, mailer_smtp_pwd, mailer_smtp_receivers, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
+
+            if len(mailer_smtp_report_type or '') == 0:
+                logger.debug("No report type configured. Defaulting to only mailing exploits.")
+                mailer_smtp_report_type="exploit_only"
+
+            try:
+                smtp_tls_port = int(mailer_smtp_tls_port)
+                if smtp_tls_port < 1:
+                    raise ValueError("SMTP TLS port can't be less 1.")
+            except:
+                smtp_tls_port = 25
+                logger.debug("SMTP TLS port is invalid or not defined. Using SMTP TLS port default (587).")
+
+            if send_mail:
+                last_dict = send_siaas_email(db_collection, mailer_smtp_account, mailer_smtp_pwd, mailer_smtp_receivers, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
 
         # Sleep before next loop
         try:
