@@ -96,7 +96,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         return last_dict
 
     if smtp_report_type.lower() == "all":
-        mail_type="All agent data"
+        mail_type="All scanned data"
     elif smtp_report_type.lower() == "vuln_only":
         mail_type="Vulnerabilities"
     else:
