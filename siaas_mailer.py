@@ -94,6 +94,13 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     if str(new_dict) == str(last_dict) and last_dict != None:
         logger.debug("No new data to report. Not sending any email.")
         return last_dict
+
+    if smtp_report_type.lower() == "all":
+        mail_type="All agent data"
+    elif smtp_report_type.lower() == "vuln_only":
+        mail_type="Vulnerabilities"
+    else:
+        mail_type="Exploits"
     
     last_dict = new_dict
     
@@ -114,7 +121,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
    
     # Message headers
     message = MIMEMultipart("alternative")
-    message["Subject"] = "SIAAS Report from "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
+    message["Subject"] = "SIAAS Report ("+mail_type+") from "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
     #message["From"] = smtp_account
     message["From"] = formataddr(("SIAAS ("+platform.node().split('.', 1)[0]+")", smtp_account))
     message["To"] = smtp_receivers
