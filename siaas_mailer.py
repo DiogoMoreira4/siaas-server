@@ -110,14 +110,20 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         new_dict_str=pprint.pformat(new_dict, width=999)
    
     # Create a CSV report
+
+    csv_contents=[]
+    for a in new_dict.keys():
+        for b in new_dict[a].keys():
+            for c in new_dict[a][b].keys():
+                for d in new_dict[a][b][c].keys():
+                    csv_contents.append([a,c,d,new_dict[a][b][c][d]])
+
     file_to_write="./tmp/siaas_report_"+datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
     os.makedirs(os.path.dirname(os.path.join(sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
-        #w = csv.DictWriter(f, new_dict.keys())
-        #w.writeheader()
-        #w.writerow(new_dict)
         w = csv.writer(f)
-        w.writerows(new_dict.items())
+        w.writerow(["Agent UID", "Target", "Information type", "Findings"])
+        w.writerows(csv_contents)
    
     # Message headers
     message = MIMEMultipart("alternative")
