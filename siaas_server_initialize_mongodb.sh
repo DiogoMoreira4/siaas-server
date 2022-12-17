@@ -7,6 +7,8 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
+echo "Initializing SIAAS database (also dropping existing) ..."
+
 #mongo --eval 'db.runCommand({ connectionStatus: 1 })'
 #mongo --eval 'Mongo().getDBNames()'
 #echo "show dbs" | mongo
