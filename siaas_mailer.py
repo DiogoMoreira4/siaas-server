@@ -285,7 +285,7 @@ if __name__ == "__main__":
     logger.info("Sending an email ...")
 
     smtp_account = "siaas.iscte@gmail.com"
-    smtp_receivers = "joao.pedro.seara@gmail.com"
+    smtp_receivers = "siaas.iscte@gmail.com"
     smtp_pwd = "mdbnifhmquaexxka"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
