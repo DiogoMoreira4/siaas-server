@@ -19,3 +19,5 @@ __
  - Logs: `tail -100f /var/log/siaas-server/siaas-server.log` or `tail -100f ./log/siaas-server.log`
 
  - Generate a project archive (it is recommended to stop all processes before): `sudo ./siaas_server_archive.sh`
+
+ - Remove: `sudo ./siaas_server_remove.sh`
