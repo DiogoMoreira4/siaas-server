@@ -56,8 +56,8 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
     Require valid-user
   </Location>
 
-  CustomLog /${APACHE_LOG_DIR}/siaas-access.log combined
-  ErrorLog /${APACHE_LOG_DIR}/siaas-error.log
+  CustomLog \${APACHE_LOG_DIR}/siaas-access.log combined
+  ErrorLog \${APACHE_LOG_DIR}/siaas-error.log
 
 </VirtualHost>
 EOF
@@ -98,8 +98,8 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas-ssl.conf
   SSLCertificateFile /etc/ssl/certs/siaas.crt
   SSLCertificateKeyFile /etc/ssl/private/siaas.key
 
-  CustomLog /${APACHE_LOG_DIR}/siaas-access.log combined
-  ErrorLog /${APACHE_LOG_DIR}/siaas-error.log
+  CustomLog \${APACHE_LOG_DIR}/siaas-access.log combined
+  ErrorLog \${APACHE_LOG_DIR}/siaas-error.log
 
 </VirtualHost>
 EOF
@@ -126,14 +126,12 @@ sleep 3 && ./siaas_server_initialize_mongodb.sh # initialize the SIAAS users in 
 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
-ln -fs ${SCRIPT_DIR}/siaas_server_run.sh /usr/local/bin/
-ln -fs ${SCRIPT_DIR}/siaas_server_kill.sh /usr/local/bin/
 ln -fs ${SCRIPT_DIR}/log /var/log/siaas-server
 cat << EOF | sudo tee /etc/systemd/system/siaas-server.service
 [Unit]
 Description=SIAAS Server
 [Service]
-ExecStart=/usr/local/bin/siaas_server_run.sh
+ExecStart=${SCRIPT_DIR}/siaas_server_run.sh
 [Install]
 WantedBy=multi-user.target
 EOF
