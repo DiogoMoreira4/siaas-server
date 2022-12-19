@@ -122,7 +122,7 @@ systemctl enable apache2
 #sed -i 's|bind_ip[[:space:]]*=[[:space:]]*127.0.0.1|bind_ip = 0.0.0.0|g' /etc/mongodb.conf # Open DB to the world (only for testing purposes)
 systemctl restart mongodb
 systemctl enable mongodb
-sleep 3 && ./siaas_server_initialize_mongodb.sh # initialize the SIAAS users in MongoDB (resets all databases as well!)
+sleep 3 && mongo --eval 'Mongo().getDBNames()' | grep siaas || ./siaas_server_initialize_mongodb.sh # initialize the MongoDB SIAAS DB if it doesn't exist
 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
