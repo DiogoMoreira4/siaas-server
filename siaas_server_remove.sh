@@ -27,8 +27,6 @@ sudo systemctl reload apache2
 
 # SERVICE CONFIGURATION
 systemctl stop siaas-server
-rm -f /usr/local/bin/siaas_server_run.sh
-rm -f /usr/local/bin/siaas_server_kill.sh
 rm -f /var/log/siaas-server
 rm -f /etc/systemd/system/siaas-server.service
 systemctl daemon-reload
