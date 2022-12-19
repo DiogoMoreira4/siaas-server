@@ -699,7 +699,7 @@ def insert_in_mongodb_collection(collection, data_to_insert):
     logger.debug("Inserting data in the DB server ...")
     try:
         logger.debug("All data that will now be written to the database:\n" +
-                     pprint.pformat(data_to_insert))
+                     pprint.pformat(data_to_insert, sort_dicts=False))
         collection.insert_one(copy(data_to_insert))
         logger.debug("Data successfully uploaded to the DB server.")
         return True
@@ -716,7 +716,7 @@ def create_or_update_in_mongodb_collection(collection, data_to_insert):
     logger.info("Inserting data in the DB server ...")
     try:
         logger.debug("All data that will now be written to the database:\n" +
-                     pprint.pformat(data_to_insert))
+                     pprint.pformat(data_to_insert, sort_dicts=False))
         data = copy(data_to_insert)
         collection.find_one_and_update(
             {'destiny': data["destiny"], 'scope': data["scope"]}, {'$set': data}, upsert=True)
@@ -775,7 +775,7 @@ def write_to_local_file(file_to_write, data_to_insert):
         os.makedirs(os.path.dirname(os.path.join(
             sys.path[0], file_to_write)), exist_ok=True)
         logger.debug("All data that will now be written to the file:\n" +
-                     pprint.pformat(data_to_insert))
+                     pprint.pformat(data_to_insert, sort_dicts=False))
         with open(file_to_write, 'w') as file:
             file.write(json.dumps(data_to_insert))
             logger.debug("Local file write ended successfully.")
