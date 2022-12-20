@@ -299,9 +299,9 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
     result=True
     for u in agent_uid.split(','):
-        uid = u.lstrip().rstrip().lower()
+        uid = u.lstrip().rstrip()
 
-        if not validate_string_key(agent_uid):
+        if not validate_string_key(uid):
            logger.error("Agent UID is not valid. No data was uploaded.")
            result=False
            continue
