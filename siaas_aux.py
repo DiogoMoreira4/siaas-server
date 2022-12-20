@@ -194,7 +194,7 @@ def create_or_update_server_configs(collection, config_dict={}):
 
     for k in config_dict.keys():
         if not validate_string_key(k):
-            logger.error("Data dict is not valid. No data was uploaded.")
+            logger.error("Configs dict has an invalid key: "+k+". No data was uploaded.")
             return False
 
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
@@ -237,12 +237,12 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
         return False
 
     if not validate_string_key(agent_uid):
-        logger.error("Agent UID is not valid. No data was uploaded.")
+        logger.error("Agent UID '"+uid+"' is not valid. No data was uploaded.")
         return False
 
     for k in data_dict.keys():
         if not validate_string_key(k):
-            logger.error("Data dict is not valid. No data was uploaded.")
+            logger.error("Data dict has an invalid key: "+k+". No data was uploaded.")
             return False
 
     # Creating a new dict with a date object and date transfer direction so we can easily filter it and order entries in MongoDB
@@ -283,7 +283,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
     for k in config_dict.keys():
         if not validate_string_key(k):
-            logger.error("Data dict is not valid. No data was uploaded.")
+            logger.error("Configs dict has an invalid key: "+k+". No data was uploaded.")
             return False
 
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
@@ -302,7 +302,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
         uid = u.lstrip().rstrip()
 
         if not validate_string_key(uid):
-           logger.error("Agent UID is not valid. No data was uploaded.")
+           logger.error("Agent UID '"+uid+"' is not valid. No data was uploaded.")
            result=False
            continue
 
