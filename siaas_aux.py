@@ -184,17 +184,17 @@ def create_or_update_server_configs(collection, config_dict={}):
 
     if type(config_dict) is not dict:
         logger.error(
-            "No valid configuration dict received. No data was uploaded.")
+            "No valid server configuration dict received. No server configs were uploaded.")
         return False
 
     if "#" in str(config_dict):
         logger.error(
-            "Detected invalid character '#' in the input configuration dict keys or values. No data was uploaded.")
+            "Detected invalid character '#' in the input server configuration dict keys or values. No server configs were uploaded.")
         return False
 
     for k in config_dict.keys():
         if not validate_string_key(k):
-            logger.error("Configs dict has an invalid key: "+k+". No data was uploaded.")
+            logger.error("Server configurations dict has an invalid key: "+k+". No server configs were uploaded.")
             return False
 
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
@@ -233,17 +233,17 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
 
     if type(data_dict) is not dict:
         logger.error(
-            "No valid data dict received. No data was uploaded.")
-        return False
-
-    if not validate_string_key(agent_uid):
-        logger.error("Agent UID '"+uid+"' is not valid. No data was uploaded.")
+            "No valid agent data dict received. No agent data was uploaded.")
         return False
 
     for k in data_dict.keys():
         if not validate_string_key(k):
-            logger.error("Data dict has an invalid key: "+k+". No data was uploaded.")
+            logger.error("Agent data dict has an invalid key: "+k+". No agent data was uploaded.")
             return False
+
+    if not validate_string_key(agent_uid):
+        logger.error("Agent UID '"+uid+"' is not valid. No agent data was uploaded.")
+        return False
 
     # Creating a new dict with a date object and date transfer direction so we can easily filter it and order entries in MongoDB
 
@@ -273,17 +273,17 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
     if type(config_dict) is not dict:
         logger.error(
-            "No valid configuration dict received. No data was uploaded.")
+            "No valid agent configuration dict received. No agent configs were uploaded.")
         return False
 
     if "#" in str(config_dict):
         logger.error(
-            "Detected invalid character '#' in the input configuration dict keys or values. No data was uploaded.")
+            "Detected invalid character '#' in the input agent configuration dict keys or values. No agent configs were uploaded.")
         return False
 
     for k in config_dict.keys():
         if not validate_string_key(k):
-            logger.error("Configs dict has an invalid key: "+k+". No data was uploaded.")
+            logger.error("Agent configurations dict has an invalid key: "+k+". No agent configs were uploaded.")
             return False
 
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
@@ -302,7 +302,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
         uid = u.lstrip().rstrip()
 
         if not validate_string_key(uid):
-           logger.error("Agent UID '"+uid+"' is not valid. No data was uploaded.")
+           logger.error("Agent UID '"+uid+"' is not valid. No agent configs were uploaded.")
            result=False
            continue
 
@@ -602,7 +602,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
         except:
             logger.debug("Ignoring invalid entry when grabbing agent configs.")
 
-    # We have to make sure that even if the Agent UID doesn't exist in the config DB, we return the broadcast values if merge_broadcast is on
+    # We have to make sure that even if the agent UID doesn't exist in the config DB, we return the broadcast values if merge_broadcast is on
     if merge_broadcast and len(agent_uid or '') > 0:
         for u in agent_uid.split(','):
             try:
