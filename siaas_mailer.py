@@ -1,6 +1,6 @@
+import siaas_aux
 import smtplib, ssl
 import csv
-import siaas_aux
 import platform
 import pprint
 import os
@@ -16,81 +16,13 @@ from email.mime.application import MIMEApplication
 
 logger = logging.getLogger(__name__)
 
-#def delete_history_data(db_collection, days_to_keep):
 def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type, last_dict=None):
 
     logger.debug("Generating a new dict to send via email ...")
 
     out_dict=siaas_aux.get_dict_current_agent_data(db_collection, agent_uid=None, module="portscanner")
-    new_dict={}
+    new_dict=siaas_aux.grab_vulns_from_agent_data_dict(out_dict, report_type=smtp_report_type)
     
-    if smtp_report_type.lower() == "all":
-        new_dict = out_dict
-    else:
-        try:
-            for a in out_dict.keys():
-                for b in out_dict[a].keys():
-                    if b == "portscanner":
-                        for c in out_dict[a][b].keys():
-                            for d in out_dict[a][b][c].keys():
-                                if d == "last_check":
-                                    if a not in new_dict.keys():
-                                        new_dict[a]={}
-                                    if b not in new_dict[a].keys():
-                                        new_dict[a][b]={}
-                                    if c not in new_dict[a][b].keys():
-                                        new_dict[a][b][c]={}
-                                    new_dict[a][b][c]["last_check"] = out_dict[a][b][c]["last_check"]
-                                if d == "scanned_ports":
-                                    for e in out_dict[a][b][c][d].keys():
-                                        for f in out_dict[a][b][c][d][e].keys():
-                                            if f == "scan_results":
-                                                for g in out_dict[a][b][c][d][e][f].keys():
-                                                    for h in out_dict[a][b][c][d][e][f][g].keys():
-                                                        if "vulners" in h or "vulscan" in h:
-                                                            if smtp_report_type.lower() == "vuln_only":
-                                                                if a not in new_dict.keys():
-                                                                     new_dict[a]={}
-                                                                if b not in new_dict[a].keys():
-                                                                     new_dict[a][b]={}
-                                                                if c not in new_dict[a][b].keys():
-                                                                     new_dict[a][b][c]={}
-                                                                if d not in new_dict[a][b][c].keys():
-                                                                     new_dict[a][b][c][d]={}
-                                                                if e not in new_dict[a][b][c][d].keys():
-                                                                     new_dict[a][b][c][d][e]={}
-                                                                if f not in new_dict[a][b][c][d][e].keys():
-                                                                     new_dict[a][b][c][d][e][f]={}
-                                                                if g not in new_dict[a][b][c][d][e][f].keys():
-                                                                    new_dict[a][b][c][d][e][f][g]={}
-                                                                new_dict[a][b][c][d][e][f][g][h]=out_dict[a][b][c][d][e][f][g][h]
-                                                            else: # exploit_only (default)
-                                                                for i in out_dict[a][b][c][d][e][f][g][h].keys():
-                                                                    for j in out_dict[a][b][c][d][e][f][g][h][i].keys():
-                                                                        if "siaas_exploit_tag" in out_dict[a][b][c][d][e][f][g][h][i][j]:
-                                                                            if a not in new_dict.keys():
-                                                                                new_dict[a]={}
-                                                                            if b not in new_dict[a].keys():
-                                                                                new_dict[a][b]={}
-                                                                            if c not in new_dict[a][b].keys():
-                                                                                new_dict[a][b][c]={}
-                                                                            if d not in new_dict[a][b][c].keys():
-                                                                                new_dict[a][b][c][d]={}
-                                                                            if e not in new_dict[a][b][c][d].keys():
-                                                                                new_dict[a][b][c][d][e]={}
-                                                                            if f not in new_dict[a][b][c][d][e].keys():
-                                                                                new_dict[a][b][c][d][e][f]={}
-                                                                            if g not in new_dict[a][b][c][d][e][f].keys():
-                                                                                new_dict[a][b][c][d][e][f][g]={}
-                                                                            if h not in new_dict[a][b][c][d][e][f][g].keys():
-                                                                                new_dict[a][b][c][d][e][f][g][h]={}
-                                                                            if i not in new_dict[a][b][c][d][e][f][g][h].keys():
-                                                                                new_dict[a][b][c][d][e][f][g][h][i]={}
-                                                                            new_dict[a][b][c][d][e][f][g][h][i][j]=out_dict[a][b][c][d][e][f][g][h][i][j]
-    
-        except Exception as e:
-            logger.warning("Error generating new dict: "+str(e))
-
     if str(new_dict) == str(last_dict) and last_dict != None:
         logger.debug("No new data to report. Not sending any email.")
         return last_dict
@@ -289,7 +221,7 @@ if __name__ == "__main__":
     smtp_pwd = "mdbnifhmquaexxka"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
-    smtp_report_type = "vuln_only" # all, vuln_only, exploit_only
+    smtp_report_type = "exploit_only" # all, vuln_only, exploit_only
 
     send_siaas_email(collection, smtp_account, smtp_pwd, smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type)
 

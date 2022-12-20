@@ -673,6 +673,104 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
     return count
 
 
+def grab_vulns_from_agent_data_dict(agent_data_dict, target_host=None, report_type="exploit_only"):
+    """
+    Receives an agent data dict and returns a list of vulnerabilities, depending on report_type: 'all', 'vuln_only', 'exploit_only'
+    Returns the vuln dict if all OK; Returns False if anything fails
+    """
+
+    if len(report_type or '') == 0:
+        report_type="exploit_only"
+
+    new_dict={}
+
+    if report_type.lower() == "all":
+        try:
+            for a in agent_data_dict.keys():
+                for b in agent_data_dict[a].keys():
+                    if b == "portscanner":
+                        for c in agent_data_dict[a][b].keys():
+                            if len(target_host or '') > 0 and c not in target_host.split(','):
+                                 continue
+                            if a not in new_dict.keys():
+                                 new_dict[a]={}
+                            if b not in new_dict[a].keys():
+                                 new_dict[a][b]={}
+                            new_dict[a][b][c]=agent_data_dict[a][b][c]
+        except Exception as e:
+           logger.error("Error generating new dict: "+str(e))
+           return False
+    else:
+        try:
+            for a in agent_data_dict.keys():
+                for b in agent_data_dict[a].keys():
+                    if b == "portscanner":
+                        for c in agent_data_dict[a][b].keys():
+                            if len(target_host or '') > 0 and c not in target_host.split(','):
+                                continue
+                            for d in agent_data_dict[a][b][c].keys():
+                                if d == "last_check":
+                                    if a not in new_dict.keys():
+                                        new_dict[a]={}
+                                    if b not in new_dict[a].keys():
+                                        new_dict[a][b]={}
+                                    if c not in new_dict[a][b].keys():
+                                        new_dict[a][b][c]={}
+                                    new_dict[a][b][c]["last_check"] = agent_data_dict[a][b][c]["last_check"]
+                                if d == "scanned_ports":
+                                    for e in agent_data_dict[a][b][c][d].keys():
+                                        for f in agent_data_dict[a][b][c][d][e].keys():
+                                            if f == "scan_results":
+                                                for g in agent_data_dict[a][b][c][d][e][f].keys():
+                                                    for h in agent_data_dict[a][b][c][d][e][f][g].keys():
+                                                        if "vulners" in h or "vulscan" in h:
+                                                            if report_type.lower() == "vuln_only":
+                                                                if a not in new_dict.keys():
+                                                                     new_dict[a]={}
+                                                                if b not in new_dict[a].keys():
+                                                                     new_dict[a][b]={}
+                                                                if c not in new_dict[a][b].keys():
+                                                                     new_dict[a][b][c]={}
+                                                                if d not in new_dict[a][b][c].keys():
+                                                                     new_dict[a][b][c][d]={}
+                                                                if e not in new_dict[a][b][c][d].keys():
+                                                                     new_dict[a][b][c][d][e]={}
+                                                                if f not in new_dict[a][b][c][d][e].keys():
+                                                                     new_dict[a][b][c][d][e][f]={}
+                                                                if g not in new_dict[a][b][c][d][e][f].keys():
+                                                                    new_dict[a][b][c][d][e][f][g]={}
+                                                                new_dict[a][b][c][d][e][f][g][h]=agent_data_dict[a][b][c][d][e][f][g][h]
+                                                            else: # exploit_only (default)
+                                                                for i in agent_data_dict[a][b][c][d][e][f][g][h].keys():
+                                                                    for j in agent_data_dict[a][b][c][d][e][f][g][h][i].keys():
+                                                                        if "siaas_exploit_tag" in agent_data_dict[a][b][c][d][e][f][g][h][i][j]:
+                                                                            if a not in new_dict.keys():
+                                                                                new_dict[a]={}
+                                                                            if b not in new_dict[a].keys():
+                                                                                new_dict[a][b]={}
+                                                                            if c not in new_dict[a][b].keys():
+                                                                                new_dict[a][b][c]={}
+                                                                            if d not in new_dict[a][b][c].keys():
+                                                                                new_dict[a][b][c][d]={}
+                                                                            if e not in new_dict[a][b][c][d].keys():
+                                                                                new_dict[a][b][c][d][e]={}
+                                                                            if f not in new_dict[a][b][c][d][e].keys():
+                                                                                new_dict[a][b][c][d][e][f]={}
+                                                                            if g not in new_dict[a][b][c][d][e][f].keys():
+                                                                                new_dict[a][b][c][d][e][f][g]={}
+                                                                            if h not in new_dict[a][b][c][d][e][f][g].keys():
+                                                                                new_dict[a][b][c][d][e][f][g][h]={}
+                                                                            if i not in new_dict[a][b][c][d][e][f][g][h].keys():
+                                                                                new_dict[a][b][c][d][e][f][g][h][i]={}
+                                                                            new_dict[a][b][c][d][e][f][g][h][i][j]=agent_data_dict[a][b][c][d][e][f][g][h][i][j]
+
+        except Exception as e:
+            logger.error("Error generating new dict: "+str(e))
+            return False
+
+    return new_dict
+
+
 def read_mongodb_collection(collection, siaas_uid="00000000-0000-0000-0000-000000000000"):
     """
     Reads data from the Mongo DB collection
