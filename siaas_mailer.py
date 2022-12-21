@@ -41,7 +41,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     last_dict = new_dict
     
     if len(new_dict) == 0:
-        new_dict_str = "No results available."
+        new_dict_str = "Nothing to report."
     else:
         new_dict_str=pprint.pformat(new_dict, width=999, sort_dicts=False)
    
