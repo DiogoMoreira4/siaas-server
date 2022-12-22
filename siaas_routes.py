@@ -327,6 +327,7 @@ def agents_history_id(agent_uid):
     older_first = request.args.get('older', default=0, type=int)
     hide_empty = request.args.get('hide', default=0, type=int)
     for m in module.split(','):
+        if m.lstrip().rstrip() == "*":
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:
