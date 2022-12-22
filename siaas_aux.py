@@ -394,7 +394,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
 
     if agent_uid == None:
         try:
-            if(int(limit_outputs)<1):
+            if(int(limit_outputs)<0):
                 limit_outputs=0
             last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
@@ -409,11 +409,11 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
     else:
         results = []
         agent_list = []
-        if(int(limit_outputs)<1):
-                limit_outputs=0
         for u in agent_uid.split(','):
             agent_list.append("agent_"+u.lstrip().rstrip().lower())
         try:
+            if(int(limit_outputs)<0):
+                limit_outputs=0
             last_d = datetime.utcnow() - timedelta(days=int(days))
             cursor = collection.find(
                 {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_data"}, {
