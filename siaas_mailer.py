@@ -41,9 +41,10 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     last_dict = new_dict
     
     if len(new_dict) == 0:
-        new_dict_str = "Nothing to report."
+        mail_body = "Nothing to report."
     else:
-        new_dict_str=pprint.pformat(new_dict, width=999, sort_dicts=False)
+        #mail_body = pprint.pformat(new_dict, width=999, sort_dicts=False)
+        mail_body = "Report attached."
    
     # Create a CSV report
 
@@ -69,7 +70,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     message["To"] = smtp_receivers
     
     # Create the MIMEText object
-    part1 = MIMEText(new_dict_str, "plain")
+    part1 = MIMEText(mail_body, "plain")
     message.attach(part1)
     
     with open(file_to_write, "r") as file:
@@ -99,7 +100,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         return last_dict
 
     logger.info("Report sent via email.")
-    logger.debug("Sent email contents:\n"+str(new_dict_str))
+    logger.debug("Sent email contents:\n"+str(mail_body))
     return new_dict
 
 
