@@ -47,7 +47,6 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
     Deny from all
     # IP access allowed
     Allow from 127.0.0.1
-    #Allow from 192.168.122.0/24
     AuthUserFile /etc/apache2/.htpasswd
     AuthName "Restricted Area"
     AuthType Basic
@@ -85,7 +84,6 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas-ssl.conf
     Deny from all
     # IP access allowed
     Allow from 127.0.0.1
-    #Allow from 192.168.122.0/24
     AuthUserFile /etc/apache2/.htpasswd
     AuthName "Restricted Area"
     AuthType Basic
