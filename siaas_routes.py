@@ -1,3 +1,7 @@
+# Intelligent System for Automation of Security Audits (SIAAS)
+# Server - API routes
+# By João Pedro Seara, 2023
+
 from __main__ import app, get_db_collection
 from flask import jsonify, request, abort
 import siaas_aux

@@ -1,6 +1,6 @@
 # siaas-server
 
-_Intelligent System for Automation of Security Audits (SIAAS) - Server Module_
+_Intelligent System for Automation of Security Audits (SIAAS) - Server_
 
 In the context of the MSc in Telecommunications and Computer Engineering, at ISCTE - Instituto Universitário de Lisboa.
 

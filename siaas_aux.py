@@ -1,3 +1,7 @@
+# Intelligent System for Automation of Security Audits (SIAAS)
+# Server - Auxiliary functions
+# By João Pedro Seara, 2023
+
 import ipaddress
 import math
 import pprint
