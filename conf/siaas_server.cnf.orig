@@ -1,6 +1,6 @@
 # Protected configurations (last for the whole run and can't be changed remotely)
 
-log_level = debug
+log_level = info
 mongo_collection = siaas
 mongo_db = siaas
 mongo_host = 127.0.0.1
@@ -12,11 +12,11 @@ mongo_user = siaas
 
 dbmaintenance_history_days_to_keep = 15
 dbmaintenance_loop_interval_sec = 86400
-mailer_loop_interval_sec = 15
+mailer_loop_interval_sec = 86400
 mailer_smtp_account = siaas.iscte@gmail.com
 mailer_smtp_pwd = mdbnifhmquaexxka
-mailer_smtp_receivers = siaas.iscte@gmail.com # comment this line to not send anything
+#mailer_smtp_receivers = siaas.iscte@gmail.com # comment this line to not send anything
 mailer_smtp_server = smtp.gmail.com
 mailer_smtp_tls_port = 587
-mailer_smtp_report_type = vuln_only # all, vuln_only, exploit_only (default)
-platform_loop_interval_sec = 60
+#mailer_smtp_report_type = exploit_only # all, vuln_only, exploit_only (default)
+platform_loop_interval_sec = 300
