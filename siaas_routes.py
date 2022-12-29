@@ -9,7 +9,7 @@ import json
 import os
 import sys
 
-SIAAS_API="v1"
+SIAAS_API = "v1"
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
@@ -17,6 +17,9 @@ app.config['JSON_SORT_KEYS'] = False
 
 @app.route('/', strict_slashes=False)
 def index():
+    """
+    Server API route - index
+    """
     output = {
         'name': 'Intelligent System for Automation of Security Audits (SIAAS)',
         'module': 'Server',
@@ -36,9 +39,13 @@ def index():
 
 @app.route('/siaas-server', methods=['GET'], strict_slashes=False)
 def siaas_server():
+    """
+    Server API route - server information
+    """
     module = request.args.get('module', default='*', type=str)
     all_existing_modules = "platform,config"
-    siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(get_db_collection()))
+    siaas_aux.merge_configs_from_upstream(
+        upstream_dict=siaas_aux.get_dict_current_server_configs(get_db_collection()))
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
             module = all_existing_modules
@@ -66,6 +73,9 @@ def siaas_server():
 
 @app.route('/siaas-server/configs', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
 def server_configs():
+    """
+    Server API route - server published configs
+    """
     collection = get_db_collection()
     if request.method == 'GET':
         output = siaas_aux.get_dict_current_server_configs(
@@ -88,7 +98,8 @@ def server_configs():
         output = siaas_aux.create_or_update_server_configs(
             collection, config_dict=content)
         if output:
-            siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
+            siaas_aux.merge_configs_from_upstream(
+                upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
             status = "success"
         else:
             status = "failure"
@@ -105,7 +116,8 @@ def server_configs():
             status = "failure"
             count_deleted = 0
         else:
-            siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
+            siaas_aux.merge_configs_from_upstream(
+                upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
             status = "success"
             count_deleted = int(output)
         return jsonify(
@@ -119,6 +131,9 @@ def server_configs():
 
 @app.route('/siaas-server/agents', methods=['GET'], strict_slashes=False)
 def agents():
+    """
+    Server API route - agents overview
+    """
     collection = get_db_collection()
     sort_by = request.args.get('sort', default="date", type=str)
     output = siaas_aux.get_dict_active_agents(collection, sort_by=sort_by)
@@ -139,6 +154,9 @@ def agents():
 
 @app.route('/siaas-server/agents/data', methods=['GET'], strict_slashes=False)
 def agents_data():
+    """
+    Server API route - agents data
+    """
     module = request.args.get('module', default='*', type=str)
     for m in module.split(','):
         if m.lstrip().rstrip() == "*":
@@ -162,6 +180,9 @@ def agents_data():
 
 @app.route('/siaas-server/agents/data/<agent_uid>', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
 def agents_data_id(agent_uid):
+    """
+    Server API route - agents data (specific UIDs, comma-separated)
+    """
     collection = get_db_collection()
     if request.method == 'GET':
         module = request.args.get('module', default='*', type=str)
@@ -218,6 +239,9 @@ def agents_data_id(agent_uid):
 
 @app.route('/siaas-server/agents/configs', methods=['GET'], strict_slashes=False)
 def agents_configs():
+    """
+    Server API route - agents published configs
+    """
     collection = get_db_collection()
     merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
     output = siaas_aux.get_dict_current_agent_configs(
@@ -239,6 +263,9 @@ def agents_configs():
 
 @app.route('/siaas-server/agents/configs/<agent_uid>', methods=['GET', 'POST', 'DELETE'], strict_slashes=False)
 def agents_configs_id(agent_uid):
+    """
+    Server API route - agents published configs (specific UIDs, comma-separated)
+    """
     collection = get_db_collection()
     if request.method == 'GET':
         merge_broadcast = request.args.get(
@@ -292,8 +319,12 @@ def agents_configs_id(agent_uid):
 
 @app.route('/siaas-server/agents/history', methods=['GET'], strict_slashes=False)
 def agents_history():
+    """
+    Server API route - agents historical data
+    """
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=100, type=int) # 0 equates to having no output limit (as per MongoDB spec)
+    # 0 equates to having no output limit (as per MongoDB spec)
+    limit_outputs = request.args.get('limit', default=100, type=int)
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
@@ -303,7 +334,7 @@ def agents_history():
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:
-        limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
+        limit_outputs = 0  # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
         collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:
@@ -324,8 +355,12 @@ def agents_history():
 
 @app.route('/siaas-server/agents/history/<agent_uid>', methods=['GET'], strict_slashes=False)
 def agents_history_id(agent_uid):
+    """
+    Server API route - agents historical data (specific UIDs, comma-separated)
+    """
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=100, type=int) # less than 1 equates to having no output limit 
+    # less than 1 equates to having no output limit
+    limit_outputs = request.args.get('limit', default=100, type=int)
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
@@ -335,7 +370,7 @@ def agents_history_id(agent_uid):
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:
-        limit_outputs = 0 # a negative value makes MongoDB behave differently. Let's avoid that
+        limit_outputs = 0  # a negative value makes MongoDB behave differently. Let's avoid that
     output = siaas_aux.get_dict_history_agent_data(
         collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:

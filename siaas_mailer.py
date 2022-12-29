@@ -3,7 +3,8 @@
 # By João Pedro Seara, 2023
 
 import siaas_aux
-import smtplib, ssl
+import smtplib
+import ssl
 import csv
 import platform
 import pprint
@@ -20,84 +21,98 @@ from email.mime.application import MIMEApplication
 
 logger = logging.getLogger(__name__)
 
-def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type, last_dict=None):
 
+def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type, last_dict=None):
+    """
+    Receives the DB collection and SMTP server details, and the last data dict that was sent
+    If changes are detected in the data dict, an email is sent. Otherwise, nothing happens
+    Returns the new data dict if all OK; Returns the last dict if no changes were detected or if something has failed
+    """
     logger.debug("Generating a new dict to send via email ...")
 
-    out_dict=siaas_aux.get_dict_current_agent_data(db_collection, agent_uid=None, module="portscanner")
-    new_dict=siaas_aux.grab_vulns_from_agent_data_dict(out_dict, report_type=smtp_report_type)
+    out_dict = siaas_aux.get_dict_current_agent_data(
+        db_collection, agent_uid=None, module="portscanner")
+    new_dict = siaas_aux.grab_vulns_from_agent_data_dict(
+        out_dict, report_type=smtp_report_type)
 
     if new_dict == False:
-        logger.error("There was an error getting vulnerability data to be sent in the email. Not sending any email.")
+        logger.error(
+            "There was an error getting vulnerability data to be sent in the email. Not sending any email.")
         return last_dict
-    
+
     if str(new_dict) == str(last_dict) and last_dict != None:
         logger.debug("No new data to report. Not sending any email.")
         return last_dict
 
     if smtp_report_type.lower() == "all":
-        mail_type="All scanned data"
+        mail_type = "All scanned data"
     elif smtp_report_type.lower() == "vuln_only":
-        mail_type="Vulnerabilities"
+        mail_type = "Vulnerabilities"
     else:
-        mail_type="Exploits"
-    
+        mail_type = "Exploits"
+
     last_dict = new_dict
-    
+
     if len(new_dict) == 0:
         mail_body = "Nothing to report."
     else:
         #mail_body = pprint.pformat(new_dict, width=999, sort_dicts=False)
         mail_body = "Report attached."
-   
+
     # Create a CSV report
 
-    csv_contents=[]
+    csv_contents = []
     for a in new_dict.keys():
         for b in new_dict[a].keys():
             for c in new_dict[a][b].keys():
                 for d in new_dict[a][b][c].keys():
-                    csv_contents.append([a,c,d,new_dict[a][b][c][d]])
+                    csv_contents.append([a, c, d, new_dict[a][b][c][d]])
 
-    file_to_write="./tmp/siaas_report_"+datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
-    os.makedirs(os.path.dirname(os.path.join(sys.path[0], file_to_write)), exist_ok=True)
+    file_to_write = "./tmp/siaas_report_" + \
+        datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
+    os.makedirs(os.path.dirname(os.path.join(
+        sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
         w = csv.writer(f)
         w.writerow(["AgentUID", "Target", "InformationType", "Findings"])
         w.writerows(csv_contents)
-   
+
     # Message headers
     message = MIMEMultipart("alternative")
-    message["Subject"] = "SIAAS Report ("+mail_type+") from "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
+    message["Subject"] = "SIAAS Report ("+mail_type+") from "+datetime.utcnow(
+    ).strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
     #message["From"] = smtp_account
-    message["From"] = formataddr(("SIAAS ("+platform.node().split('.', 1)[0]+")", smtp_account))
+    message["From"] = formataddr(
+        ("SIAAS ("+platform.node().split('.', 1)[0]+")", smtp_account))
     message["To"] = smtp_receivers
-    
+
     # Create the MIMEText object
     part1 = MIMEText(mail_body, "plain")
     message.attach(part1)
-    
+
     with open(file_to_write, "r") as file:
-      part = MIMEApplication(
-      file.read(),
-      Name=os.path.basename(file_to_write)
-      )
-    part['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(file_to_write)
-    
+        part = MIMEApplication(
+            file.read(),
+            Name=os.path.basename(file_to_write)
+        )
+    part['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(
+        file_to_write)
+
     if len(new_dict) > 0:
         message.attach(part)
-    
+
     # Create secure connection with server and send email
     try:
         context = ssl.create_default_context()
-        smtp_receivers_list = sorted(set(smtp_receivers.split(',')), key=lambda x: x[0].casefold() if len(x or "")>0  else "")
+        smtp_receivers_list = sorted(set(smtp_receivers.split(
+            ',')), key=lambda x: x[0].casefold() if len(x or "") > 0 else "")
         with smtplib.SMTP(smtp_server, smtp_tls_port) as server:
             server.starttls(context=context)
             server.login(smtp_account, smtp_pwd)
             server.sendmail(
                 smtp_account, smtp_receivers_list, message.as_string()
             )
-    
+
         Path(file_to_write).unlink(missing_ok=True)
     except Exception as e:
         logger.error("Error while sending email report: "+str(e))
@@ -109,7 +124,9 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
 
 
 def loop():
-
+    """
+    Mailer module loop (calls the email sending function)
+    """
     # Generate global variables from the configuration file
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
     MONGO_USER = None
@@ -148,27 +165,34 @@ def loop():
     last_dict = None
     while run:
 
-        send_mail=True
+        send_mail = True
 
         logger.debug("Loop running ...")
 
-        mailer_smtp_account=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_account")
-        mailer_smtp_pwd=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_pwd")
-        mailer_smtp_receivers=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_receivers")
-        mailer_smtp_server=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_server")
-        mailer_smtp_tls_port=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_tls_port")
-        mailer_smtp_report_type=siaas_aux.get_config_from_configs_db(config_name="mailer_smtp_report_type")
+        mailer_smtp_account = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_account")
+        mailer_smtp_pwd = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_pwd")
+        mailer_smtp_receivers = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_receivers")
+        mailer_smtp_server = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_server")
+        mailer_smtp_tls_port = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_tls_port")
+        mailer_smtp_report_type = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_report_type")
 
         if len(mailer_smtp_account or '') == 0 or len(mailer_smtp_pwd or '') == 0 or len(mailer_smtp_receivers or '') == 0 or len(mailer_smtp_server or '') == 0:
             logger.warning(
                 "One or more of the mailer configuration fields are undefined or invalid. Not sending mail.")
-            send_mail=False
+            send_mail = False
 
         if send_mail:
 
             if len(mailer_smtp_report_type or '') == 0:
-                logger.debug("No report type configured. Defaulting to only mailing exploits.")
-                mailer_smtp_report_type="exploit_only"
+                logger.debug(
+                    "No report type configured. Defaulting to only mailing exploits.")
+                mailer_smtp_report_type = "exploit_only"
 
             try:
                 smtp_tls_port = int(mailer_smtp_tls_port)
@@ -176,10 +200,12 @@ def loop():
                     raise ValueError("SMTP TLS port can't be less 1.")
             except:
                 smtp_tls_port = 25
-                logger.debug("SMTP TLS port is invalid or not defined. Using SMTP TLS port default (587).")
+                logger.debug(
+                    "SMTP TLS port is invalid or not defined. Using SMTP TLS port default (587).")
 
             if send_mail:
-                last_dict = send_siaas_email(db_collection, mailer_smtp_account, mailer_smtp_pwd, mailer_smtp_receivers, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
+                last_dict = send_siaas_email(db_collection, mailer_smtp_account, mailer_smtp_pwd,
+                                             mailer_smtp_receivers, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
 
         # Sleep before next loop
         try:
@@ -230,8 +256,9 @@ if __name__ == "__main__":
     smtp_pwd = "mdbnifhmquaexxka"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
-    smtp_report_type = "exploit_only" # all, vuln_only, exploit_only
+    smtp_report_type = "exploit_only"  # all, vuln_only, exploit_only
 
-    send_siaas_email(collection, smtp_account, smtp_pwd, smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type)
+    send_siaas_email(collection, smtp_account, smtp_pwd,
+                     smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type)
 
     print('\nAll done. Bye!\n')

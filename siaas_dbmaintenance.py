@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 def delete_history_data(db_collection, days_to_keep):
-
+    """
+    Receives a MongoDB collection and number of days to keep
+    Deletes all documents older than those days
+    Returns True if all OK; False if something failed
+    """
     logger.info("Performing history database cleanup, keeping last " +
                 str(days_to_keep)+" days ...")
     deleted_count = siaas_aux.delete_all_records_older_than(
@@ -31,7 +35,9 @@ def delete_history_data(db_collection, days_to_keep):
 
 
 def loop():
-
+    """
+    DB Maintenance loop (calls the delete historical data function)
+    """
     # Generate global variables from the configuration file
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
     MONGO_USER = None
@@ -75,7 +81,8 @@ def loop():
             days_to_keep = int(siaas_aux.get_config_from_configs_db(
                 config_name="dbmaintenance_history_days_to_keep"))
             if days_to_keep < 0:
-                raise ValueError("Number of historical days can't be negative.")
+                raise ValueError(
+                    "Number of historical days can't be negative.")
         except:
             logger.warning(
                 "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year as a precaution against deleting any recent data.")
@@ -130,4 +137,3 @@ if __name__ == "__main__":
     delete_history_data(collection, days_to_keep=3650)
 
     print('\nAll done. Bye!\n')
-

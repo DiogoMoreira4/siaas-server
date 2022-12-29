@@ -19,8 +19,14 @@ LOG_DIR = "log"
 API_PORT = 5000
 
 DB_COLLECTION_OBJ = None
+
+
 def get_db_collection():
+    """
+    Returns the MongoDB collection object
+    """
     return DB_COLLECTION_OBJ
+
 
 if __name__ == "__main__":
 
@@ -85,7 +91,8 @@ if __name__ == "__main__":
 
     # Define logging level according to user config
     os.makedirs(os.path.join(sys.path[0], LOG_DIR), exist_ok=True)
-    log_file = os.path.join(os.path.join(sys.path[0], LOG_DIR), "siaas-server.log")
+    log_file = os.path.join(os.path.join(
+        sys.path[0], LOG_DIR), "siaas-server.log")
     log_level = siaas_aux.get_config_from_configs_db(config_name="log_level")
     for handler in logging.root.handlers[:]:
         logging.root.removeHandler(handler)
@@ -113,17 +120,21 @@ if __name__ == "__main__":
 
     # Check if DB is alive
     if not siaas_aux.mongodb_ping(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION):
-       logger.critical(
-           "DB is down. Aborting !")
-       sys.exit(1)
+        logger.critical(
+            "DB is down. Aborting !")
+        sys.exit(1)
 
     # Merge upstream configs
-    siaas_aux.merge_configs_from_upstream(upstream_dict=siaas_aux.get_dict_current_server_configs(DB_COLLECTION_OBJ))
+    siaas_aux.merge_configs_from_upstream(
+        upstream_dict=siaas_aux.get_dict_current_server_configs(DB_COLLECTION_OBJ))
 
     # Create MongoDB indexes
-    DB_COLLECTION_OBJ.create_index("origin", unique=False, name="agent_origin_index")
-    DB_COLLECTION_OBJ.create_index("destiny", unique=False, name="agent_destiny_index")
-    DB_COLLECTION_OBJ.create_index("timestamp", unique=False, name="agent_timestamp_index")
+    DB_COLLECTION_OBJ.create_index(
+        "origin", unique=False, name="agent_origin_index")
+    DB_COLLECTION_OBJ.create_index(
+        "destiny", unique=False, name="agent_destiny_index")
+    DB_COLLECTION_OBJ.create_index(
+        "timestamp", unique=False, name="agent_timestamp_index")
 
     print("\nSIAAS Server v"+SIAAS_VERSION +
           " starting ["+server_uid+"]\n\nLogging to: "+os.path.join(sys.path[0], log_file)+"\n")
