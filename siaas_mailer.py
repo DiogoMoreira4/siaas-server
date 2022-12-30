@@ -253,7 +253,7 @@ if __name__ == "__main__":
 
     smtp_account = "siaas.iscte@gmail.com"
     smtp_receivers = "siaas.iscte@gmail.com"
-    smtp_pwd = "mdbnifhmquaexxka"
+    smtp_pwd = "password123"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
     smtp_report_type = "exploit_only"  # all, vuln_only, exploit_only
