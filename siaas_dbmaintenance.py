@@ -84,8 +84,8 @@ def loop():
                 raise ValueError(
                     "Number of historical days can't be negative.")
         except:
-            logger.warning(
-                "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year as a precaution against deleting any recent data.")
+            logger.debug(
+                "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year by default.")
             days_to_keep = 365
 
         delete_history_data(db_collection, days_to_keep)
@@ -99,8 +99,8 @@ def loop():
             time.sleep(sleep_time)
         except:
             logger.debug(
-                "The interval loop time is not configured or is invalid. Sleeping now for 60 seconds by default ...")
-            time.sleep(60)
+                "The interval loop time is not configured or is invalid. Sleeping now for 1 day by default ...")
+            time.sleep(86400)
 
 
 if __name__ == "__main__":

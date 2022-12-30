@@ -221,7 +221,7 @@ def loop():
             time.sleep(sleep_time)
         except:
             logger.debug(
-                "The interval loop time is not configured or is invalid. Sleeping now for 86400 seconds by default ...")
+                "The interval loop time is not configured or is invalid. Sleeping now for 1 day by default ...")
             time.sleep(86400)
 
 
