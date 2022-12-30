@@ -182,16 +182,21 @@ def loop():
         mailer_smtp_report_type = siaas_aux.get_config_from_configs_db(
             config_name="mailer_smtp_report_type")
 
-        if len(mailer_smtp_account or '') == 0 or len(mailer_smtp_pwd or '') == 0 or len(mailer_smtp_receivers or '') == 0 or len(mailer_smtp_server or '') == 0:
+        if len(mailer_smtp_receivers or '') == 0:
+            logger.info(
+                "No email receivers are defined. Not sending any emails.")
+            send_mail = False
+
+        elif len(mailer_smtp_account or '') == 0 or len(mailer_smtp_pwd or '') == 0 or len(mailer_smtp_server or '') == 0:
             logger.warning(
-                "One or more of the mailer configuration fields are undefined or invalid. Not sending mail.")
+                "One or more of the mailer configuration fields are undefined or invalid. Not sending any emails.")
             send_mail = False
 
         if send_mail:
 
             if len(mailer_smtp_report_type or '') == 0:
                 logger.debug(
-                    "No report type configured. Defaulting to only mailing exploits.")
+                    "No report type configured. Defaulting to only emailing exploits.")
                 mailer_smtp_report_type = "exploit_only"
 
             try:
