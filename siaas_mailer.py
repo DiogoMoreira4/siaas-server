@@ -69,18 +69,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
                 for d in new_dict[a][b][c].keys():
                     csv_contents.append([a, c, d, new_dict[a][b][c][d]])
 
-    try:
-        locale.setlocale(locale.LC_ALL, '')
-        dec_pt_chr = locale.localeconv()['decimal_point']
-        if dec_pt_chr == ',':
-            csv_delimiter = ';'
-        else:
-            csv_delimiter = ','
-    except:
-        logger.warning(
-            "Could not grab locale details in order to set the CSV delimiter. Using ',' as the default delimiter.")
-        csv_delimiter = ','
-
+    csv_delimiter = ';'
     file_to_write = "./tmp/siaas_report_" + \
         datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
     os.makedirs(os.path.dirname(os.path.join(
