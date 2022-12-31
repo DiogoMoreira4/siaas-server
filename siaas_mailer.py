@@ -73,7 +73,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     os.makedirs(os.path.dirname(os.path.join(
         sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
-        w = csv.writer(f)
+        w = csv.writer(f, delimiter=';')
         w.writerow(["AgentUID", "Target", "InformationType", "Findings"])
         w.writerows(csv_contents)
 
