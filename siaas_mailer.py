@@ -10,6 +10,7 @@ import platform
 import pprint
 import os
 import sys
+import locale
 import logging
 import time
 from pathlib import Path
@@ -68,12 +69,19 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
                 for d in new_dict[a][b][c].keys():
                     csv_contents.append([a, c, d, new_dict[a][b][c][d]])
 
+    locale.setlocale(locale.LC_ALL, '')
+    dec_pt_chr=locale.localeconv()['decimal_point']
+    if dec_pt_chr==',':
+        csv_delimiter=';'
+    else:
+        csv_delimiter=','
+
     file_to_write = "./tmp/siaas_report_" + \
         datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
     os.makedirs(os.path.dirname(os.path.join(
         sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
-        w = csv.writer(f, delimiter=';')
+        w = csv.writer(f, delimiter=csv_delimiter)
         w.writerow(["AgentUID", "Target", "InformationType", "Findings"])
         w.writerows(csv_contents)
 

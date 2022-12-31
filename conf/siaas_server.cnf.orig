@@ -10,7 +10,7 @@ mongo_user = siaas
 
 # Runtime configurations (can be changed during runtime by the remote server)
 
-dbmaintenance_history_days_to_keep = 15
+dbmaintenance_history_days_to_keep = 365
 dbmaintenance_loop_interval_sec = 86400
 mailer_loop_interval_sec = 86400
 mailer_smtp_account = siaas.iscte@gmail.com
