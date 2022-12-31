@@ -83,7 +83,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     ).strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
     #message["From"] = smtp_account
     message["From"] = formataddr(
-        ("SIAAS ("+platform.node().split('.', 1)[0]+")", smtp_account))
+        ("SIAAS Server ("+platform.node().split('.', 1)[0]+")", smtp_account))
     message["To"] = smtp_receivers
 
     # Create the MIMEText object
