@@ -124,7 +124,7 @@ sleep 3 && mongo --eval 'Mongo().getDBNames()' | grep siaas || ./siaas_server_in
 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
-ln -fs ${SCRIPT_DIR}/log /var/log/siaas-server
+ln -fsT ${SCRIPT_DIR}/log /var/log/siaas-server
 cat << EOF | sudo tee /etc/systemd/system/siaas-server.service
 [Unit]
 Description=SIAAS Server
