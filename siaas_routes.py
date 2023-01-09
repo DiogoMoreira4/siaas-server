@@ -47,7 +47,7 @@ def siaas_server():
     siaas_aux.merge_configs_from_upstream(
         upstream_dict=siaas_aux.get_dict_current_server_configs(get_db_collection()))
     for m in module.split(','):
-        if m.lstrip().rstrip() == "*":
+        if m.strip() == "*":
             module = all_existing_modules
     output = siaas_aux.merge_module_dicts(module)
     if type(output) == bool and output == False:
@@ -159,7 +159,7 @@ def agents_data():
     """
     module = request.args.get('module', default='*', type=str)
     for m in module.split(','):
-        if m.lstrip().rstrip() == "*":
+        if m.strip() == "*":
             module = None
     collection = get_db_collection()
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
@@ -187,7 +187,7 @@ def agents_data_id(agent_uid):
     if request.method == 'GET':
         module = request.args.get('module', default='*', type=str)
         for m in module.split(','):
-            if m.lstrip().rstrip() == "*":
+            if m.strip() == "*":
                 module = None
         output = siaas_aux.get_dict_current_agent_data(
             collection, agent_uid=agent_uid, module=module)
@@ -330,7 +330,7 @@ def agents_history():
     older_first = request.args.get('older', default=0, type=int)
     hide_empty = request.args.get('hide', default=0, type=int)
     for m in module.split(','):
-        if m.lstrip().rstrip() == "*":
+        if m.strip() == "*":
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:
@@ -366,7 +366,7 @@ def agents_history_id(agent_uid):
     older_first = request.args.get('older', default=0, type=int)
     hide_empty = request.args.get('hide', default=0, type=int)
     for m in module.split(','):
-        if m.lstrip().rstrip() == "*":
+        if m.strip() == "*":
             module = None
     collection = get_db_collection()
     if limit_outputs < 0:

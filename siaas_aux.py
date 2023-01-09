@@ -26,7 +26,7 @@ def merge_module_dicts(modules=""):
     """
     merged_dict = {}
     for module in sorted(set(modules.lower().split(','))):
-        module = module.lstrip().rstrip()
+        module = module.strip()
         try:
             module_dict = read_from_local_file(
                 os.path.join(sys.path[0], 'var/'+str(module)+'.db'))
@@ -136,13 +136,13 @@ def write_config_db_from_conf_file(conf_file=os.path.join(sys.path[0], 'conf/sia
 
     for line in local_conf_file.splitlines():
         try:
-            line_uncommented = line.split('#')[0].rstrip().lstrip()
+            line_uncommented = line.split('#')[0].strip()
             if len(line_uncommented) == 0:
                 continue
-            config_name = line_uncommented.split("=", 1)[0].rstrip().lstrip()
+            config_name = line_uncommented.split("=", 1)[0].strip()
             if not bool(re.match(pattern, config_name)):
                 raise ValueError("Invalid character in config key.")
-            config_value = line_uncommented.split("=", 1)[1].rstrip().lstrip()
+            config_value = line_uncommented.split("=", 1)[1].strip()
             config_dict[config_name] = config_value
         except:
             logger.warning(
@@ -207,7 +207,7 @@ def create_or_update_server_configs(collection, config_dict={}):
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
     corrected_config_dict = {}
     for k in config_dict.keys():
-        formatted_key = k.lower().lstrip().rstrip()
+        formatted_key = k.lower().strip()
         corrected_config_dict[formatted_key] = config_dict[k]
 
     siaas_uid = get_or_create_unique_system_id()
@@ -300,7 +300,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     # Turn all keys to lowercase, also ignore "nickname" and "description" if the target is broadcast:
     corrected_config_dict = {}
     for k in config_dict.keys():
-        formatted_key = k.lower().lstrip().rstrip()
+        formatted_key = k.lower().strip()
         if (formatted_key == "nickname" or formatted_key == "description") and agent_uid == "ffffffff-ffff-ffff-ffff-ffffffffffff":
             logger.warning("Ignoring '"+formatted_key +
                            "' key from broadcast configuration insertion.")
@@ -311,7 +311,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
     result = True
     for u in agent_uid.split(','):
-        uid = u.lstrip().rstrip()
+        uid = u.strip()
 
         if not validate_string_key(uid):
             logger.error("Agent UID '"+uid +
@@ -427,7 +427,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
         results = []
         agent_list = []
         for u in agent_uid.split(','):
-            agent_list.append("agent_"+u.lstrip().rstrip().lower())
+            agent_list.append("agent_"+u.strip().lower())
         try:
             if(int(limit_outputs) < 0):
                 limit_outputs = 0
@@ -454,7 +454,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                     else:
                         out_dict[uid][timestamp] = {}
                         for m in sorted(set(module.lower().split(','))):
-                            mod = m.lstrip().rstrip()
+                            mod = m.strip()
                             if mod in r["payload"].keys():
                                 out_dict[uid][timestamp][mod] = r["payload"][mod]
                     if hide_empty:
@@ -482,7 +482,7 @@ def get_dict_history_agent_data(collection, agent_uid=None, module=None, limit_o
                     else:
                         out_dict[timestamp][uid] = {}
                         for m in sorted(set(module.lower().split(','))):
-                            mod = m.lstrip().rstrip()
+                            mod = m.strip()
                             if mod in r["payload"].keys():
                                 out_dict[timestamp][uid][mod] = r["payload"][mod]
                     out_dict[timestamp] = dict(sorted(out_dict[timestamp].items(
@@ -531,7 +531,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
     else:
         results = []
         for u in agent_uid.split(','):
-            uid = u.lstrip().rstrip().lower()
+            uid = u.strip().lower()
             try:
                 cursor = collection.find(
                     {'$and': [{"payload": {'$exists': True}}, {
@@ -551,7 +551,7 @@ def get_dict_current_agent_data(collection, agent_uid=None, module=None):
                 else:
                     out_dict[uid] = {}
                     for m in sorted(set(module.lower().split(','))):
-                        mod = m.lstrip().rstrip()
+                        mod = m.strip()
                         if mod in r["payload"].keys():
                             out_dict[uid][mod] = r["payload"][mod]
         except:
@@ -589,7 +589,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     else:
         results = []
         for u in agent_uid.split(','):
-            uid = u.lstrip().rstrip().lower()
+            uid = u.strip().lower()
             try:
                 cursor = collection.find(
                     {'$and': [{"payload": {'$exists': True}}, {
@@ -633,7 +633,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
     if merge_broadcast and len(agent_uid or '') > 0:
         for u in agent_uid.split(','):
             try:
-                uid = u.lstrip().rstrip().lower()
+                uid = u.strip().lower()
                 if uid not in out_dict.keys():
                     if len(results_bc) > 0:
                         out_dict[uid] = results_bc[0]["payload"]
@@ -681,7 +681,7 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
     else:
         agent_list = []
         for u in agent_uid.split(','):
-            agent_list.append("agent_"+u.lstrip().rstrip().lower())
+            agent_list.append("agent_"+u.strip().lower())
         try:
             last_d = datetime.utcnow() - timedelta(days=int(days_to_keep))
             if scope == None:
@@ -988,31 +988,31 @@ def get_or_create_unique_system_id():
     try:
         with open("/sys/firmware/devicetree/base/serial-number", 'r') as file:  # Raspberry Pi serial
             content = file.read()
-            new_uid = str(content.split('\n')[0].lstrip(
-            ).rstrip().lstrip('\x00').rstrip('\x00'))
+            new_uid = str(content.split('\n')[0].strip(
+            ).strip('\x00'))
     except:
         pass
     if len(new_uid or '') == 0 or new_uid.upper() == "N/A":
         try:
             with open("/sys/class/dmi/id/board_serial", 'r') as file:
                 content = file.read()
-                new_uid = str(content.split('\n')[0].lstrip(
-                ).rstrip().lstrip('\x00').rstrip('\x00'))
+                new_uid = str(content.split('\n')[0].strip(
+                ).strip('\x00'))
         except:
             pass
     if len(new_uid or '') == 0 or new_uid.upper() == "N/A":
         try:
             with open("/sys/class/dmi/id/product_uuid", 'r') as file:
                 content = file.read()
-                new_uid = str(content.split('\n')[0].lstrip(
-                ).rstrip().lstrip('\x00').rstrip('\x00'))
+                new_uid = str(content.split('\n')[0].strip(
+                ).strip('\x00'))
         except:
             pass
     # if len(new_uid or '') == 0 or new_uid.upper() == "N/A":
     #    try:
     #        with open("/var/lib/dbus/machine-id", 'r') as file:
     #            content = file.read()
-    #            new_uid = str(content.split('\n')[0].lstrip().rstrip().lstrip('\x00').rstrip('\x00'))
+    #            new_uid = str(content.split('\n')[0].strip().strip('\x00'))
     #    except:
     #        pass
     if len(new_uid or '') == 0 or new_uid.upper() == "N/A":
