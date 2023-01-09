@@ -29,7 +29,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     If changes are detected in the data dict, an email is sent. Otherwise, nothing happens
     Returns the new data dict if all OK; Returns the last dict if no changes were detected or if something has failed
     """
-    logger.debug("Generating a new dict to send via email ...")
+    logger.info("Generating a new email report to send ...")
 
     out_dict = siaas_aux.get_dict_current_agent_data(
         db_collection, agent_uid=None, module="portscanner")
@@ -42,7 +42,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         return last_dict
 
     if str(new_dict) == str(last_dict) and last_dict != None:
-        logger.debug("No new data to report. Not sending any email.")
+        logger.info("No new data to report. Not sending any email.")
         return last_dict
 
     if smtp_report_type.lower() == "all":
