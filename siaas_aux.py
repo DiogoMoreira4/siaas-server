@@ -188,6 +188,8 @@ def create_or_update_server_configs(collection, config_dict={}):
     Returns True if all OK; False if NOK
     """
 
+    logger.info("Server configs received and now being uploaded to the DB ...")
+
     if type(config_dict) is not dict:
         logger.error(
             "No valid server configuration dict received. No server configs were uploaded.")
@@ -230,6 +232,8 @@ def create_or_update_server_configs(collection, config_dict={}):
     ), key=lambda x: x[0].casefold() if len(x or "") > 0 else None))
     complete_dict["timestamp"] = get_now_utc_obj()
 
+    logger.info("Server configs upload to the DB finished.")
+
     return create_or_update_in_mongodb_collection(collection, complete_dict)
 
 
@@ -238,6 +242,8 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     Receives a dict with agent data, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
     """
+
+    logger.info("Agent data received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
 
     if type(data_dict) is not dict:
         logger.error(
@@ -272,6 +278,8 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     complete_dict["payload"] = data_dict
     complete_dict["timestamp"] = get_now_utc_obj()
 
+    logger.info("Agent data upload to the DB ["+str(agent_uid)+"] finished.")
+
     return insert_in_mongodb_collection(collection, complete_dict)
 
 
@@ -280,6 +288,8 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     Receives a dict with agent configs, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
     """
+
+    logger.info("Agent configs received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
 
     if type(config_dict) is not dict:
         logger.error(
@@ -339,6 +349,9 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
 
         if not create_or_update_in_mongodb_collection(collection, complete_dict):
             result = False
+
+    logger.info("Agent configs upload to the DB ["+str(agent_uid)+"] finished.")
+
     return result
 
 
@@ -850,13 +863,13 @@ def insert_in_mongodb_collection(collection, data_to_insert):
     """
     logger.debug("Inserting data in the DB server ...")
     try:
-        logger.debug("All data that will now be written to the database:\n" +
+        logger.debug("All data that will now be inserted in the database:\n" +
                      pprint.pformat(data_to_insert, sort_dicts=False))
         collection.insert_one(copy(data_to_insert))
-        logger.debug("Data successfully uploaded to the DB server.")
+        logger.debug("Data successfully inserted in the DB server.")
         return True
     except Exception as e:
-        logger.error("Can't upload data to the DB server: "+str(e))
+        logger.error("Can't insert data in the DB server: "+str(e))
         return False
 
 
@@ -865,17 +878,17 @@ def create_or_update_in_mongodb_collection(collection, data_to_insert):
     Creates or updates an object with data
     Returns 1 if all was OK. Returns -1 if the insertion failed
     """
-    logger.info("Inserting data in the DB server ...")
+    logger.debug("Creating or updating data in the DB server ...")
     try:
-        logger.debug("All data that will now be written to the database:\n" +
+        logger.debug("All data that will now be created or updated in the database:\n" +
                      pprint.pformat(data_to_insert, sort_dicts=False))
         data = copy(data_to_insert)
         collection.find_one_and_update(
             {'destiny': data["destiny"], 'scope': data["scope"]}, {'$set': data}, upsert=True)
-        logger.info("Data successfully uploaded to the DB server.")
+        logger.debug("Data successfully created or updated in the DB server.")
         return True
     except Exception as e:
-        logger.error("Can't upload data to the DB server: "+str(e))
+        logger.error("Can't create or update data to the DB server: "+str(e))
         return False
 
 
@@ -908,7 +921,7 @@ def connect_mongodb_collection(mongo_user="siaas", mongo_password="siaas", mongo
         client = MongoClient(uri)
         db = client[mongo_db]
         collection = db[mongo_collection]
-        logger.info(
+        logger.debug(
             "Correctly configured the DB server connection to collection '"+mongo_collection+"'.")
         return collection
     except Exception as e:
