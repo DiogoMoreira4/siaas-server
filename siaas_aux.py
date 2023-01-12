@@ -243,7 +243,8 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     Returns True if all OK; False if NOK
     """
 
-    logger.info("Agent data received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
+    logger.info(
+        "Agent data received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
 
     if type(data_dict) is not dict:
         logger.error(
@@ -289,7 +290,8 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
     Returns True if all OK; False if NOK
     """
 
-    logger.info("Agent configs received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
+    logger.info(
+        "Agent configs received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
 
     if type(config_dict) is not dict:
         logger.error(
@@ -350,7 +352,8 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
         if not create_or_update_in_mongodb_collection(collection, complete_dict):
             result = False
 
-    logger.info("Agent configs upload to the DB ["+str(agent_uid)+"] finished.")
+    logger.info(
+        "Agent configs upload to the DB ["+str(agent_uid)+"] finished.")
 
     return result
 
