@@ -5,8 +5,8 @@
 import os
 import sys
 import logging
+import multiprocessing_logging
 from logging.handlers import RotatingFileHandler
-import uuid
 from flask import Flask, jsonify, render_template
 from multiprocessing import Process, Value, Manager, Lock
 from waitress import serve
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         sys.path[0], LOG_DIR), "siaas-server.log")
     log_level = siaas_aux.get_config_from_configs_db(config_name="log_level")
     log_max_bytes = 10240000
-    log_backup_count = 5
+    log_backup_count = 3
     while len(logging.root.handlers) > 0:
         logging.root.removeHandler(logging.root.handlers[-1])
     try:
@@ -104,6 +104,7 @@ if __name__ == "__main__":
     except:
         logging.basicConfig(handlers=[RotatingFileHandler(os.path.join(sys.path[0], log_file), maxBytes=log_max_bytes, backupCount=log_backup_count)],
                             format='%(asctime)s.%(msecs)03d %(levelname)-5s %(filename)s [%(processName)s|%(threadName)s] %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=logging.INFO)
+    multiprocessing_logging.install_mp_handler()
 
     # Grabbing a unique system ID before proceeding
     server_uid = siaas_aux.get_or_create_unique_system_id()
@@ -143,6 +144,7 @@ if __name__ == "__main__":
     logger.info("SIAAS Server v"+SIAAS_VERSION+" starting ["+server_uid+"]")
 
     # Main logic
+
     platform = Process(target=siaas_platform.loop, args=(SIAAS_VERSION,))
     dbmaintenance = Process(target=siaas_dbmaintenance.loop, args=())
     mailer = Process(target=siaas_mailer.loop, args=())
