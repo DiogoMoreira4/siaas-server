@@ -53,12 +53,14 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         mail_type = "Exploits"
 
     last_dict = new_dict
+    signature = "Server UID: " + siaas_aux.get_or_create_unique_system_id()
 
     if len(new_dict) == 0:
         mail_body = "Nothing to report."
     else:
         #mail_body = pprint.pformat(new_dict, width=999, sort_dicts=False)
         mail_body = "Report attached."
+    mail_body = mail_body + "\n\n" + signature
 
     # Create a CSV report
 
@@ -70,8 +72,8 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
                     csv_contents.append([a, c, d, new_dict[a][b][c][d]])
 
     csv_delimiter = ';'
-    file_to_write = "./tmp/siaas_report_" + \
-        datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
+    file_to_write = "./tmp/siaas_report_" + siaas_aux.get_or_create_unique_system_id() + \
+        "_" + datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
     os.makedirs(os.path.dirname(os.path.join(
         sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
@@ -81,8 +83,8 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
 
     # Message headers
     message = MIMEMultipart("alternative")
-    message["Subject"] = "SIAAS Report ("+mail_type+") from "+datetime.utcnow(
-    ).strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
+    message["Subject"] = "SIAAS Report ("+mail_type+") from "+platform.node().split('.', 1)[
+        0]+" on "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
     #message["From"] = smtp_account
     message["From"] = formataddr(
         ("SIAAS Server ("+platform.node().split('.', 1)[0]+")", smtp_account))
