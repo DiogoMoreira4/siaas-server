@@ -719,13 +719,13 @@ def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_t
     return count
 
 
-def grab_vulns_from_agent_data_dict(agent_data_dict, target_host=None, report_type="exploit_only"):
+def grab_vulns_from_agent_data_dict(agent_data_dict, target_host=None, report_type="vuln_only"):
     """
-    Receives an agent data dict and returns a list of vulnerabilities, depending on report_type: 'all', 'vuln_only', 'exploit_only'
+    Receives an agent data dict and returns a list of vulnerabilities, depending on report_type: 'all', 'vuln_only', 'exploit_vuln_only'
     Returns the vuln dict if all OK; Returns False if anything fails
     """
     if len(report_type or '') == 0:
-        report_type = "exploit_only"
+        report_type = "vuln_only"
 
     new_dict = {}
 
@@ -792,7 +792,7 @@ def grab_vulns_from_agent_data_dict(agent_data_dict, target_host=None, report_ty
                                                                     new_dict[a][b][c][d][e][f][g] = {
                                                                     }
                                                                 new_dict[a][b][c][d][e][f][g][h] = agent_data_dict[a][b][c][d][e][f][g][h]
-                                                            # exploit_only (default)
+                                                            # exploit_vuln_only
                                                             else:
                                                                 for i in agent_data_dict[a][b][c][d][e][f][g][h].keys():
                                                                     for j in agent_data_dict[a][b][c][d][e][f][g][h][i].keys():

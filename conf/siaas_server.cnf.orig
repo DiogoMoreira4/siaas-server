@@ -18,5 +18,5 @@ mailer_smtp_pwd = password123
 #mailer_smtp_receivers = siaas.iscte@gmail.com # comment this line to not send anything
 mailer_smtp_server = smtp.gmail.com
 mailer_smtp_tls_port = 587
-#mailer_smtp_report_type = exploit_only # all, vuln_only, exploit_only (default)
+mailer_smtp_report_type = exploit_vuln_only # all, vuln_only (default), exploit_vuln_only
 platform_loop_interval_sec = 300

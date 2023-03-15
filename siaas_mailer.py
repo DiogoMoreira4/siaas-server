@@ -200,8 +200,8 @@ def loop():
 
             if len(mailer_smtp_report_type or '') == 0:
                 logger.debug(
-                    "No report type configured. Defaulting to only emailing exploits.")
-                mailer_smtp_report_type = "exploit_only"
+                    "No report type configured. Defaulting to 'vuln_only'.")
+                mailer_smtp_report_type = "vuln_only"
 
             try:
                 smtp_tls_port = int(mailer_smtp_tls_port)
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     smtp_pwd = "password123"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
-    smtp_report_type = "exploit_only"  # all, vuln_only, exploit_only
+    smtp_report_type = "exploit_vuln_only"  # all, vuln_only, exploit_vuln_only
 
     send_siaas_email(collection, smtp_account, smtp_pwd,
                      smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type)
