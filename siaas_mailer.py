@@ -47,10 +47,10 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
 
     if smtp_report_type.lower() == "all":
         mail_type = "All scanned data"
-    elif smtp_report_type.lower() == "vuln_only":
-        mail_type = "Vulnerabilities"
-    else:
+    elif smtp_report_type.lower() == "exploit_vuln_only":
         mail_type = "Exploits"
+    else:
+        mail_type = "Vulnerabilities"
 
     last_dict = new_dict
     signature = "Server UID: " + siaas_aux.get_or_create_unique_system_id()
@@ -265,7 +265,8 @@ if __name__ == "__main__":
     smtp_pwd = "password123"
     smtp_server = "smtp.gmail.com"
     smtp_tls_port = "587"
-    smtp_report_type = "exploit_vuln_only"  # all, vuln_only, exploit_vuln_only
+    # all, vuln_only (default), exploit_vuln_only
+    smtp_report_type = "exploit_vuln_only"
 
     send_siaas_email(collection, smtp_account, smtp_pwd,
                      smtp_receivers, smtp_server, smtp_tls_port, smtp_report_type)
