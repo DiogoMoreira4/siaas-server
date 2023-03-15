@@ -232,9 +232,11 @@ def create_or_update_server_configs(collection, config_dict={}):
     ), key=lambda x: x[0].casefold() if len(x or "") > 0 else None))
     complete_dict["timestamp"] = get_now_utc_obj()
 
+    result = create_or_update_in_mongodb_collection(collection, complete_dict)
+
     logger.info("Server configs upload to the DB finished.")
 
-    return create_or_update_in_mongodb_collection(collection, complete_dict)
+    return result
 
 
 def upload_agent_data(collection, agent_uid=None, data_dict={}):
@@ -279,9 +281,11 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     complete_dict["payload"] = data_dict
     complete_dict["timestamp"] = get_now_utc_obj()
 
-    logger.info("Agent data upload to the DB ["+str(agent_uid)+"] finished.")
+    result = insert_in_mongodb_collection(collection, complete_dict)
 
-    return insert_in_mongodb_collection(collection, complete_dict)
+    logger.info("Agent data upload to the DB finished ["+str(agent_uid)+"].")
+
+    return result
 
 
 def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
@@ -353,7 +357,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
             result = False
 
     logger.info(
-        "Agent configs upload to the DB ["+str(agent_uid)+"] finished.")
+        "Agent configs upload to the DB finished ["+str(agent_uid)+"].")
 
     return result
 
