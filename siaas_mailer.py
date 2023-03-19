@@ -131,7 +131,7 @@ def loop():
     """
     Mailer module loop (calls the email sending function)
     """
-    # Generate global variables from the configuration file
+    # Generate global variables from the configurations DB
     config_dict = siaas_aux.get_config_from_configs_db(convert_to_string=True)
     MONGO_USER = None
     MONGO_PWD = None
