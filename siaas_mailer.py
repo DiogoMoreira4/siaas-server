@@ -33,12 +33,18 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
 
     out_dict = siaas_aux.get_dict_current_agent_data(
         db_collection, agent_uid=None, module="portscanner")
+
+    if out_dict == False:
+        logger.error(
+            "There was an error getting agent data to be sent in the email. Not sending any email.")
+        return last_dict
+
     new_dict = siaas_aux.grab_vulns_from_agent_data_dict(
         out_dict, report_type=smtp_report_type)
 
     if new_dict == False:
         logger.error(
-            "There was an error getting vulnerability data to be sent in the email. Not sending any email.")
+            "There was an error parsing vulnerability data to be sent in the email. Not sending any email.")
         return last_dict
 
     if str(new_dict) == str(last_dict) and last_dict != None:

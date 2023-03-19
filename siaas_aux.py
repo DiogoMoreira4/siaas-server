@@ -52,12 +52,13 @@ def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config
     local_config_dict = {}
     merged_config_dict = {}
     delta_dict = {}
-    protected_configs = ["log_level", "mongo_collection", "mongo_db", "mongo_host", "mongo_port", "mongo_pwd", "mongo_user"]
+    protected_configs = ["log_level", "mongo_collection", "mongo_db",
+                         "mongo_host", "mongo_port", "mongo_pwd", "mongo_user"]
     try:
         local_config_dict = get_config_from_configs_db(local_dict=local_dict)
         if type(upstream_dict) is not dict:
             raise TypeError("Upstream configs are invalid.")
-        for p in protected_configs: # remove any protected configs from upstream dict
+        for p in protected_configs:  # remove any protected configs from upstream dict
             for k in upstream_dict.copy().keys():
                 if p.lower().strip() == k.lower().strip():
                     del(upstream_dict[k])
