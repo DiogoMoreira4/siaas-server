@@ -58,7 +58,7 @@ def siaas_server():
     try:
         for k in output["config"].keys():
             if k.endswith("_pwd") or k.endswith("_passwd") or k.endswith("_password"):
-                output["config"][k] = '*' * len(output["config"][k])
+                output["config"][k] = '*' * 8
     except:
         pass
     return jsonify(
