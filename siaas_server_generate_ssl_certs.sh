@@ -41,7 +41,7 @@ openssl req -nodes -newkey rsa:2048 -keyout siaas.key -out siaas.csr -config sia
 openssl x509 -in siaas.csr -out siaas.crt -req -signkey siaas.key -extfile siaas.cnf -extensions v3_req -days 3650
 chmod 644 *.crt
 chmod 644 *.csr
-chmod 644 *.key
+chmod 640 *.key
 
 cd -
 
