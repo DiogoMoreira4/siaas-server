@@ -183,8 +183,8 @@ def loop():
             config_name="mailer_smtp_account")
         mailer_smtp_pwd = siaas_aux.get_config_from_configs_db(
             config_name="mailer_smtp_pwd")
-        mailer_smtp_receivers = siaas_aux.get_config_from_configs_db(
-            config_name="mailer_smtp_receivers")
+        mailer_smtp_recipients = siaas_aux.get_config_from_configs_db(
+            config_name="mailer_smtp_recipients")
         mailer_smtp_server = siaas_aux.get_config_from_configs_db(
             config_name="mailer_smtp_server")
         mailer_smtp_tls_port = siaas_aux.get_config_from_configs_db(
@@ -192,7 +192,7 @@ def loop():
         mailer_smtp_report_type = siaas_aux.get_config_from_configs_db(
             config_name="mailer_smtp_report_type")
 
-        if len(mailer_smtp_receivers or '') == 0:
+        if len(mailer_smtp_recipients or '') == 0:
             logger.info(
                 "No email receivers are defined. Not sending any emails.")
             send_mail = False
@@ -220,7 +220,7 @@ def loop():
 
             if send_mail:
                 last_dict = send_siaas_email(db_collection, mailer_smtp_account, mailer_smtp_pwd,
-                                             mailer_smtp_receivers, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
+                                             mailer_smtp_recipients, mailer_smtp_server, smtp_tls_port, mailer_smtp_report_type, last_dict)
 
         # Sleep before next loop
         try:
