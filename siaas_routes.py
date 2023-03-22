@@ -54,7 +54,7 @@ def siaas_server():
     output = siaas_aux.merge_module_dicts(module)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
@@ -86,7 +86,7 @@ def server_configs():
             collection)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             output = {}
         else:
             status = "success"
@@ -108,7 +108,7 @@ def server_configs():
             status = "success"
         else:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
         return jsonify(
             {
                 'status': status,
@@ -120,7 +120,7 @@ def server_configs():
             collection, scope="server_configs", days_to_keep=0)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             count_deleted = 0
         else:
             siaas_aux.merge_configs_from_upstream(
@@ -147,7 +147,7 @@ def agents():
     output = siaas_aux.get_dict_active_agents(collection, sort_by=sort_by)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
@@ -175,7 +175,7 @@ def agents_data():
     output = siaas_aux.get_dict_current_agent_data(collection, module=module)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
@@ -205,7 +205,7 @@ def agents_data_id(agent_uid):
             collection, agent_uid=agent_uid, module=module)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             output = {}
         else:
             status = "success"
@@ -225,7 +225,7 @@ def agents_data_id(agent_uid):
             status = "success"
         else:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
         return jsonify(
             {
                 'status': status,
@@ -238,7 +238,7 @@ def agents_data_id(agent_uid):
             collection, scope="agent_data", agent_uid=agent_uid, days_to_keep=days)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             count_deleted = 0
         else:
             status = "success"
@@ -264,7 +264,7 @@ def agents_configs():
         collection, merge_broadcast=merge_broadcast)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
@@ -292,7 +292,7 @@ def agents_configs_id(agent_uid):
             collection, agent_uid=agent_uid, merge_broadcast=merge_broadcast)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             output = {}
         else:
             status = "success"
@@ -312,7 +312,7 @@ def agents_configs_id(agent_uid):
             status = "success"
         else:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
         return jsonify(
             {
                 'status': status,
@@ -324,7 +324,7 @@ def agents_configs_id(agent_uid):
             collection, scope="agent_configs", agent_uid=agent_uid, days_to_keep=0)
         if type(output) == bool and output == False:
             status = "failure"
-            ret_code = 400
+            ret_code = 500
             count_deleted = 0
         else:
             status = "success"
@@ -361,7 +361,7 @@ def agents_history():
         collection, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
@@ -399,7 +399,7 @@ def agents_history_id(agent_uid):
         collection, agent_uid=agent_uid, module=module, limit_outputs=limit_outputs, days=days, sort_by=sort_by, older_first=older_first, hide_empty=hide_empty)
     if type(output) == bool and output == False:
         status = "failure"
-        ret_code = 400
+        ret_code = 500
         output = {}
     else:
         status = "success"
