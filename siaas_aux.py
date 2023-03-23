@@ -11,6 +11,7 @@ import os
 import sys
 import re
 import json
+import socket
 from copy import copy
 from datetime import datetime, timedelta
 from pymongo import MongoClient
@@ -1165,3 +1166,20 @@ def get_ipv6_cidr(mask):
         return None
         logger.warning("Bad IPv6 netmask: "+mask)
     return count
+
+
+def get_main_ip_address():
+    """
+    Grabs and returns the main IP address (the one with the default route)
+    Returns "127.0.0.1" if any problem occurs
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.settimeout(0)
+    try:
+        s.connect(("10.254.254.254", 1))  # doesn't have to be reachable
+        ip = s.getsockname()[0]
+    except:
+        ip = "127.0.0.1"
+    finally:
+        s.close()
+    return str(ip)

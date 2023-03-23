@@ -59,7 +59,8 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         mail_type = "Vulnerabilities"
 
     last_dict = new_dict
-    signature = "Server UID: " + siaas_aux.get_or_create_unique_system_id()
+    signature = "Server UID: " + siaas_aux.get_or_create_unique_system_id() + \
+        "\nServer IP: " + siaas_aux.get_main_ip_address()
 
     if len(new_dict) == 0:
         mail_body = "Nothing to report."
