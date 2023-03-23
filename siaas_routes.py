@@ -20,6 +20,10 @@ def index():
     """
     Server API route - index
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     output = {
         'name': 'Intelligent System for Automation of Security Audits (SIAAS)',
@@ -43,6 +47,10 @@ def siaas_server():
     """
     Server API route - server information
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
     all_existing_modules = "platform,config"
@@ -79,6 +87,10 @@ def server_configs():
     """
     Server API route - server published configs
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     collection = get_db_collection()
     if request.method == 'GET':
@@ -141,6 +153,10 @@ def agents():
     """
     Server API route - agents overview
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     collection = get_db_collection()
     sort_by = request.args.get('sort', default="date", type=str)
@@ -166,6 +182,10 @@ def agents_data():
     """
     Server API route - agents data
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
     for m in module.split(','):
@@ -194,6 +214,10 @@ def agents_data_id(agent_uid):
     """
     Server API route - agents data (specific UIDs, comma-separated)
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     collection = get_db_collection()
     if request.method == 'GET':
@@ -257,6 +281,10 @@ def agents_configs():
     """
     Server API route - agents published configs
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     collection = get_db_collection()
     merge_broadcast = request.args.get('merge_broadcast', default=0, type=int)
@@ -283,6 +311,10 @@ def agents_configs_id(agent_uid):
     """
     Server API route - agents published configs (specific UIDs, comma-separated)
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     collection = get_db_collection()
     if request.method == 'GET':
@@ -343,10 +375,13 @@ def agents_history():
     """
     Server API route - agents historical data
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
-    # 0 equates to having no output limit (as per MongoDB spec)
-    limit_outputs = request.args.get('limit', default=100, type=int)
+    limit_outputs = request.args.get('limit', default=100, type=int) # less than 1 equates to having no output limit
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
@@ -381,10 +416,13 @@ def agents_history_id(agent_uid):
     """
     Server API route - agents historical data (specific UIDs, comma-separated)
     """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
-    # less than 1 equates to having no output limit
-    limit_outputs = request.args.get('limit', default=100, type=int)
+    limit_outputs = request.args.get('limit', default=100, type=int) # less than 1 equates to having no output limit
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
