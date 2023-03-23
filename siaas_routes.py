@@ -381,7 +381,8 @@ def agents_history():
         ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=100, type=int) # less than 1 equates to having no output limit
+    # less than 1 equates to having no output limit
+    limit_outputs = request.args.get('limit', default=100, type=int)
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
@@ -422,7 +423,8 @@ def agents_history_id(agent_uid):
         ip = request.remote_addr
     ret_code = 200
     module = request.args.get('module', default='*', type=str)
-    limit_outputs = request.args.get('limit', default=100, type=int) # less than 1 equates to having no output limit
+    # less than 1 equates to having no output limit
+    limit_outputs = request.args.get('limit', default=100, type=int)
     days = request.args.get('days', default=15, type=int)
     sort_by = request.args.get('sort', default="date", type=str)
     older_first = request.args.get('older', default=0, type=int)
