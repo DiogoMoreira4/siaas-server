@@ -1,6 +1,6 @@
 # Protected configurations (last for the whole run and can't be changed remotely)
 
-log_level = info # (Default: info)
+log_level = info # options: debug, info, warn, error, critical (Default: info)
 mongo_collection = siaas # (Default: None)
 mongo_db = siaas # (Default: None)
 mongo_host = 127.0.0.1 # (Default: None)
