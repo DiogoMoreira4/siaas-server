@@ -101,7 +101,7 @@ def server_configs():
     if request.method == 'POST':
         content = request.json
         output = siaas_aux.create_or_update_server_configs(
-            collection, config_dict=content)
+            collection, config_dict=content, orig_ip=request.remote_addr)
         if output:
             siaas_aux.merge_configs_from_upstream(
                 upstream_dict=siaas_aux.get_dict_current_server_configs(collection))
@@ -220,7 +220,7 @@ def agents_data_id(agent_uid):
     if request.method == 'POST':
         content = request.json
         output = siaas_aux.upload_agent_data(
-            collection, agent_uid=agent_uid, data_dict=content)
+            collection, agent_uid=agent_uid, data_dict=content, orig_ip=request.remote_addr)
         if output:
             status = "success"
         else:
@@ -307,7 +307,7 @@ def agents_configs_id(agent_uid):
     if request.method == 'POST':
         content = request.json
         output = siaas_aux.create_or_update_agent_configs(
-            collection, agent_uid=agent_uid, config_dict=content)
+            collection, agent_uid=agent_uid, config_dict=content, orig_ip=request.remote_addr)
         if output:
             status = "success"
         else:

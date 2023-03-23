@@ -189,7 +189,7 @@ def get_dict_current_server_configs(collection):
     return out_dict
 
 
-def create_or_update_server_configs(collection, config_dict={}):
+def create_or_update_server_configs(collection, config_dict={}, orig_ip="127.0.0.1"):
     """
     Receives a dict with server configs, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
@@ -229,6 +229,7 @@ def create_or_update_server_configs(collection, config_dict={}):
     # origin - Creator of this entry
     # destiny - Intended destiny
     # payload - Data payload
+    # orig_ip - IP address of the requester
     # timestamp - Data object with creation timestamp of the record
 
     complete_dict = {}
@@ -237,6 +238,7 @@ def create_or_update_server_configs(collection, config_dict={}):
     complete_dict["destiny"] = "server"
     complete_dict["payload"] = dict(sorted(corrected_config_dict.items(
     ), key=lambda x: x[0].casefold() if len(x or "") > 0 else None))
+    complete_dict["orig_ip"] = str(orig_ip)
     complete_dict["timestamp"] = get_now_utc_obj()
 
     result = create_or_update_in_mongodb_collection(collection, complete_dict)
@@ -246,7 +248,7 @@ def create_or_update_server_configs(collection, config_dict={}):
     return result
 
 
-def upload_agent_data(collection, agent_uid=None, data_dict={}):
+def upload_agent_data(collection, agent_uid=None, data_dict={}, orig_ip="127.0.0.1"):
     """
     Receives a dict with agent data, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
@@ -279,6 +281,7 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     # origin - Creator of this entry
     # destiny - Intended destiny
     # payload - Data payload
+    # orig_ip - IP address of the requester
     # timestamp - Data object with creation timestamp of the record
 
     complete_dict = {}
@@ -286,6 +289,7 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     complete_dict["origin"] = "agent_"+agent_uid.lower()
     complete_dict["destiny"] = "server"
     complete_dict["payload"] = data_dict
+    complete_dict["orig_ip"] = str(orig_ip)
     complete_dict["timestamp"] = get_now_utc_obj()
 
     result = insert_in_mongodb_collection(collection, complete_dict)
@@ -295,7 +299,7 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}):
     return result
 
 
-def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
+def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, orig_ip="127.0.0.1"):
     """
     Receives a dict with agent configs, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
@@ -350,6 +354,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
         # origin - Creator of this entry
         # destiny - Intended destiny
         # payload - Data payload
+        # orig_ip - IP address of the requester
         # timestamp - Data object with creation timestamp of the record
 
         complete_dict = {}
@@ -358,6 +363,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}):
         complete_dict["destiny"] = "agent_"+uid.lower()
         complete_dict["payload"] = dict(sorted(corrected_config_dict.items(
         ), key=lambda x: x[0].casefold() if len(x or "") > 0 else None))
+        complete_dict["orig_ip"] = str(orig_ip)
         complete_dict["timestamp"] = get_now_utc_obj()
 
         if not create_or_update_in_mongodb_collection(collection, complete_dict):
@@ -381,7 +387,8 @@ def get_dict_active_agents(collection, sort_by="date"):
         cursor = collection.aggregate([
             {"$match": {"origin": {"$regex": "^agent_"}}},
             {"$group": {"_id": {"origin": "$origin"}, "origin": {
-                "$last": "$origin"}, "timestamp": {"$last": "$timestamp"}}},
+                "$last": "$origin"}, "timestamp": {"$last": "$timestamp"},
+                "orig_ip": {"$last": "$orig_ip"}}},
             {"$sort": {"timestamp": -1}}
         ])
         results = list(cursor)
@@ -403,6 +410,7 @@ def get_dict_active_agents(collection, sort_by="date"):
                     collection, agent_uid=uid, merge_broadcast=False)[uid]["description"])
             except:
                 pass
+            out_dict[uid]["origin_ip"] = r["orig_ip"]
             out_dict[uid]["last_seen"] = r["timestamp"].strftime(
                 '%Y-%m-%dT%H:%M:%SZ')
         except:
@@ -904,7 +912,7 @@ def create_or_update_in_mongodb_collection(collection, data_to_insert):
         return False
 
 
-def mongodb_ping(mongo_user="siaas", mongo_password="siaas", mongo_host="127.0.0.1:27017", mongo_db="siaas", mongo_collection="siaas"):
+def mongodb_ping(mongo_user=None, mongo_password=None, mongo_host=None, mongo_db=None, mongo_collection=None):
     """
     Returns True if the DB is alive, False if otherwise
     """
@@ -921,7 +929,7 @@ def mongodb_ping(mongo_user="siaas", mongo_password="siaas", mongo_host="127.0.0
         return False
 
 
-def connect_mongodb_collection(mongo_user="siaas", mongo_password="siaas", mongo_host="127.0.0.1:27017", mongo_db="siaas", mongo_collection="siaas"):
+def connect_mongodb_collection(mongo_user=None, mongo_password=None, mongo_host=None, mongo_db=None, mongo_collection=None):
     """
     Set up a MongoDB collection connection based on the inputs
     Returns the collection obj if succeeded. Returns None if it failed
