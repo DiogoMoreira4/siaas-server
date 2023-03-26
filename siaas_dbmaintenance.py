@@ -84,8 +84,8 @@ def loop():
                     "Number of historical days can't be negative.")
         except:
             logger.debug(
-                "The number of days to keep in the database is not configured or is invalid. Using the value of 1 year by default.")
-            days_to_keep = 365
+                "The number of days to keep in the database is not configured or is invalid. Using the value of 2 weeks by default.")
+            days_to_keep = 14
 
         delete_history_data(db_collection, days_to_keep)
 
@@ -133,6 +133,6 @@ if __name__ == "__main__":
 
     logger.info("Cleaning up the DB ...")
 
-    delete_history_data(collection, days_to_keep=3650)
+    delete_history_data(collection, days_to_keep=365)
 
     print('\nAll done. Bye!\n')
