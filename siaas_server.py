@@ -5,6 +5,7 @@
 import os
 import sys
 import logging
+import time
 import multiprocessing_logging
 from logging.handlers import RotatingFileHandler
 from flask import Flask, jsonify, render_template
@@ -54,6 +55,12 @@ if __name__ == "__main__":
     os.makedirs(os.path.join(sys.path[0], 'conf'), exist_ok=True)
     os.makedirs(os.path.join(sys.path[0], 'tmp'), exist_ok=True)
     os.makedirs(os.path.join(sys.path[0], 'var'), exist_ok=True)
+
+    # Deleting any existing databases leftovers
+    old_dbs = os.listdir(os.path.join(sys.path[0], 'var/'))
+    for db in old_dbs:
+        if db.endswith(".db"):
+            os.remove(os.path.join(sys.path[0], 'var/'+db))
 
     # Initializing local databases for configurations
     siaas_aux.write_to_local_file(
@@ -148,10 +155,13 @@ if __name__ == "__main__":
     platform = Process(target=siaas_platform.loop, args=(SIAAS_VERSION,))
     dbmaintenance = Process(target=siaas_dbmaintenance.loop, args=())
     mailer = Process(target=siaas_mailer.loop, args=())
+
     platform.start()
     dbmaintenance.start()
     mailer.start()
 
+    # give the modules some time to start before launching the API
+    time.sleep(5)
     #app.run(debug=True, use_reloader=False, host="127.0.0.1", port=API_PORT)
     serve(app, host="127.0.0.1", port=API_PORT)
 
