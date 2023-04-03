@@ -116,7 +116,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     try:
         context = ssl.create_default_context()
         smtp_receivers_list = sorted(set(smtp_receivers.split(
-            ',')), key=lambda x: x[0].casefold() if len(x or "") > 0 else "")
+            ',')), key=lambda x: x.casefold() if len(x or "") > 0 else "")
         with smtplib.SMTP(smtp_server, smtp_tls_port) as server:
             server.starttls(context=context)
             server.login(smtp_account, smtp_pwd)
