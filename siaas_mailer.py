@@ -85,7 +85,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
         w = csv.writer(f, delimiter=csv_delimiter)
-        w.writerow(["AgentUID", "Target", "InformationType", "Findings"])
+        w.writerow(["AgentUID", "TargetHost", "InformationType", "Findings"])
         w.writerows(csv_contents)
 
     # Message headers
