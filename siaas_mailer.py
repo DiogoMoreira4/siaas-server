@@ -8,6 +8,7 @@ import ssl
 import csv
 import platform
 import pprint
+import json
 import os
 import sys
 import locale
@@ -76,7 +77,8 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
         for b in new_dict[a].keys():
             for c in new_dict[a][b].keys():
                 for d in new_dict[a][b][c].keys():
-                    csv_contents.append([a, c, d, new_dict[a][b][c][d]])
+                    csv_contents.append([a, c, d, json.dumps(
+                        new_dict[a][b][c][d], ensure_ascii=False)])
 
     csv_delimiter = ';'
     file_to_write = "./tmp/siaas_report_" + siaas_aux.get_or_create_unique_system_id() + \
