@@ -54,10 +54,13 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
 
     if smtp_report_type.lower() == "all":
         mail_type = "All scanned data"
+        csv_type = "all"
     elif smtp_report_type.lower() == "exploit_vuln_only":
         mail_type = "Exploits"
+        csv_type = "exploits"
     else:
         mail_type = "Vulnerabilities"
+        csv_type = "vulns"
 
     last_dict = new_dict
     signature = "Server UID: " + siaas_aux.get_or_create_unique_system_id() + \
@@ -81,8 +84,8 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
                         new_dict[a][b][c][d], sort_keys=False, ensure_ascii=False)])
 
     csv_delimiter = ';'
-    file_to_write = "./tmp/siaas_report_" + siaas_aux.get_or_create_unique_system_id() + \
-        "_" + datetime.now().strftime('%Y%m%d%H%M%S')+".csv"
+    file_to_write = "./tmp/siaas_report_" + csv_type + "_" + siaas_aux.get_or_create_unique_system_id() + \
+        "_" + datetime.utcnow().strftime('%Y%m%d%H%M%S')+".csv"
     os.makedirs(os.path.dirname(os.path.join(
         sys.path[0], file_to_write)), exist_ok=True)
     with open(file_to_write, 'w') as f:
@@ -93,7 +96,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
     # Message headers
     message = MIMEMultipart("alternative")
     message["Subject"] = "SIAAS Report ("+mail_type+") from "+platform.node().split('.', 1)[
-        0]+" on "+datetime.utcnow().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
+        0]+" on "+datetime.now().strftime('%Y-%m-%d at %H:%M')+" "+datetime.now().astimezone().tzname()
     #message["From"] = smtp_account
     message["From"] = formataddr(
         ("SIAAS Server ("+platform.node().split('.', 1)[0]+")", smtp_account))
