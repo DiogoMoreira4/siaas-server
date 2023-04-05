@@ -18,9 +18,10 @@ cd ${SCRIPT_DIR}
 
 # MONGODB REPO CONFIGURATION
 apt-get update
-apt-get install -y gnupg lsb-release || exit 1
-wget --no-check-certificate -qO - https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
+apt-get install -y curl gnupg lsb-release || exit 1
+repo_component="main" && [[ `lsb_release -is | tr '[:upper:]' '[:lower:]'` == "ubuntu" ]] && repo_component="multiverse" # if Ubuntu use the multiverse component
+curl --insecure -fsSL https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add -
+echo "deb https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} ${repo_component}" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
 mongo_shell="mongosh" && which ${mongo_shell} > /dev/null || mongo_shell="mongo" # fallback to the older mongo shell binary, if the new one is not found
 
 # INSTALL PACKAGES
