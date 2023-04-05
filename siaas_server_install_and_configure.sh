@@ -10,8 +10,16 @@ fi
 
 cd ${SCRIPT_DIR}
 
+# MONGODB REPO CONFIGURATION
 apt-get update
-apt-get install -y python3 python3-pip python3-venv git mongodb apache2 openssl dmidecode
+apt-get install -y gnupg lsb-release || exit 1
+wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+# INSTALL PACKAGES
+apt-get update
+apt-get install -y python3 python3-pip python3-venv git apache2 apache2-utils mongodb-org mongodb-mongosh openssl dmidecode || exit 1
+systemctl daemon-reload
 
 # SSL CONFIGURATION WITH SELF-SIGNED CERTS
 [ ! -f "./ssl/siaas.crt" ] && ./siaas_server_generate_ssl_certs.sh # generate new self-signed certs on first run
@@ -117,10 +125,10 @@ systemctl restart apache2
 systemctl enable apache2
 
 # MONGO DB CONFIGURATION
-#sed -i 's|bind_ip[[:space:]]*=[[:space:]]*127.0.0.1|bind_ip = 0.0.0.0|g' /etc/mongodb.conf # Open DB to the world (only for testing purposes)
-systemctl restart mongodb
-systemctl enable mongodb
-sleep 3 && mongo --eval 'Mongo().getDBNames()' | grep siaas || ./siaas_server_initialize_mongodb.sh # initialize the MongoDB SIAAS DB if it doesn't exist
+#sed -i 's|bindIp[[:space:]]*:[[:space:]]*127.0.0.1|bindIp: 0.0.0.0|g' /etc/mongod.conf # open DB to the world (only for testing purposes
+systemctl restart mongod
+systemctl enable mongod
+sleep 3 && mongosh --quiet --eval 'Mongo().getDBNames()' | grep siaas || ./siaas_server_initialize_mongodb.sh # initialize the MongoDB SIAAS DB if it doesn't exist
 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf

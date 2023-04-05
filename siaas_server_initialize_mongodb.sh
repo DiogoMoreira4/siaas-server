@@ -7,19 +7,19 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-echo "Initializing SIAAS database (also dropping existing) ..."
+echo "Initializing SIAAS database (also dropping existing, if any) ..."
 
-#mongo --eval 'db.runCommand({ connectionStatus: 1 })'
-#mongo --eval 'Mongo().getDBNames()'
-#echo "show dbs" | mongo
+#mongosh --quiet --eval 'db.runCommand({ connectionStatus: 1 })'
+#mongosh --quiet --eval 'Mongo().getDBNames()'
+#echo "show dbs" | mongosh --quiet
 
-mongo siaas --eval 'db.dropAllUsers()'
-mongo siaas --eval 'db.dropAllRoles()'
-mongo siaas --eval 'db.dropDatabase()'
+mongosh --quiet siaas --eval 'db.dropAllUsers()'
+mongosh --quiet siaas --eval 'db.dropAllRoles()'
+mongosh --quiet siaas --eval 'db.dropDatabase()'
 
-mongo siaas --eval 'db.createUser({"user":"siaas", "pwd": "siaas", roles:[{"role":"userAdmin","db":"siaas"}]})'
-mongo siaas --eval 'db.getUsers()'
+mongosh --quiet siaas --eval 'db.createUser({"user":"siaas", "pwd": "siaas", roles:[{"role":"userAdmin","db":"siaas"}]})'
+mongosh --quiet siaas --eval 'db.getUsers()'
 
-#mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.insert({"siaas_test_key":"siaas_test_value"})'
-#mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.getCollectionNames()'
-#mongo -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.drop()'
+#mongosh --quiet -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.insertOne({"siaas_test_key":"siaas_test_value"})'
+#mongosh --quiet -u siaas -p siaas 127.0.0.1/siaas --eval 'db.getCollectionNames()'
+#mongosh --quiet -u siaas -p siaas 127.0.0.1/siaas --eval 'db.siaas_test_collection.drop()'

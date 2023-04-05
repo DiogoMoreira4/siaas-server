@@ -8,7 +8,7 @@ By João Pedro Seara, supervised by teacher Carlos Serrão (PhD), 2023
 
 __
 
-**Instructions (tested on Ubuntu 20.04 "Focal")**
+**Instructions (tested on Ubuntu 20.04 "Focal", Ubuntu 22.04 "Jammy", and Debian 11 "Bullseye")**
 
  - Install and configure: `sudo ./siaas_server_install_and_configure.sh`
 
