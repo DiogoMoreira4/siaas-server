@@ -78,7 +78,7 @@ def send_siaas_email(db_collection, smtp_account, smtp_pwd, smtp_receivers, smtp
             for c in new_dict[a][b].keys():
                 for d in new_dict[a][b][c].keys():
                     csv_contents.append([a, c, d, json.dumps(
-                        new_dict[a][b][c][d], ensure_ascii=False)])
+                        new_dict[a][b][c][d], sort_keys=False, ensure_ascii=False)])
 
     csv_delimiter = ';'
     file_to_write = "./tmp/siaas_report_" + siaas_aux.get_or_create_unique_system_id() + \
