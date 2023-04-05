@@ -10,7 +10,7 @@ __
 
 **Instructions (tested on Ubuntu 20.04 "Focal", Ubuntu 22.04 "Jammy", and Debian 11 "Bullseye")**
 
- - Install and configure: `sudo ./siaas_server_install_and_configure.sh`
+ - Install and configure: `sudo ./siaas_server_install_and_configure.sh` (note that, in older CPUs, the latest version of MongoDB might not work properly. In that case, remove MongoDB, and then re-install SIAAS Server using an older version of MongoDB: `sudo ./siaas_server_install_and_configure.sh 4.4`)
 
  - Start: `sudo systemctl start siaas-server` or `sudo ./siaas_server_run.sh`
 
