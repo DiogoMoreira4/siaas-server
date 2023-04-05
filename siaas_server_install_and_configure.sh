@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 if [ $# -ge 1 ]; then
-  MONGO_VERSION=${1}
+  MONGO_VERSION=$1
 else
   MONGO_VERSION="6.0"
 fi
@@ -19,13 +19,13 @@ cd ${SCRIPT_DIR}
 # MONGODB REPO CONFIGURATION
 apt-get update
 apt-get install -y gnupg lsb-release || exit 1
-wget -qO - https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | sudo apt-key add -
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-siaas.list
+wget --no-check-certificate -qO - https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
 mongo_shell="mongosh" && which ${mongo_shell} > /dev/null || mongo_shell="mongo" # fallback to the older mongo shell binary, if the new one is not found
 
 # INSTALL PACKAGES
 apt-get update
-apt-get install -y python3 python3-pip python3-venv git apache2 mongodb-org=${MONGO_VERSION}.* openssl dmidecode || { rm -f /etc/apt/sources.list.d/mongodb-org-siaas.list; exit 1; }
+apt-get install -y python3 python3-pip python3-venv git apache2 mongodb-org=${MONGO_VERSION}.* openssl dmidecode ca-certificates || { rm -f /etc/apt/sources.list.d/mongodb-org-siaas.list; exit 1; }
 systemctl daemon-reload
 
 # SSL CONFIGURATION WITH SELF-SIGNED CERTS
@@ -46,9 +46,9 @@ APACHE_AUTH_PWD=siaas
 echo $APACHE_AUTH_PWD > .siaas_apache_pwd
 htpasswd -c -i /etc/apache2/.htpasswd siaas < .siaas_apache_pwd
 rm -f .siaas_apache_pwd
-sudo chown root:www-data /etc/apache2/.htpasswd
-sudo chmod 640 /etc/apache2/.htpasswd
-cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
+chown root:www-data /etc/apache2/.htpasswd
+chmod 640 /etc/apache2/.htpasswd
+cat << EOF | tee /etc/apache2/sites-available/siaas.conf
 <VirtualHost *:80>
 
   ServerName ${THIS_HOST}
@@ -75,7 +75,7 @@ cat << EOF | sudo tee /etc/apache2/sites-available/siaas.conf
 
 </VirtualHost>
 EOF
-cat << EOF | sudo tee /etc/apache2/sites-available/siaas-ssl.conf
+cat << EOF | tee /etc/apache2/sites-available/siaas-ssl.conf
 <VirtualHost *:80>
 
   ServerName ${THIS_HOST}
@@ -140,7 +140,7 @@ sleep 5 && ${mongo_shell} --quiet --eval 'Mongo().getDBNames()' | grep siaas || 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
 ln -fsT ${SCRIPT_DIR}/log /var/log/siaas-server
-cat << EOF | sudo tee /etc/systemd/system/siaas-server.service
+cat << EOF | tee /etc/systemd/system/siaas-server.service
 [Unit]
 Description=SIAAS Server
 [Service]
