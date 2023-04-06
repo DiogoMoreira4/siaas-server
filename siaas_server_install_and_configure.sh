@@ -58,6 +58,11 @@ cat << EOF | tee /etc/apache2/sites-available/siaas.conf
   ServerName ${THIS_HOST}
   ServerAlias siaas
 
+  # Workaround against: https://github.com/scottie1984/swagger-ui-express/issues/183
+  RewriteEngine on
+  RewriteRule ^/docs(.*) http://%{HTTP_HOST}/api\$0
+  RewriteRule ^/static(.*) http://%{HTTP_HOST}/api\$0
+
   ProxyPreserveHost On
   ProxyPass "/api" http://127.0.0.1:5000
   ProxyPassReverse "/api" http://127.0.0.1:5000
@@ -94,6 +99,11 @@ cat << EOF | tee /etc/apache2/sites-available/siaas-ssl.conf
 
   ServerName ${THIS_HOST}
   ServerAlias siaas
+
+  # Workaround against: https://github.com/scottie1984/swagger-ui-express/issues/183
+  RewriteEngine on
+  RewriteRule ^/docs(.*) https://%{HTTP_HOST}/api\$0
+  RewriteRule ^/static(.*) https://%{HTTP_HOST}/api\$0
 
   ProxyPreserveHost On
   ProxyPass "/api" http://127.0.0.1:5000

@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: SIAAS API
+  description: API running in the SIAAS Server.
+
+paths:
+  /api:
+    get:
+      tags:
+        - api
+      description: Shows API information.
+      responses:
+        '200':
+          description: Success.
+  /api/siaas-server:
+    get:
+      tags:
+        - siaas-server
+      description: Shows local data from the server.
+      parameters:
+        - in: query
+          name: module
+          required: false
+          description: Filters specific modules (accepts a comma-separated list).
+          schema:
+            type: string
+            example: platform,config
+      responses:
+        '200':
+          description: Success.
+        '500':
+          description: Bad input or server error.
+  /api/siaas-server/configs:
+    get:
+      tags:
+        - siaas-server-configs-get
+      description: Shows published configurations the server.
+      responses:
+        '200':
+          description: Success.
+        '500':
+          description: Bad input or server error.
+    post:
+      tags:
+        - siaas-server-configs-post
+      description: Publishes a configuration dict for the server.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/configDict'
+      responses:
+        '200':
+          description: Success.
+        '500':
+          description: Bad input or server error.
+    delete:
+      tags:
+        - siaas-server-configs-delete
+      description: Deletes all published configurations for the server.
+      responses:
+        '200':
+          description: Success.
+        '500':
+          description: Bad input or server error.
+
+components:
+  schemas:
+    configDict:
+      type: object
+      example:
+        config_key: "a string"
+        config_key2: 123
