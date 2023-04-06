@@ -25,7 +25,6 @@ apt-get install -y curl gnupg lsb-release || exit 1
 repo_component="main" && [[ `lsb_release -is | tr '[:upper:]' '[:lower:]'` == "ubuntu" ]] && repo_component="multiverse" # if Ubuntu use the multiverse component
 curl --insecure -fsSL https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add -
 echo "deb https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} ${repo_component}" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
-mongo_shell="mongosh" && which ${mongo_shell} > /dev/null || mongo_shell="mongo" # fallback to the older mongo shell binary, if the new one is not found
 
 # INSTALL PACKAGES
 apt-get update
@@ -146,6 +145,7 @@ systemctl restart apache2
 systemctl enable apache2
 
 # MONGO DB CONFIGURATION
+mongo_shell="mongosh" && which ${mongo_shell} > /dev/null || mongo_shell="mongo" # fallback to the older mongo shell binary, if the new one is not found
 #sed -i 's|bindIp[[:space:]]*:[[:space:]]*127.0.0.1|bindIp: 0.0.0.0|g' /etc/mongod.conf # open DB to the world (only for testing purposes
 systemctl restart mongod
 systemctl enable mongod
