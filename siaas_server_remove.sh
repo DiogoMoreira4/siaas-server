@@ -8,6 +8,9 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
 mongo_shell="mongosh" && which ${mongo_shell} > /dev/null || mongo_shell="mongo" # fallback to the older mongo shell binary, if the new one is not found
 
 cd ${SCRIPT_DIR}

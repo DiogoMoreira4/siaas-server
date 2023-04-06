@@ -14,6 +14,9 @@ else
   MONGO_VERSION="6.0"
 fi
 
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+
 cd ${SCRIPT_DIR}
 
 # MONGODB REPO CONFIGURATION
