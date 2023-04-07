@@ -1,50 +1,60 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   version: 1.0.0
-  title: SIAAS API
-  description: API running in the SIAAS Server.
+  title: "SIAAS API"
+  description: "API running in the SIAAS Server"
 
 paths:
   /api:
     get:
       tags:
-        - api
-      description: Shows API information.
+        - "api"
+      summary: "API information"
+      description: "Shows details about the API running in the server"
       responses:
         '200':
-          description: Success.
+          description: "Success"
   /api/siaas-server:
     get:
       tags:
-        - siaas-server
-      description: Shows local data from the server.
+        - "siaas-server"
+      summary: "Gets server data"
+      description: "Shows module and configuration data from the local DBs"
       parameters:
-        - in: query
-          name: module
+        - name: module
+          in: query
+          explode: false
           required: false
-          description: Filters specific modules (accepts a comma-separated list).
+          description: "Filters specific modules (accepts multiple values, comma-separated)"
+          allowReserved: true
           schema:
-            type: string
-            example: platform,config
+            type: array
+            items:
+              type: string
+              enum: ["platform","config","*"]
+            default: "*"
+          #example: "platform,config" # comment to avoid: https://github.com/swagger-api/swagger-ui/issues/5776
       responses:
         '200':
-          description: Success.
+          description: "Success"
         '500':
-          description: Bad input or server error.
+          description: "Bad input or server error"
   /api/siaas-server/configs:
     get:
       tags:
-        - siaas-server-configs-get
-      description: Shows published configurations the server.
+        - "siaas-server-configs"
+      summary: "Gets server configurations"
+      description: "Shows the configuration dictionary for the server"
       responses:
         '200':
-          description: Success.
+          description: "Success"
         '500':
-          description: Bad input or server error.
+          description: "Bad input or server error"
     post:
       tags:
-        - siaas-server-configs-post
-      description: Publishes a configuration dict for the server.
+        - "siaas-server-configs"
+      summary: "Posts server configurations"
+      description: "Publishes a configuration dictionary for the server"
       requestBody:
         required: true
         content:
@@ -53,19 +63,19 @@ paths:
               $ref: '#/components/schemas/configDict'
       responses:
         '200':
-          description: Success.
+          description: "Success"
         '500':
-          description: Bad input or server error.
+          description: "Bad input or server error"
     delete:
       tags:
-        - siaas-server-configs-delete
-      description: Deletes all published configurations for the server.
+        - "siaas-server-configs"
+      summary: "Deletes server configurations"
+      description: "Deletes the configuration dictionary for the server"
       responses:
         '200':
-          description: Success.
+          description: "Success"
         '500':
-          description: Bad input or server error.
-
+          description: "Bad input or server error"
 components:
   schemas:
     configDict:
