@@ -92,6 +92,9 @@ def get_config_from_configs_db(local_dict=os.path.join(sys.path[0], 'var/config.
         logger.debug("Getting configuration dictionary from local DB ...")
         config_dict = read_from_local_file(
             local_dict)
+        if not isinstance(config_dict, dict):
+            logger.error("Configuration dictionary from the local DB is not in a valid format. Returning nothing.")
+            return {}
         if len(config_dict or '') > 0:
             out_dict = {}
             for k in config_dict.keys():
@@ -110,6 +113,9 @@ def get_config_from_configs_db(local_dict=os.path.join(sys.path[0], 'var/config.
                      config_name+"' from local DB ...")
         config_dict = read_from_local_file(
             local_dict)
+        if not isinstance(config_dict, dict):
+            logger.error("Configuration dictionary from the local DB is not in a valid format. Returning nothing.")
+            return None
         if len(config_dict or '') > 0:
             if config_name in config_dict.keys():
                 value = config_dict[config_name]
@@ -189,9 +195,11 @@ def get_dict_current_server_configs(collection):
     return out_dict
 
 
-def create_or_update_server_configs(collection, config_dict={}, orig_ip="127.0.0.1"):
+def create_or_update_server_configs(collection, config_dict={}, orig_ip="127.0.0.1", convert_to_string=True):
     """
     Receives a dict with server configs, validates it, and calls the mongodb insertion function to insert it
+    By default, converts the dictionary values to a string, to avoid any injection of unsupporte
+d or malicious data
     Returns True if all OK; False if NOK
     """
 
@@ -217,7 +225,10 @@ def create_or_update_server_configs(collection, config_dict={}, orig_ip="127.0.0
     corrected_config_dict = {}
     for k in config_dict.keys():
         formatted_key = k.lower().strip()
-        corrected_config_dict[formatted_key] = config_dict[k]
+        if convert_to_string:
+            corrected_config_dict[formatted_key] = str(config_dict[k])
+        else:
+            corrected_config_dict[formatted_key] = config_dict[k]
 
     siaas_uid = get_or_create_unique_system_id()
 
@@ -299,9 +310,10 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}, orig_ip="127.0.0
     return result
 
 
-def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, orig_ip="127.0.0.1"):
+def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, orig_ip="127.0.0.1", convert_to_string=True):
     """
     Receives a dict with agent configs, validates it, and calls the mongodb insertion function to insert it
+    By default, converts the dictionary values to a string, to avoid any injection of unsupported or malicious data
     Returns True if all OK; False if NOK
     """
 
@@ -332,7 +344,10 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, o
             logger.warning("Ignoring '"+formatted_key +
                            "' key from broadcast configuration insertion.")
             continue
-        corrected_config_dict[formatted_key] = config_dict[k]
+        if convert_to_string:
+            corrected_config_dict[formatted_key] = str(config_dict[k])
+        else:
+            corrected_config_dict[formatted_key] = config_dict[k]
 
     siaas_uid = get_or_create_unique_system_id()
 
@@ -896,7 +911,7 @@ def insert_in_mongodb_collection(collection, data_to_insert):
 def create_or_update_in_mongodb_collection(collection, data_to_insert):
     """
     Creates or updates an object with data
-    Returns 1 if all was OK. Returns -1 if the insertion failed
+    Returns True if all was OK. Returns False if the insertion failed
     """
     logger.debug("Creating or updating data in the DB server ...")
     try:

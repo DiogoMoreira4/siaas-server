@@ -30,7 +30,7 @@
         "parameters": [
           {
             "name": "module",
-            "description": "Filters specific modules (accepts multiple values, comma-separated)",
+            "description": "Filters specific modules (accepts multiple comma-separated values)",
             "in": "query",
             "explode": false,
             "required": false,
@@ -130,7 +130,6 @@
             "name": "sort",
             "description": "Sorts the agents by last ping or UID",
             "in": "query",
-            "explode": false,
             "required": false,
             "allowReserved": true,
             "schema": {
@@ -163,8 +162,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "Filters specific agent UIDs (accepts multiple UIDs, comma-separated)",
+            "description": "Filters specific agent UIDs (accepts multiple comma-separated UIDs, leave empty to select all)",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -179,7 +179,7 @@
           },
           {
             "name": "module",
-            "description": "Filters specific modules (accepts multiple values, comma-separated)",
+            "description": "Filters specific modules (accepts multiple comma-separated values)",
             "in": "query",
             "explode": false,
             "required": false,
@@ -258,8 +258,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated)",
+            "description": "The agent UID for which data will be deleted (accepts multiple comma-separated UIDs)",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -301,8 +302,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "Filters specific agent UIDs (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
+            "description": "Filters specific agent UIDs (accepts multiple comma-separated UIDs, leave empty to select all). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -349,8 +351,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "The agent UID for which the configurations are published for (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
+            "description": "The agent UID for which the configurations are published for (accepts multiple comma-separated UIDs). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -389,8 +392,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
+            "description": "The agent UID for which data will be deleted (accepts multiple comma-separated UIDs). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -421,8 +425,9 @@
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "Filters specific agent UIDs (accepts multiple UIDs, comma-separated)",
+            "description": "Filters specific agent UIDs (accepts multiple comma-separated UIDs, leave empty to select all)",
             "in": "path",
+            "explode": false,
             "required": true,
             "allowReserved": true,
             "schema": {
@@ -474,7 +479,7 @@
           },
           {
             "name": "module",
-            "description": "Filters specific modules (accepts multiple values, comma-separated)",
+            "description": "Filters specific modules (accepts multiple comma-separated values)",
             "in": "query",
             "explode": false,
             "required": false,
@@ -515,7 +520,6 @@
             "name": "sort",
             "description": "Sort data by most recent or by agent UID",
             "in": "query",
-            "explode": false,
             "required": false,
             "allowReserved": true,
             "schema": {
@@ -553,8 +557,9 @@
       "configDict": {
         "type": "object",
         "example": {
-          "config_key_str": "a string",
-          "config_key_int": 123
+          "dummy_config_str": "Hello world!",
+          "dummy_config_int": 123,
+          "dummy_config_bool": true
         }
       }
     }
