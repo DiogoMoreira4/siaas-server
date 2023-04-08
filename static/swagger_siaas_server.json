@@ -345,11 +345,11 @@
           "siaas-server-agents-configs"
         ],
         "summary": "Posts agent published configs",
-        "description": "Publishes an agent configuration dictionary in the server. Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
+        "description": "Publishes an agent configuration dictionary in the server",
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "The agent UID for which the configurations are published for (accepts multiple UIDs, comma-separated)",
+            "description": "The agent UID for which the configurations are published for (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
             "in": "path",
             "required": true,
             "allowReserved": true,
@@ -385,11 +385,11 @@
           "siaas-server-agents-configs"
         ],
         "summary": "Deletes agent published configs",
-        "description": "Deletes an agent configuration dictionary from the server. Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
+        "description": "Deletes an agent configuration dictionary from the server",
         "parameters": [
           {
             "name": "siaas_agent_uid",
-            "description": "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated)",
+            "description": "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff",
             "in": "path",
             "required": true,
             "allowReserved": true,
