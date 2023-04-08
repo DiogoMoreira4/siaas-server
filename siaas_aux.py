@@ -269,7 +269,7 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}, orig_ip="127.0.0
             return False
 
     if not validate_string_key(agent_uid):
-        logger.error("Agent UID '"+uid +
+        logger.error("Agent UID '" + agent_uid +
                      "' is not valid. No agent data was uploaded.")
         return False
 
@@ -341,7 +341,7 @@ def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, o
         uid = u.strip()
 
         if not validate_string_key(uid):
-            logger.error("Agent UID '"+uid +
+            logger.error("Agent UID '" + uid +
                          "' is not valid. No agent configs were uploaded.")
             result = False
             continue

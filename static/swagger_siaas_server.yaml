@@ -8,7 +8,7 @@ paths:
   /api:
     get:
       tags:
-        - "api"
+        - "index"
       summary: "API information"
       description: "Shows details about the API running in the server"
       responses:
@@ -22,18 +22,18 @@ paths:
       description: "Shows module and configuration data from the local DBs"
       parameters:
         - name: module
+          description: "Filters specific modules (accepts multiple values, comma-separated)"
           in: query
           explode: false
           required: false
-          description: "Filters specific modules (accepts multiple values, comma-separated)"
           allowReserved: true
           schema:
             type: array
             items:
               type: string
               enum: ["platform","config","*"]
-            default: "*"
-          #example: "platform,config" # comment to avoid: https://github.com/swagger-api/swagger-ui/issues/5776
+            default: ["*"]
+          #example: ["platform","config"] # comment to avoid: https://github.com/swagger-api/swagger-ui/issues/5776
       responses:
         '200':
           description: "Success"
@@ -76,10 +76,283 @@ paths:
           description: "Success"
         '500':
           description: "Bad input or server error"
+  /api/siaas-server/agents:
+    get:
+      tags:
+        - "siaas-server-agents"
+      summary: "Gets active agents"
+      description: "Shows a summary of the agents connected to the server (nickname, description, IP, last ping) (nickname and description strings for each agent are read from the published configuration keys “nickname” and “description”, for each agent’s uid)"
+      parameters:
+        - name: sort
+          description: "Sorts the agents by last ping or UID"
+          in: query
+          explode: false
+          required: false
+          allowReserved: true
+          schema:
+            type: string
+            enum: ["agent","date"]
+            default: "date"
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+  /api/siaas-server/agents/data/{siaas_agent_uid}:
+    get:
+      tags:
+        - "siaas-server-agents-data"
+      summary: "Gets agent data"
+      description: "Shows module and configuration data from the remote agents"
+      parameters:
+        - name: siaas_agent_uid
+          description: "Filters specific agent UIDs (accepts multiple UIDs, comma-separated)"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+            default: [""]
+        - name: module
+          description: "Filters specific modules (accepts multiple values, comma-separated)"
+          in: query
+          explode: false
+          required: false
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: ["platform","neighborhood","portscanner","config","*"]
+            default: ["*"]
+          #example: ["neighborhood","portscanner"] # comment to avoid: https://github.com/swagger-api/swagger-ui/issues/5776
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+    post:
+      tags:
+        - "siaas-server-agents-data"
+      summary: "Posts agent data"
+      description: "Publishes an agent data dictionary in the server"
+      parameters:
+        - name: siaas_agent_uid
+          description: "The agent UID publishing the data"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: string
+            default: ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dataDict'
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+    delete:
+      tags:
+        - "siaas-server-agents-data"
+      summary: "Deletes agent data"
+      description: "Deletes agent data from the server"
+      parameters:
+        - name: siaas_agent_uid
+          description: "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated)"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: days
+          description: "Number of days to keep"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            default: 365
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+  /api/siaas-server/agents/configs/{siaas_agent_uid}:
+    get:
+      tags:
+        - "siaas-server-agents-configs"
+      summary: "Gets agent published configs"
+      description: "Shows published configurations for the remote agents"
+      parameters:
+        - name: siaas_agent_uid
+          description: "Filters specific agent UIDs (accepts multiple UIDs, comma-separated). Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+            default: [""]
+        - name: merge_broadcast
+          description: "Merge broadcasted configurations with the UID's specific confgurations"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            enum: [0,1]
+            default: 0
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+    post:
+      tags:
+        - "siaas-server-agents-configs"
+      summary: "Posts agent published configs"
+      description: "Publishes an agent configuration dictionary in the server. Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff"
+      parameters:
+        - name: siaas_agent_uid
+          description: "The agent UID for which the configurations are published for (accepts multiple UIDs, comma-separated)"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/configDict'
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+    delete:
+      tags:
+        - "siaas-server-agents-configs"
+      summary: "Deletes agent published configs"
+      description: "Deletes an agent configuration dictionary from the server. Broadcast UID: ffffffff-ffff-ffff-ffff-ffffffffffff"
+      parameters:
+        - name: siaas_agent_uid
+          description: "The agent UID for which data will be deleted (accepts multiple UIDs, comma-separated)"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
+  /api/siaas-server/agents/history/{siaas_agent_uid}:
+    get:
+      tags:
+        - "siaas-server-agents-history"
+      summary: "Gets agent historical data"
+      description: "Shows the history of the data uploaded by the remote agents"
+      parameters:
+        - name: siaas_agent_uid
+          description: "Filters specific agent UIDs (accepts multiple UIDs, comma-separated)"
+          in: path
+          required: true
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+            default: [""]
+        - name: days
+          description: "Maximum number of days to show"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            default: 15
+        - name: hide
+          description: "Hides empty keys from the outputs (till module-key level)"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            enum: [0,1]
+            default: 0
+        - name: limit
+          description: "Maximum number of records to show"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            default: 100
+        - name: module
+          description: "Filters specific modules (accepts multiple values, comma-separated)"
+          in: query
+          explode: false
+          required: false
+          allowReserved: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: ["platform","neighborhood","portscanner","config","*"]
+            default: ["*"]
+          #example: ["neighborhood","portscanner"] # comment to avoid: https://github.com/swagger-api/swagger-ui/issues/5776
+        - name: older
+          description: "Shows older records first"
+          in: query
+          required: false
+          allowReserved: true
+          schema:
+            type: integer
+            enum: [0,1]
+            default: 0
+        - name: sort
+          description: "Sort data by most recent or by agent UID"
+          in: query
+          explode: false
+          required: false
+          allowReserved: true
+          schema:
+            type: string
+            enum: ["agent","date"]
+            default: "date"
+      responses:
+        '200':
+          description: "Success"
+        '500':
+          description: "Bad input or server error"
 components:
   schemas:
+    dataDict:
+      type: object
+      example:
+        platform: {}
+        neighborhood: {}
+        portscanner: {}
+        config: {}
     configDict:
       type: object
       example:
-        config_key: "a string"
-        config_key2: 123
+        config_key_str: "a string"
+        config_key_int: 123
