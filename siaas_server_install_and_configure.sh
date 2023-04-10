@@ -166,7 +166,7 @@ systemctl daemon-reload
 systemctl enable siaas-server
 
 # INITIALIZE
-sudo rm -rf ${SCRIPT_DIR}/venv
+#sudo rm -rf ${SCRIPT_DIR}/venv
 ${SCRIPT_DIR}/siaas_server_venv_setup.sh
 
 echo -e "\nSIAAS Server will be started on boot.\n\nTo start (or restart) manually right now: sudo systemctl [start/restart] siaas-server\n"
