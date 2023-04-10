@@ -8,13 +8,8 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 cd ${SCRIPT_DIR}
-rm -f ./var/uid
 
-# Reinstall venv if for some reason it disappeared
-if ! source ./venv/bin/activate 2> /dev/null
-then
-	./siaas_server_venv_setup.sh
-fi
-
+python3 -m venv ./venv
 source ./venv/bin/activate
-python3 -u ./siaas_server.py
+pip3 install wheel==0.37.1
+pip3 install -r ./requirements.txt
