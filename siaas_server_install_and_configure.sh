@@ -68,19 +68,20 @@ cat << EOF | tee /etc/apache2/sites-available/siaas.conf
   ProxyPassReverse "/api" http://127.0.0.1:5000
 
   <Location "/api">
+    Order deny,allow
     Deny from all
     # IP access allowed
     Allow from 127.0.0.1
-    AuthUserFile /etc/apache2/.htpasswd
-    AuthName "Restricted Area"
     AuthType Basic
+    AuthName "Restricted Area"
+    AuthUserFile /etc/apache2/.htpasswd
     # Satisfy Any will allow either IP or authentication; Satisfy All will enforce both IP and authentication
     Satisfy Any
     Require valid-user
   </Location>
 
-  CustomLog \${APACHE_LOG_DIR}/siaas-access.log combined
-  ErrorLog \${APACHE_LOG_DIR}/siaas-error.log
+  CustomLog \${APACHE_LOG_DIR}/siaas_access.log combined
+  ErrorLog \${APACHE_LOG_DIR}/siaas_error.log
 
 </VirtualHost>
 EOF
@@ -100,6 +101,10 @@ cat << EOF | tee /etc/apache2/sites-available/siaas-ssl.conf
   ServerName ${THIS_HOST}
   ServerAlias siaas
 
+  SSLEngine On
+  SSLCertificateFile /etc/ssl/certs/siaas.crt
+  SSLCertificateKeyFile /etc/ssl/private/siaas.key
+
   # Workaround against: https://github.com/scottie1984/swagger-ui-express/issues/183
   RewriteEngine on
   RewriteRule ^/docs(.*) https://%{HTTP_HOST}/api\$0
@@ -110,23 +115,20 @@ cat << EOF | tee /etc/apache2/sites-available/siaas-ssl.conf
   ProxyPassReverse "/api" http://127.0.0.1:5000
 
   <Location "/api">
+    Order deny,allow
     Deny from all
     # IP access allowed
     Allow from 127.0.0.1
-    AuthUserFile /etc/apache2/.htpasswd
-    AuthName "Restricted Area"
     AuthType Basic
+    AuthName "Restricted Area"
+    AuthUserFile /etc/apache2/.htpasswd
     # Satisfy Any will allow either IP or authentication; Satisfy All will enforce both IP and authentication
     Satisfy Any
     Require valid-user
   </Location>
 
-  SSLEngine On
-  SSLCertificateFile /etc/ssl/certs/siaas.crt
-  SSLCertificateKeyFile /etc/ssl/private/siaas.key
-
-  CustomLog \${APACHE_LOG_DIR}/siaas-access.log combined
-  ErrorLog \${APACHE_LOG_DIR}/siaas-error.log
+  CustomLog \${APACHE_LOG_DIR}/siaas_access.log combined
+  ErrorLog \${APACHE_LOG_DIR}/siaas_error.log
 
 </VirtualHost>
 EOF
@@ -158,8 +160,14 @@ ln -fsT ${SCRIPT_DIR}/log /var/log/siaas-server
 cat << EOF | tee /etc/systemd/system/siaas-server.service
 [Unit]
 Description=SIAAS Server
+Requires=mongod.service
+Wants=apache2.service
+After=mongod.service apache2.service
+
 [Service]
 ExecStart=${SCRIPT_DIR}/siaas_server_run.sh
+Restart=on-failure
+
 [Install]
 WantedBy=multi-user.target
 EOF
