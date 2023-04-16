@@ -23,8 +23,9 @@ cd ${SCRIPT_DIR}
 apt-get update
 apt-get install -y curl gnupg lsb-release || exit 1
 repo_component="main" && [[ `lsb_release -is | tr '[:upper:]' '[:lower:]'` == "ubuntu" ]] && repo_component="multiverse" # if Ubuntu use the multiverse component
-curl --insecure -fsSL https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add -
-echo "deb https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} ${repo_component}" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
+#curl --insecure -fsSL https://www.mongodb.org/static/pgp/server-${MONGO_VERSION}.asc | apt-key add - # apt-key is deprecated
+curl --insecure -fsSL https://pgp.mongodb.com/server-${MONGO_VERSION}.asc | gpg -o /usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg --dearmor --yes
+echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-${MONGO_VERSION}.gpg ] https://repo.mongodb.org/apt/`lsb_release -is | tr '[:upper:]' '[:lower:]'` `lsb_release -cs | tr '[:upper:]' '[:lower:]'`/mongodb-org/${MONGO_VERSION} ${repo_component}" | tee /etc/apt/sources.list.d/mongodb-org-siaas.list
 
 # INSTALL PACKAGES
 apt-get update
