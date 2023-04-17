@@ -2,8 +2,6 @@
 # Server - Auxiliary functions
 # By João Pedro Seara, 2023
 
-import ipaddress
-import math
 import pprint
 import logging
 import uuid
@@ -27,12 +25,12 @@ def merge_module_dicts(modules=""):
     """
     merged_dict = {}
     for module in sorted(set(modules.lower().split(','))):
+        next_dict_to_merge = {}
         module = module.strip()
         try:
             module_dict = read_from_local_file(
                 os.path.join(sys.path[0], 'var/'+str(module)+'.db'))
             if module_dict != None:
-                next_dict_to_merge = {}
                 next_dict_to_merge[module] = module_dict
                 merged_dict = dict(
                     list(merged_dict.items())+list(next_dict_to_merge.items()))
@@ -44,12 +42,16 @@ def merge_module_dicts(modules=""):
     return merged_dict
 
 
-def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config_local.db'), output=os.path.join(sys.path[0], 'var/config.db'), upstream_dict={}):
+def merge_configs_from_upstream(local_dict=os.path.join(sys.path[0], 'var/config_local.db'), output=os.path.join(sys.path[0], 'var/config.db'), upstream_dict=None):
     """
     Merges the upstream configs to the local configs, after removing protected configurations from the upstream configs
     If the config disappears from the server, it reverts to the local config
     In case of errors, no changes are made
     """
+
+    if upstream_dict == None:
+        upstream_dict = {}
+
     local_config_dict = {}
     merged_config_dict = {}
     delta_dict = {}
@@ -197,13 +199,16 @@ def get_dict_current_server_configs(collection):
     return out_dict
 
 
-def create_or_update_server_configs(collection, config_dict={}, orig_ip="127.0.0.1", convert_to_string=True):
+def create_or_update_server_configs(collection, config_dict=None, orig_ip="127.0.0.1", convert_to_string=True):
     """
     Receives a dict with server configs, validates it, and calls the mongodb insertion function to insert it
     By default, converts the dictionary values to a string, to avoid any injection of unsupporte
 d or malicious data
     Returns True if all OK; False if NOK
     """
+
+    if config_dict == None:
+        config_dict = {}
 
     logger.info("Server configs received and now being uploaded to the DB ...")
 
@@ -261,11 +266,14 @@ d or malicious data
     return result
 
 
-def upload_agent_data(collection, agent_uid=None, data_dict={}, orig_ip="127.0.0.1"):
+def upload_agent_data(collection, agent_uid=None, data_dict=None, orig_ip="127.0.0.1"):
     """
     Receives a dict with agent data, validates it, and calls the mongodb insertion function to insert it
     Returns True if all OK; False if NOK
     """
+
+    if data_dict == None:
+        data_dict = {}
 
     logger.info(
         "Agent data received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
@@ -312,12 +320,15 @@ def upload_agent_data(collection, agent_uid=None, data_dict={}, orig_ip="127.0.0
     return result
 
 
-def create_or_update_agent_configs(collection, agent_uid=None, config_dict={}, orig_ip="127.0.0.1", convert_to_string=True):
+def create_or_update_agent_configs(collection, agent_uid=None, config_dict=None, orig_ip="127.0.0.1", convert_to_string=True):
     """
     Receives a dict with agent configs, validates it, and calls the mongodb insertion function to insert it
     By default, converts the dictionary values to a string, to avoid any injection of unsupported or malicious data
     Returns True if all OK; False if NOK
     """
+
+    if config_dict == None:
+        config_dict = {}
 
     logger.info(
         "Agent configs received and now being uploaded to the DB ["+str(agent_uid)+"] ...")
@@ -652,8 +663,8 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
                 logger.error("Can't read data from the DB server: "+str(e))
                 return False
 
+    results_bc = []
     if merge_broadcast:
-        results_bc = []
         try:
             cursor = collection.find(
                 {'$and': [{"payload": {'$exists': True}}, {"scope": "agent_configs"}, {
@@ -1188,8 +1199,8 @@ def get_ipv6_cidr(mask):
                 break
             count += bitCount.index(int(w, 16))
     except:
-        return None
         logger.warning("Bad IPv6 netmask: "+mask)
+        return None
     return count
 
 

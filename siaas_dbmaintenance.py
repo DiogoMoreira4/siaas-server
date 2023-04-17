@@ -6,9 +6,7 @@ import siaas_aux
 import logging
 import os
 import sys
-import pprint
 import time
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

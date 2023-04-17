@@ -7,11 +7,9 @@ import smtplib
 import ssl
 import csv
 import platform
-import pprint
 import json
 import os
 import sys
-import locale
 import logging
 import time
 from pathlib import Path
