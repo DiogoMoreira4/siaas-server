@@ -1135,18 +1135,16 @@ def validate_string_key(string):
     return True
 
 
-def get_size(bytes, suffix="B"):
+def get_size(size_bytes, suffix="B"):
     """
-    Scale bytes to its proper format
-    e.g:
-        1253656 => '1.20MB'
-        1253656678 => '1.17GB'
+    Scale bytes to a shorter "MB" or "GB" format
+    Example: 1253656678 -> 1.17GB
     """
     factor = 1024
     for unit in ["", "K", "M", "G", "T", "P"]:
-        if bytes < factor:
-            return f"{bytes:.2f} {unit}{suffix}"
-        bytes /= factor
+        if size_bytes < factor:
+            return f"{size_bytes:.2f} {unit}{suffix}"
+        size_bytes /= factor
 
 
 def convert_sec_to_pretty_format(seconds):
@@ -1190,14 +1188,14 @@ def get_ipv6_cidr(mask):
     Returns the IPv6 short netmask from a long netmask input
     Returns None if inputted mask is not proper
     """
-    bitCount = [0, 0x8000, 0xc000, 0xe000, 0xf000, 0xf800, 0xfc00, 0xfe00,
-                0xff00, 0xff80, 0xffc0, 0xffe0, 0xfff0, 0xfff8, 0xfffc, 0xfffe, 0xffff]
+    bit_count = [0, 0x8000, 0xc000, 0xe000, 0xf000, 0xf800, 0xfc00, 0xfe00,
+                 0xff00, 0xff80, 0xffc0, 0xffe0, 0xfff0, 0xfff8, 0xfffc, 0xfffe, 0xffff]
     count = 0
     try:
         for w in mask.split(':'):
             if not w or int(w, 16) == 0:
                 break
-            count += bitCount.index(int(w, 16))
+            count += bit_count.index(int(w, 16))
     except:
         logger.warning("Bad IPv6 netmask: "+mask)
         return None
