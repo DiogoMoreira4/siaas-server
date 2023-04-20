@@ -7,7 +7,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-now=$(date +%Y%m%d%H%M%S)
+now=`date +%Y%m%d%H%M%S`
 
 if [ $# -lt 1 ]; then
   BACKUP_FILE=siaas_db_backup_${now}
