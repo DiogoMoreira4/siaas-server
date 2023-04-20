@@ -15,6 +15,7 @@ echo "Initializing SIAAS database (also dropping existing, if any) ..."
 #${mongo_shell} --quiet --eval 'Mongo().getDBNames()'
 #echo "show dbs" | ${mongo_shell} --quiet
 
+${mongo_shell} --quiet siaas --eval 'db.siaas.dropIndexes()' 2> /dev/null
 ${mongo_shell} --quiet siaas --eval 'db.dropAllUsers()'
 ${mongo_shell} --quiet siaas --eval 'db.dropAllRoles()'
 ${mongo_shell} --quiet siaas --eval 'db.dropDatabase()'
