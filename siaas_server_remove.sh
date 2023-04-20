@@ -44,6 +44,7 @@ rm -f /etc/systemd/system/siaas-server.service
 systemctl daemon-reload
 
 echo -e "\nSIAAS Server service and configurations were removed from the system.\n\nThe MongoDB SIAAS DB was kept intact. To remove it manually: \n\n \
+ sudo ${mongo_shell} siaas --eval 'db.siaas.dropIndexes()'\n \
  sudo ${mongo_shell} siaas --eval 'db.dropAllUsers()'\n \
  sudo ${mongo_shell} siaas --eval 'db.dropAllRoles()'\n \
  sudo ${mongo_shell} siaas --eval 'db.dropDatabase()'\n"
