@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 if [ $# -ge 1 ]; then
-  MONGO_VERSION=$1
+  MONGO_VERSION=${1}
 else
   MONGO_VERSION="6.0"
 fi
@@ -155,6 +155,8 @@ systemctl enable mongod
 sleep 5 && ${mongo_shell} --quiet --eval 'Mongo().getDBNames()' | grep siaas || ./siaas_server_initialize_mongodb.sh # initialize the MongoDB SIAAS DB if it doesn't exist
 
 # SERVICE CONFIGURATION
+ln -fs ${SCRIPT_DIR}/siaas_server_backup_mongodb.sh /usr/local/bin/siaas-db-backup
+ln -fs ${SCRIPT_DIR}/siaas_server_restore_mongodb.sh /usr/local/bin/siaas-db-restore
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
 ln -fsT ${SCRIPT_DIR}/log /var/log/siaas-server
 cat << EOF | tee /etc/systemd/system/siaas-server.service
