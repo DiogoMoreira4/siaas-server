@@ -37,8 +37,6 @@ rm -f /etc/apache2/sites-available/siaas-ssl.conf
 sudo systemctl reload apache2
 
 # SERVICE CONFIGURATION
-rm -f /usr/local/bin/siaas-db-backup
-rm -f /usr/local/bin/siaas-db-restore
 rm -f /var/log/siaas-server
 rm -f /etc/systemd/system/siaas-server.service
 systemctl daemon-reload

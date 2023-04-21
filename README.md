@@ -21,3 +21,11 @@ __
  - Generate a project archive (it is recommended to stop all processes before): `sudo ./siaas_server_archive.sh`
 
  - Remove: `sudo ./siaas_server_remove.sh`
+
+__
+
+**Backup and Restore**
+
+ - Back up: `sudo ./siaas_server_backup_mongodb.sh` (accepts a custom output filename as argument)
+
+ - Restore: `sudo ./siaas_server_restore_mongodb.sh <backup_file>`

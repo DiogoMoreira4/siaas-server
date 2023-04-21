@@ -13,6 +13,4 @@ else
   BACKUP_FILE=${1}
 fi
 
-stat ${BACKUP_FILE} 2> /dev/null
-
 mongorestore --nsInclude=siaas.* --drop --archive=${BACKUP_FILE}

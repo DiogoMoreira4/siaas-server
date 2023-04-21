@@ -17,4 +17,5 @@ fi
 
 mongodump --db=siaas --archive=${BACKUP_FILE}
 
-stat ${BACKUP_FILE} 2> /dev/null
+echo -e "\nBackup file information:\n"
+stat ${BACKUP_FILE}
