@@ -715,7 +715,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=99999):
     """
     Delete records older than n-days
-    We can select a list of agent UIDs or scopes, else it will pick all scopes and all records
+    We can select a list of agent UIDs and/or scope, else it will pick all scopes and all records
     Returns number of deleted records as a string, or False if error
     """
     logger.debug("Removing data from the DB server ...")
