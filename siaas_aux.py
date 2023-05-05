@@ -715,7 +715,7 @@ def get_dict_current_agent_configs(collection, agent_uid=None, merge_broadcast=F
 def delete_all_records_older_than(collection, scope=None, agent_uid=None, days_to_keep=99999):
     """
     Delete records older than n-days
-    We can select a list of agent_uuids or scope, else it will pick all scopes and all records
+    We can select a list of agent UIDs or scopes, else it will pick all scopes and all records
     Returns number of deleted records as a string, or False if error
     """
     logger.debug("Removing data from the DB server ...")
@@ -1075,7 +1075,7 @@ def get_or_create_unique_system_id():
     #        pass
     if len(new_uid or '') < 5:
         logger.warning(
-            "Couldn't create a new UID from the system info. Will create a new randomized UUID for this session only!")
+            "Couldn't create a new UID from the system info. Will create a new randomized UID for this session only!")
         try:
             new_uid = "temp-"+str(uuid.UUID(int=uuid.getnode()))
         except:
