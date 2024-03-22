@@ -1,6 +1,6 @@
 # Intelligent System for Automation of Security Audits (SIAAS)
 # Server - DB Maintenance module
-# By João Pedro Seara, 2023
+# By João Pedro Seara, 2022-2024
 
 import siaas_aux
 import logging

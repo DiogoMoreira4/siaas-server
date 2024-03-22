@@ -1,6 +1,6 @@
 # Intelligent System for Automation of Security Audits (SIAAS)
 # Server - Mailer module
-# By João Pedro Seara, 2023
+# By João Pedro Seara, 2022-2024
 
 import siaas_aux
 import smtplib

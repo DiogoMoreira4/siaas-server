@@ -1,6 +1,6 @@
 # Intelligent System for Automation of Security Audits (SIAAS)
 # Server
-# By João Pedro Seara, 2023
+# By João Pedro Seara, 2022-2024
 
 import os
 import sys
@@ -16,7 +16,7 @@ from waitress import serve
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
-SIAAS_VERSION = "1.0.0"
+SIAAS_VERSION = "1.0.1"
 LOG_DIR = "log"
 API_PORT = 5000
 SWAGGER_URL = "/docs"  # route for exposing Swagger UI

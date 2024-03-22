@@ -1,12 +1,12 @@
 # Intelligent System for Automation of Security Audits (SIAAS)
 # Server - API routes
-# By João Pedro Seara, 2023
+# By João Pedro Seara, 2022-2024
 
 from __main__ import app, get_db_collection
 from flask import jsonify, request
 import siaas_aux
 
-SIAAS_API = "v1"
+SIAAS_VERSION = "1.0.1"
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
@@ -25,9 +25,7 @@ def index():
     output = {
         'name': 'Intelligent System for Automation of Security Audits (SIAAS)',
         'module': 'Server',
-        'api': SIAAS_API,
-        'author': 'João Pedro Seara',
-        'supervisor': 'Carlos Serrão',
+        'version': SIAAS_VERSION,
         'docs': request.url_root.rstrip('/')+"/api/docs"
     }
     return jsonify(
