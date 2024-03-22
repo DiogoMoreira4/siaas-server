@@ -167,7 +167,7 @@ if __name__ == "__main__":
     # give the modules some time to start before launching the API
     time.sleep(5)
     app.register_blueprint(get_swaggerui_blueprint(SWAGGER_URL, SWAGGER_JSON_URL, config={
-                           'app_name': SWAGGER_APP_NAME}), url_prefix=SWAGGER_URL)
+                           'app_name': SWAGGER_APP_NAME, 'validatorUrl': 'none'}), url_prefix=SWAGGER_URL)
     #app.run(debug=True, use_reloader=False, host="127.0.0.1", port=API_PORT)
     serve(app, host="127.0.0.1", port=API_PORT)
 
