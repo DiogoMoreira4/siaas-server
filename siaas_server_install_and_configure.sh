@@ -156,6 +156,7 @@ sleep 5 && ${mongo_shell} --quiet --eval 'Mongo().getDBNames()' | grep siaas || 
 
 # SERVICE CONFIGURATION
 cp -n conf/siaas_server.cnf.orig conf/siaas_server.cnf
+chmod o-rwx conf/siaas_server.cnf
 ln -fsT ${SCRIPT_DIR}/log /var/log/siaas-server
 cat << EOF | tee /etc/systemd/system/siaas-server.service
 [Unit]
