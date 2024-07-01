@@ -318,6 +318,25 @@ def upload_agent_data(collection, agent_uid=None, data_dict=None, orig_ip="127.0
     logger.info("Agent data upload to the DB finished ["+str(agent_uid)+"].")
 
     return result
+    
+    
+def upload_zap_data(collection, data, orig_ip="127.0.0.1"):
+    """
+    Receives a dict with agent data, validates it, and calls the mongodb insertion function to insert it
+    Returns True if all OK; False if NOK
+    """
+
+    if data == None:
+        data = {}
+
+    logger.info(
+        "Agent data received and now being uploaded to the DB...")
+
+    result = insert_in_mongodb_collection(collection, data)
+
+    logger.info("Agent data upload to the DB finished.")
+
+    return result
 
 
 def create_or_update_agent_configs(collection, agent_uid=None, config_dict=None, orig_ip="127.0.0.1", convert_to_string=True):

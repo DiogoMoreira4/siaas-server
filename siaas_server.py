@@ -24,6 +24,7 @@ SWAGGER_JSON_URL = "/static/swagger_siaas_server.json"
 SWAGGER_APP_NAME = "SIAAS Server"
 
 DB_COLLECTION_OBJ = None
+DB_ZAP_COLLECTION_OBJ = None
 
 
 def get_db_collection():
@@ -32,6 +33,11 @@ def get_db_collection():
     """
     return DB_COLLECTION_OBJ
 
+def get_db_collection_zap():
+    """
+    Returns the MongoDB ZAP collection object
+    """
+    return DB_ZAP_COLLECTION_OBJ
 
 if __name__ == "__main__":
 

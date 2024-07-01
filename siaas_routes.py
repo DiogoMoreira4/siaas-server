@@ -2,7 +2,7 @@
 # Server - API routes
 # By João Pedro Seara, 2022-2024
 
-from __main__ import app, get_db_collection
+from __main__ import app, get_db_collection, get_db_collection_zap
 from flask import jsonify, request
 import siaas_aux
 
@@ -447,3 +447,74 @@ def agents_history_id(agent_uid):
             'time': siaas_aux.get_now_utc_str()
         }
     ), ret_code
+    
+
+    
+@app.route('/siaas-server/siaas-zap', methods=['GET'], strict_slashes=False)
+def siaas_zap():
+    """
+    Server API route - Siaas ZAP
+    """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    ret_code = 200
+    output = {
+        'name': 'Intelligent System for Automation of Security Audits (SIAAS) - SIAAS ZAP',
+        'module': 'Server',
+        'api': SIAAS_API,
+        'author': 'Diogo da Silva Moreira',
+        'supervisor': 'Carlos Serrão',
+    }
+    return jsonify(
+        {
+            'output': output,
+            'status': 'success',
+            'time': siaas_aux.get_now_utc_str()
+        }
+    ), ret_code
+    
+
+
+        
+@app.route('/siaas-server/siaas-zap/results', methods=['GET', 'POST'], strict_slashes=False)
+def get_zap_results():
+    """
+    Server API route - agents published configs (specific UIDs, comma-separated)
+    """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    ret_code = 200
+    collection_zap = get_db_collection_zap()
+    if request.method == 'GET':
+        output = list(collection_zap.find({}, {'_id': 0}))
+        if type(output) == bool and output == False:
+            status = "failure"
+            ret_code = 500
+            output = {}
+        else:
+            status = "success"
+        return jsonify(
+            {
+                'output': output,
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        ), ret_code
+    if request.method == 'POST':
+        content = request.json
+        output = siaas_aux.upload_zap_data(collection_zap, content, ip)
+        if output:
+            status = "success"
+        else:
+            status = "failure"
+            ret_code = 500
+        return jsonify(
+            {
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        ), ret_code
