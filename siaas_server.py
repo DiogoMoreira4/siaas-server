@@ -142,7 +142,7 @@ if __name__ == "__main__":
     else:
         mongo_host_port = MONGO_HOST
     DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
-    DB_ZAP_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+    DB_ZAP_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_ZAP_COLLECTION)
 
     # Check if DB is alive
     if not siaas_aux.mongodb_ping(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION):
