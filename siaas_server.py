@@ -109,6 +109,8 @@ if __name__ == "__main__":
             MONGO_DB = config_dict[config_name]
         if config_name.upper() == "MONGO_COLLECTION":
             MONGO_COLLECTION = config_dict[config_name]
+        if config_name.upper() == "MONGO_ZAP_COLLECTION":
+            MONGO_ZAP_COLLECTION = config_dict[config_name]
 
     # Define logging level according to user config
     os.makedirs(os.path.join(sys.path[0], LOG_DIR), exist_ok=True)
@@ -139,8 +141,8 @@ if __name__ == "__main__":
         mongo_host_port = MONGO_HOST+":"+MONGO_PORT
     else:
         mongo_host_port = MONGO_HOST
-    DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(
-        MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+    DB_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
+    DB_ZAP_COLLECTION_OBJ = siaas_aux.connect_mongodb_collection(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION)
 
     # Check if DB is alive
     if not siaas_aux.mongodb_ping(MONGO_USER, MONGO_PWD, mongo_host_port, MONGO_DB, MONGO_COLLECTION):

@@ -463,7 +463,7 @@ def siaas_zap():
     output = {
         'name': 'Intelligent System for Automation of Security Audits (SIAAS) - SIAAS ZAP',
         'module': 'Server',
-        'api': SIAAS_API,
+        'VERSION': SIAAS_VERSION,
         'author': 'Diogo da Silva Moreira',
         'supervisor': 'Carlos Serrão',
     }
