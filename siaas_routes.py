@@ -4,12 +4,17 @@
 
 from __main__ import app, get_db_collection, get_db_collection_zap
 from flask import jsonify, request
+import configparser, os
 import siaas_aux
+
 
 SIAAS_VERSION = "1.0.1"
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSON_SORT_KEYS'] = False
+
+config = configparser.ConfigParser()
+config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'conf', 'zap_config.ini'))
 
 
 @app.route('/', strict_slashes=False)
@@ -476,8 +481,58 @@ def siaas_zap():
     ), ret_code
     
 
+@app.route('/siaas-server/siaas-zap/config', methods=['GET'], strict_slashes=False)
+def get_zap_config():
+    """
+    Server API route - Siaas ZAP
+    """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    ret_code = 200
 
+    config_dict = {section: dict(config.items(section)) for section in config.sections()}
+    return jsonify(config_dict), ret_code
         
+        
+        
+@app.route('/siaas-server/siaas-zap/config/<section>', methods=['GET', 'POST'], strict_slashes=False)
+def configure_zap_config_section(section):
+    """
+    Server API route - Siaas ZAP
+    """
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    ret_code = 200
+    
+    if request.method == 'GET':
+        if section in config:
+            return jsonify({section: dict(config.items(section))}), ret_code
+        else:
+            return jsonify({"error": "Section not found"}), 404
+        
+        
+    if request.method == 'POST':
+        content = request.json
+        if section not in config:
+            config.add_section(section)
+            
+        for key, value in content.items():
+            config.set(section, key, str(value))
+            
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'conf', 'zap_config.ini')
+        try:    
+            with open(file_path, 'w') as configfile:
+                config.write(configfile)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+            
+        return jsonify({"message": "Configuration updated successfully"}), ret_code
+    
+    
 @app.route('/siaas-server/siaas-zap/results', methods=['GET', 'POST'], strict_slashes=False)
 def get_zap_results():
     """
