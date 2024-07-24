@@ -573,3 +573,37 @@ def get_zap_results():
                 'time': siaas_aux.get_now_utc_str()
             }
         ), ret_code
+        
+@app.route('/siaas-server/siaas-zap/results/<target>', methods=['GET'], strict_slashes=False)
+def get_zap_results_by_target(target):
+    """
+    Server API route - agents published configs (specific UIDs, comma-separated)
+    """
+    risk = request.args.get('risk')
+    
+    if request.headers.getlist("X-Forwarded-For"):
+        ip = request.headers.getlist("X-Forwarded-For")[0]
+    else:
+        ip = request.remote_addr
+    ret_code = 200
+    collection_zap = get_db_collection_zap()
+    if request.method == 'GET':
+        output = collection_zap.find_one({"target": target}, {'_id': 0})
+        if risk:
+            filtered_alerts = [alert for alert in output['alerts'] if alert['risk'] == risk]
+            output['alerts'] = filtered_alerts
+        
+        if type(output) == bool and output == False:
+            status = "failure"
+            ret_code = 500
+            output = {}
+        else:
+            status = "success"
+        return jsonify(
+            {
+                'output': output,
+                'status': status,
+                'time': siaas_aux.get_now_utc_str()
+            }
+        ), ret_code
+
