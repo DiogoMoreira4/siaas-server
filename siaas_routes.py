@@ -590,7 +590,8 @@ def get_zap_results_by_target(target):
     if request.method == 'GET':
         output = collection_zap.find_one({"target": target}, {'_id': 0})
         if risk:
-            filtered_alerts = [alert for alert in output['alerts'] if alert['risk'] == risk]
+            risks = risk.split(',')
+            filtered_alerts = [alert for alert in output['alerts'] if alert['risk'] in risks]
             output['alerts'] = filtered_alerts
         
         if type(output) == bool and output == False:
