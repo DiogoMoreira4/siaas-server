@@ -573,8 +573,9 @@ def get_zap_results():
                 'time': siaas_aux.get_now_utc_str()
             }
         ), ret_code
+    
         
-@app.route('/siaas-server/siaas-zap/results/<target>', methods=['GET'], strict_slashes=False)
+@app.route('/siaas-server/siaas-zap/results/<target>', methods=['GET', 'DELETE'], strict_slashes=False)
 def get_zap_results_by_target(target):
     """
     Server API route - agents published configs (specific UIDs, comma-separated)
@@ -605,6 +606,25 @@ def get_zap_results_by_target(target):
                 'output': output,
                 'status': status,
                 'time': siaas_aux.get_now_utc_str()
+            }
+        ), ret_code
+    if request.method == 'DELETE':
+        try:
+            result = collection_zap.delete_one({"target": target})
+            if result.deleted_count == 1:
+                status = "success"
+                ret_code = 200
+            else:
+                status = "failure"
+                ret_code = 404
+                return jsonify({"status": status, "message": "Target not found"}), ret_code
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)}), 500
+
+        return jsonify(
+            {
+                "status": status,
+                "message": "Target deleted successfully"
             }
         ), ret_code
 
